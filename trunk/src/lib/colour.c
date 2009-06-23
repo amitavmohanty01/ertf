@@ -1,13 +1,39 @@
 #include "colour.h"
 #include <stdlib.h>
 #include <string.h>
+
 static int ertf_colour_add(FILE *);
+/*
+ * This function creates a colour table for an rtf file. It returns 1 upon 
+ * success and 0 in case of failure.
+ */
 int ertf_colortbl(FILE *fp){
   int c;
+  // initialize eina array module
+  if(!eina_array_init()){
+    fprintf(stderr, "Error during initialization of eina error module.\n");
+    return 0;
+  }
+
+  // create an eina array
+  colour_table=eina_array_new(7);
+  if(!colour_table){
+    eina_array_shutdown();
+    // In case of success, the eina array module shall be shut down by ertf
+    // clean up functions when the app is closed.
+    return 0;
+  }
+
+  // ready to parse the colour table now
   while((c=fgetc(fp))!=EOF){
     switch(c){
-    case ';':// indicates default font
+      COLOUR *node;
+    case ';':// indicates default colour
+      node=(COLOUR *)malloc(sizeof(COLOUR));
+      // todo: assign default RGB values to this node
+      eina_array_push(colour_table, node);
       break;
+
     case '\\':
       ungetc(c, fp);
       if(ertf_colour_add(fp))
@@ -15,8 +41,10 @@ int ertf_colortbl(FILE *fp){
       else
 	fprintf(stderr, "colortbl: Ill-formed rtf\n");
       break;
+
     case '}':// end of colour table
       return 1;
+
     default:
       fprintf(stderr, "colortbl: Ill-formed rtf");
       return 0;
@@ -26,12 +54,12 @@ int ertf_colortbl(FILE *fp){
   return 0;
 }
 /*
- * This functions adds an entry to the colour table. It returns 1 on success and
+ * This function adds an entry to the colour table. It returns 1 on success and
  * 0 in case of failure.
  */
 static int ertf_colour_add(FILE *fp){
   char colour[7];
-  char index;
+  int index;
   COLOUR *node=(COLOUR *)malloc(sizeof(COLOUR));
   int c;
   while((c=fgetc(fp))!=EOF){
@@ -53,9 +81,10 @@ static int ertf_colour_add(FILE *fp){
 	fprintf(stderr, "Warning: skipped tag \"%s\".\n", colour);
       break;
     case ';':// todo: add the entry to a eina array or list as appropriate
+      eina_array_push(colour_table, node);
       return 1;
     default:
-      fprintf(stderr, "Ill-formed rtf file.\n");
+      fprintf(stderr, "ertf_colour_add: Ill-formed rtf file.\n");
       goto err;
     }    
   }
