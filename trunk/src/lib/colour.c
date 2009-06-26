@@ -7,7 +7,7 @@ static int ertf_colour_add(FILE *);
  * This function creates a colour table for an rtf file. It returns 1 upon 
  * success and 0 in case of failure.
  */
-int ertf_colortbl(FILE *fp){
+int ertf_colour_table(FILE *fp){
   int c;
   // initialize eina array module
   if(!eina_array_init()){
