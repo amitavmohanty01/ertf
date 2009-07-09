@@ -41,8 +41,14 @@ int ertf_stylesheet_parse(FILE *fp){
     case '}':// end of stylesheets
       return 1;// successful return
 
+    case '\n':// todo: check whether newline character is a valid delimiter?
+      // the spec doesn't mention so as far as I know.
+      // The issue came up during debugging and I am just skipping it as of now.
+      // Seeing the rtf file, that is what I interpret it to be.
+      break;
+
     default:
-      fprintf(stderr, "ertf_stylesheet_parse: invalid character.\n");
+      fprintf(stderr, "ertf_stylesheet_parse: invalid character `%c'.\n", c);
       return 0;
     }
   }
@@ -134,25 +140,29 @@ static int ertf_stylesheet_add(FILE *fp){
 	  if(feof(fp)){
 	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading font number");
 	    goto error;
-	  }else if(strcmp(buf+1, "s")==0){
-	    fscanf(fp, "%u", &style->font_size);
-	  }else{// unrecognised/unsupported tag
-	    // todo: check if NOR conversion simplifies it
-	    while((c=fgetc(fp))!= EOF  && c != '\\')
-	      ;
-	    if(c == EOF){
-	      fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
-	      goto error;
-	    }else if (c=='\\'){
-	      ungetc(c, fp);
-	    }
 	  }
-	}
+	}else if(strcmp(buf+1, "s")==0){
+	  fscanf(fp, "%u", &style->font_size);
+	  if(feof(fp)){
+	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading font number");
+	    goto error;
+	  }
+	}else{// unrecognised/unsupported tag
+	  // todo: check if NOR conversion simplifies it
+	  while((c=fgetc(fp))!= EOF  && c != '\\')
+	    ;
+	  if(c == EOF){
+	    fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
+	    goto error;
+	  }else if (c=='\\'){
+	    ungetc(c, fp);
+	  }
+	}	
 	break;
 
       default:// skip unrecognised/unsupported control word
 	// todo: check if NOR conversion simplifies it
-	while((c=fgetc(fp))!= EOF  && c != '\\' && !isdigit(c))
+	while((c=fgetc(fp))!= EOF  && c != '\\')
 	  ;
 	if(c == EOF){
 	  fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
@@ -187,7 +197,7 @@ static int ertf_stylesheet_add(FILE *fp){
       break;
 
     default:
-      fprintf(stderr, "ertf_stylesheet_add: unrecognised control character '%c'.\n", c);
+      fprintf(stderr, "ertf_stylesheet_add: unrecognised control character `%c'.\n", c);
       goto error;
     }
   }
