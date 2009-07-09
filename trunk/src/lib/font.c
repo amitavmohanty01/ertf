@@ -71,8 +71,10 @@ static int ertf_font_add(FILE *fp){
     switch(c){
     case '\\': //encountered a control word      
       fscanf(fp, "%[^ 0123456789]", buf);
-      if(feof(fp))
+      if(feof(fp)){
 	fprintf(stderr, "ertf_font_add: Ill-formed rtf.\n");
+	goto error;
+      }
       if(strcmp(buf, "f")==0){
 	fscanf(fp, "%d",&node->number);
       }else if(strcmp(buf, "fRoman")==0){
@@ -92,7 +94,7 @@ static int ertf_font_add(FILE *fp){
 	// todo: after the multiple occurence check, the font family checks can
 	// be modified to be done only once and rather have a bitwise check
 	// run each time
-      }else{// unrecognised or unsupported tag
+      }else{// skip unrecognised or unsupported tag
 	while((c=fgetc(fp))!= EOF  && c != '\\' && !isdigit(c))
 	  ;
 	if(c == EOF){
