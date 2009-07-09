@@ -96,8 +96,57 @@ static int ertf_stylesheet_add(FILE *fp){
       case 's':
 	if(buf[1] == '\0'){
 	  // read font number
-	  fscanf(fp, "%d", &style->font_number);	 
+	  fscanf(fp, "%d", &style->style_number);
+	  if(feof(fp)){
+	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading stylesheet number");
+	    goto error;
+	  }
 	}else if (strcmp(buf+1,"basedon")==0){
+	  fscanf(fp, "%d", &c);
+	  if(feof(fp)){
+	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading style number");
+	    goto error;
+	  }
+	  //todo: copy relevant parts of the style
+	}else if (strcmp(buf+1, "next")==0){
+	  fscanf(fp, "%d", &c);
+	  if(feof(fp)){
+	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading paragraph number");
+	    goto error;
+	  }
+	  // todo: set relevant paragraphs for the style
+	}else{// unrecognised/unsupported tag
+	  // todo: check if NOR conversion simplifies it
+	  while((c=fgetc(fp))!= EOF  && c != '\\')
+	    ;
+	  if(c == EOF){
+	    fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
+	    goto error;
+	  }else if (c=='\\'){
+	    ungetc(c, fp);
+	  }
+	}
+	break;
+
+      case 'f':
+	if(buf[1] == '\0'){
+	  fscanf(fp, "%u", &style->font_number);
+	  if(feof(fp)){
+	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading font number");
+	    goto error;
+	  }else if(strcmp(buf+1, "s")==0){
+	    fscanf(fp, "%u", &style->font_size);
+	  }else{// unrecognised/unsupported tag
+	    // todo: check if NOR conversion simplifies it
+	    while((c=fgetc(fp))!= EOF  && c != '\\')
+	      ;
+	    if(c == EOF){
+	      fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
+	      goto error;
+	    }else if (c=='\\'){
+	      ungetc(c, fp);
+	    }
+	  }
 	}
 	break;
 
@@ -114,7 +163,15 @@ static int ertf_stylesheet_add(FILE *fp){
       }
       break;
 
+      // parse group
     case '{':
+      // todo: check if NOR conversion simplifies it
+      while((c=fgetc(fp))!= EOF  && c != '}')
+	;
+      if(c == EOF){
+	fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised group\n");
+	goto error;
+      }
       break;
 
     case ';':// end of style
