@@ -71,6 +71,7 @@ static int ertf_font_add(FILE *fp){
     switch(c){
     case '\\': //encountered a control word      
       fscanf(fp, "%[^ 0123456789]", buf);
+      // todo: replace by CHECK_EOF(fp, "...", goto error)
       if(feof(fp)){
 	fprintf(stderr, "ertf_font_add: Ill-formed rtf.\n");
 	goto error;
