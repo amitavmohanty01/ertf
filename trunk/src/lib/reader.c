@@ -4,6 +4,7 @@
 #include "summary.h"
 #include "stylesheet.h"
 #include "GUI.h"
+#include "rtf_to_markup.h"
 #include <string.h>
 //#define NDEBUG
 #include <assert.h>
@@ -86,7 +87,7 @@ void readloop(){
       fscanf(fstream, "%[^ {\\;0123456789]", control_word);
       // Interestingly, a semi-colon delimits the "\colortbl" keyword sometimes
 
-      CHECK_EOF(fstream, "readloop: EOF encountered.\n", return)
+      CHECK_EOF(fstream, "readloop: EOF encountered.\n", return);
 
       if(strcmp(control_word, "fonttbl")==0){
 	if(ertf_font_table(fstream)){
