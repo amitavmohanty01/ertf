@@ -1,4 +1,5 @@
 #include "stylesheet.h"
+#include "input.h"
 #include "colour.h"
 #include <stdlib.h>
 #include <string.h>
@@ -73,11 +74,7 @@ static int ertf_stylesheet_add(FILE *fp){
     case '\\':// get the control word
       fscanf(fp, "%[^ 0123456789\\]", buf);
       // read until a delimiter is encountered
-
-      if(feof(fp)){
-	fprintf(stderr, "ertf_stylesheet_add: Ill-formed rtf.\n");
-	goto error;
-      }
+      CHECK_EOF(fp, "ertf_stylesheet_add: Ill-formed rtf.\n", goto error);
 
       // todo: use pattern matching technique / hashing and benchmark them
       // to decide the optimal alternative to the if-else ladder
