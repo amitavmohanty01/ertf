@@ -1,4 +1,5 @@
 #include "font.h"
+#include "input.h"
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -71,11 +72,8 @@ static int ertf_font_add(FILE *fp){
     switch(c){
     case '\\': //encountered a control word      
       fscanf(fp, "%[^ 0123456789]", buf);
-      // todo: replace by CHECK_EOF(fp, "...", goto error)
-      if(feof(fp)){
-	fprintf(stderr, "ertf_font_add: Ill-formed rtf.\n");
-	goto error;
-      }
+      CHECK_EOF(fp, "ertf_fond_add: Ill-formed rtf.\n", goto error);
+
       if(strcmp(buf, "f")==0){
 	fscanf(fp, "%d",&node->number);
       }else if(strcmp(buf, "fRoman")==0){
@@ -108,10 +106,7 @@ static int ertf_font_add(FILE *fp){
       break;
 
     case ' ':fscanf(fp, "%[^;]", node->name);
-      if(feof(fp)){
-	fprintf(stderr, "ertf_font_add: end of file encountered while reading font name.\n");
-	goto error;
-      }
+      CHECK_EOF(fp, "ertf_font_add: end of file encountered while reading font name. \n", goto error);
       break;
 
     case';':// end of font entry
