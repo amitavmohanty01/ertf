@@ -4,5 +4,5 @@
 /*
  * This enables cleaner EOF checking.
  */
-#define CHECK_EOF(STREAM, MESSAGE, RECOVERY) if(feof(STREAM)){fprintf(stderr, MESSAGE);RECOVERY;}
+#define CHECK_EOF(STREAM, MESSAGE, RECOVERY); if(feof(STREAM)){fprintf(stderr, MESSAGE);RECOVERY;}
 #endif
