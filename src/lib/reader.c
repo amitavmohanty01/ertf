@@ -89,6 +89,7 @@ void readloop(){
 
       CHECK_EOF(fstream, "readloop: EOF encountered.\n", return);
 
+      /* font table */
       if(strcmp(control_word, "fonttbl")==0){
 	if(ertf_font_table(fstream)){
 	  // todo: check for success from return value
@@ -96,21 +97,33 @@ void readloop(){
 	  bracecount--;
 	}else
 	  printf("failure in creating font table.\n");
+
+	/* colour table */
       }else if(strcmp(control_word, "colortbl")==0){
 	if(ertf_colour_table(fstream)){
-	  // todo: check for success from return value
 	  printf("Successfully created colour table.\n");
 	  bracecount--;
 	}else
 	  printf("failure in creating colour table.\n");
+
+	/* stylesheet */
       }else if(strcmp(control_word, "stylesheet")==0){
 	if(ertf_stylesheet_parse(fstream)){
-	  // todo: check for success from return value
 	  printf("Successfully created stylesheet table.\n");
 	  bracecount--;
 	}else
 	  printf("failure in creating stylesheet table.\n");
       }
+
+	/* paragraph */
+      else if(strcmp(control_word, "pard")==0){
+	if(ertf_paragraph_translate(fstream)){
+	  printf("Successfully parsed a paragraph.\n");
+	  bracecount--;
+	}else
+	  printf("failure parsing parapgraph.\n");
+      }
+
       break;
 
     default://write c
