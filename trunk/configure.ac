@@ -1,4 +1,4 @@
-AC_INIT([evil], [0.0.1], [enlightenment-devel@lists.sourceforge.net])
+AC_INIT([ertf], [0.0.1], [enlightenment-devel@lists.sourceforge.net])
 AC_PREREQ([2.52])
 AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_MACRO_DIR([m4])
