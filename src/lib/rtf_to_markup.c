@@ -2,15 +2,12 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "input.h"
+
 int ertf_paragraph_translate(FILE *);
 static int ertf_group_translate(FILE *, int);
 
   // \plain is ignored and the text part is copied as markup and evas
   // textblock uses the style set by default
-
-  // \b transaltes to ?
-
-  // \caps translates to touppercase() on the text part that follows
 
   // todo: \deleted not implemented in the initial version
 
@@ -42,10 +39,8 @@ int ertf_paragraph_translate(FILE *fp){
       /* get control word */
     case '\\':
       fscanf(fp, "%[^ 0123456789\\{]", buf);
-      CHECK_EOF(fp, "ertf_paragraph_transalte: end-of-file encountered while "
+      CHECK_EOF(fp, "ertf_paragraph_translate: end-of-file encountered while "
 		"retrieving control word.\n", return 0);
-
-      // todo: process the control word
 
       /* reset to default character formatting */
       if(strcmp(buf, "plain")==0){
@@ -66,6 +61,13 @@ int ertf_paragraph_translate(FILE *fp){
 
       /* unsupported/unrecognised control tag */
       else{
+	fprintf(stderr, "Skipped control tag `%s'\n", buf);
+
+	/* read till next delimiter */
+	while((c=fgetc(fp))!='\\' && c != ' ' && c!='{')
+	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF reached while skipping"
+		    " control info.\n", return 0);
+	ungetc(c, fp);
       }
 
       break;
@@ -78,9 +80,14 @@ int ertf_paragraph_translate(FILE *fp){
       break;
 
     default:
-      fprintf(stderr, "ertf_paragraph_translate: unrecognised control character `%c'\n", c);
+      fprintf(stderr, "ertf_paragraph_translate: unrecognised control"
+	      " character `%c'\n", c);
+
     }
   }
+  fprintf(stderr, "ertf_paragraph_translate: EOF encountered while looping for"
+	  " control word.\n");
+  return 0;
 }
 
 // align = 0 for left and 1 for right
@@ -114,15 +121,26 @@ static int ertf_group_translate(FILE *fp, int align){
 
       /* italicized text */
       else if(strcmp(buf, "i")==0){
+	if(!isdigit(c=fgetc(fp)))
+	  ungetc(c, fp);
+	CHECK_EOF(fp, "ertf_group_translate: EOF encountered while checking for italicisation.\n", return 0);
 	// todo: find relevant markup
       }
 
       /* bold text */
       else if(strcmp(buf, "b")==0){
+	if(!isdigit(c=fgetc(fp)))
+	  ungetc(c, fp);
+	CHECK_EOF(fp, "ertf_group_translate: EOF encountered while checking for bold text.\n", return 0);
+	// todo: find relevant markup
       }
 
       /* font entry number */
       else if(strcmp(buf, "f")==0){
+	if(!isdigit(c=fgetc(fp)))
+	  ungetc(c, fp);
+	CHECK_EOF(fp, "ertf_group_translate: EOF encountered while checking for bold text.\n", return 0);
+	// todo: find relevant markup
       }
 
       /* underline */
@@ -153,13 +171,20 @@ static int ertf_group_translate(FILE *fp, int align){
 
       /* unrecognised/unsupported control word */
       else{
-	fprintf(stderr, "Skipped control tag `%s'\n", buf);
+	fprintf(stderr, "ertf_group_translate: Skipped control tag `%s'\n", buf);
+
+	/* read till next delimiter */
+	while((c=fgetc(fp))!='\\' && c != ' ' && c!='{')
+	  CHECK_EOF(fp, "ertf_group_translate: EOF reached while skipping control info.\n", return 0);
+	ungetc(c, fp);
       }
 
       break;
 
       /* handle nested group */
     case '{':
+      if(!ertf_group_translate(fp, align))
+	return 0;
       break;
 
       /* end of group */
@@ -181,11 +206,9 @@ static int ertf_group_translate(FILE *fp, int align){
     }
   }
 
-  if(c== EOF){
-    fprintf(stderr, "ertf_group_translate: End-of-file reached \n");
-
-    // todo: confirm if this should return one and complete the string
-    // todo: may be keep partial rendering optional
-    return 0;
-  }
+  fprintf(stderr, "ertf_group_translate: End-of-file reached \n");
+  // todo: confirm if this should return one and complete the string
+  // todo: may be keep partial rendering optional
+  return 0;
+  
 }

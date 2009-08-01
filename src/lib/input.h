@@ -5,4 +5,5 @@
  * This enables cleaner EOF checking.
  */
 #define CHECK_EOF(STREAM, MESSAGE, RECOVERY); if(feof(STREAM)){fprintf(stderr, MESSAGE);RECOVERY;}
+char markup[1024];
 #endif
