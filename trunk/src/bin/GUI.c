@@ -1,4 +1,5 @@
 #include "GUI.h"
+#include "input.h"
 #include <stdlib.h>
 #include <Evas.h>
 #include <Ecore.h>
@@ -56,9 +57,7 @@ int init_gui(){
   evas_object_textblock_style_set(textblock, st);
   evas_textblock_style_free(st);
   evas_object_textblock_clear(textblock);
-  evas_object_textblock_text_markup_set(textblock,
-				           "<center><h1>ERTF</h1></center><br>"
-					);
+  evas_object_textblock_text_markup_set(textblock, markup);
   evas_object_move(textblock, 0, 0);
   evas_object_resize(textblock, 800, 600);
   evas_object_show(textblock);
