@@ -31,6 +31,9 @@ int ertf_paragraph_translate(FILE *fp){
   char buf[12];
 
   printf("<p>");
+  strcpy(markup+ertf_markup_position, "<p>");
+  ertf_markup_position+=3;
+
   while((c=fgetc(fp))!=EOF){
     switch(c){
     case '\n':// ignore it
@@ -56,6 +59,9 @@ int ertf_paragraph_translate(FILE *fp){
       else if(strcmp(buf, "par")==0){
 	// todo: ensure that </p> is defined in style string
 	printf("</p>");
+
+	strcpy(markup+ertf_markup_position, "</p>");
+	ertf_markup_position+=4;
 	return 1;
       }
 
@@ -82,7 +88,6 @@ int ertf_paragraph_translate(FILE *fp){
     default:
       fprintf(stderr, "ertf_paragraph_translate: unrecognised control"
 	      " character `%c'\n", c);
-
     }
   }
   fprintf(stderr, "ertf_paragraph_translate: EOF encountered while looping for"
@@ -106,17 +111,21 @@ static int ertf_group_translate(FILE *fp, int align){
       if(strcmp(buf, "rtlch")==0){
 	// todo: either insert align=right in markup or in a style
 	printf("<right>");
+
+	strcpy(markup+ertf_markup_position, "<right>");
+	ertf_markup_position+=7;
+
 	if(!ertf_group_translate(fp, 1))
 	  return 0;
 	printf("</right>");
+
+	strcpy(markup+ertf_markup_position, "</right>");
+	ertf_markup_position+=8;
       }
 
       /* left aligned text */
-      else if(strcmp(buf, "ltrch")==0){
-	if(align)
-	  return 1;
-	else
-	  continue;
+      else if(strcmp(buf, "ltrch")==0 && align){
+	return 1;	
       }
 
       /* italicized text */
@@ -147,10 +156,14 @@ static int ertf_group_translate(FILE *fp, int align){
       else if(strcmp(buf, "ul")==0){
 	// todo: check if underline colour needs to be specified
 	printf("<underline=on>");
+
+	strcpy(markup+ertf_markup_position, "<underline=on>");
+	ertf_markup_position+=14;
 	if(!ertf_group_translate(fp, align))
 	  return 0;
 	printf("</>");
-
+	strcpy(markup+ertf_markup_position, "</>");
+	ertf_markup_position+=3;
       }
       
       /* font size */
@@ -158,15 +171,27 @@ static int ertf_group_translate(FILE *fp, int align){
 	/* use the digit character instead of reading an int and converting it back to character for markup */
 
 	printf("<font_size=");
+
+	strcpy(markup+ertf_markup_position, "<font_size=");
+	ertf_markup_position+=11;
 	while(isdigit(c=fgetc(fp))){
 	  CHECK_EOF(fp, "ertf_group_translate: EOF encountered while getting font size.\n", return 0);
 	  printf("%c", c);
+
+	  markup[ertf_markup_position]=c;
+	  ertf_markup_position++;
 	}
 	ungetc(c, fp);
 	printf(">");
+
+	markup[ertf_markup_position]='>';
+	ertf_markup_position++;
 	if(!ertf_group_translate(fp, align))
 	  return 0;
 	printf("</>");
+
+	strcpy(markup+ertf_markup_position, "</>");
+	ertf_markup_position+=3;
       }
 
       /* unrecognised/unsupported control word */
@@ -202,11 +227,12 @@ static int ertf_group_translate(FILE *fp, int align){
 
     default:
       printf("%c", c);
-      fprintf(stderr, "ertf_group_translate: skipping control character `%c'\n", c);
+      markup[ertf_markup_position]=c;
+      ertf_markup_position++;
     }
-  }
+  }// end of while
 
-  fprintf(stderr, "ertf_group_translate: End-of-file reached \n");
+  fprintf(stderr, "ertf_group_translate: End-of-file reached.%d\n", c);
   // todo: confirm if this should return one and complete the string
   // todo: may be keep partial rendering optional
   return 0;

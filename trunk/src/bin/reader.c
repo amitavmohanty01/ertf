@@ -74,6 +74,9 @@ void init_parser(){
 void readloop(){
   int c;
   char control_word[30];
+
+  ertf_markup_position=0;
+
   while((c=getc(fstream))!=EOF){
     //todo:connect c to the required stream to read characters
     switch(c){
@@ -130,6 +133,9 @@ void readloop(){
       ;
     }
   }
+
+  markup[ertf_markup_position]='\0';
+  printf("%d\n", ertf_markup_position);
   // When end-of-file is reached, check if parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
   if(bracecount)
