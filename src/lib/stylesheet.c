@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 static int ertf_stylesheet_add(FILE *);
 int ertf_stylesheet_parse(FILE *fp){
   int c;

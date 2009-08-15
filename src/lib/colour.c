@@ -3,6 +3,7 @@
 #include <string.h>
 
 static int ertf_colour_add(FILE *);
+static void ertf_colour_generate_markup(void);
 /*
  * This function creates a colour table for an rtf file. It returns 1 upon 
  * success and 0 in case of failure.
@@ -47,6 +48,8 @@ int ertf_colour_table(FILE *fp){
       break;
 
     case '}':// end of colour table
+      // generate markup strings for all colours
+      ertf_colour_generate_markup();
       return 1;
 
     default:
@@ -109,4 +112,13 @@ static int ertf_colour_add(FILE *fp){
  err:
   free(node);
   return 0;
+}
+
+static void ertf_colour_generate_markup(void){
+  Eina_Array_Iterator iterator;
+  unsigned int i;
+  COLOUR *node=(COLOUR *)malloc(sizeof(COLOUR));
+  EINA_ARRAY_ITER_NEXT(colour_table, i, node, iterator){
+    sprintf(node->string, "%x%x%xff", node->r, node->g, node->b);
+  }
 }

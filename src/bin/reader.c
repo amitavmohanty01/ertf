@@ -120,9 +120,12 @@ void readloop(){
 
 	/* paragraph */
       else if(strcmp(control_word, "pard")==0){
+	// experimental
+  strcpy(markup+ertf_markup_position, "<p>");
+  ertf_markup_position+=3;
+	// experimental
 	if(ertf_paragraph_translate(fstream)){
 	  printf("Successfully parsed a paragraph.\n");
-	  bracecount--;
 	}else
 	  printf("failure parsing parapgraph.\n");
       }
@@ -135,7 +138,7 @@ void readloop(){
   }
 
   markup[ertf_markup_position]='\0';
-  printf("%d\n", ertf_markup_position);
+  printf("%d\n%s\n", ertf_markup_position, markup);
   // When end-of-file is reached, check if parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
   if(bracecount)
