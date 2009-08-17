@@ -29,7 +29,7 @@ int main(int argc, char **argv){
   if((fstream = fopen(argv[1], "r"))== NULL){
     fprintf(stderr, "Cannot open %s\n", argv[1]);
   }else{
-  // todo: use setvbuf() to properly buffer the stream before reading
+    // todo: use setvbuf() to properly buffer the stream before reading
     init_parser();
     // when the markup is generated, the parser can be shut down
     shutdown_parser();
@@ -76,7 +76,6 @@ void readloop(){
   char control_word[30];
 
   ertf_markup_position=0;
-
   while((c=getc(fstream))!=EOF){
     //todo:connect c to the required stream to read characters
     switch(c){
@@ -118,13 +117,11 @@ void readloop(){
 	  printf("failure in creating stylesheet table.\n");
       }
 
-	/* paragraph */
-      else if(strcmp(control_word, "pard")==0){
-	// experimental
-  strcpy(markup+ertf_markup_position, "<p>");
-  ertf_markup_position+=3;
-	// experimental
-	if(ertf_paragraph_translate(fstream)){
+      /* paragraph */
+      else if(strcmp(control_word, "pard")==0){	
+	strcpy(markup+ertf_markup_position, "<p>");
+	ertf_markup_position+=3;	
+	if(ertf_paragraph_translate(fstream, 0)){
 	  printf("Successfully parsed a paragraph.\n");
 	}else
 	  printf("failure parsing parapgraph.\n");
@@ -132,8 +129,8 @@ void readloop(){
 
       break;
 
-    default://write c
-      ;
+    default:
+      fprintf(stderr, "readloop: skipped control char `%c'\n", c);
     }
   }
 
@@ -144,7 +141,6 @@ void readloop(){
   if(bracecount)
     fprintf(stderr, "readloop: Ill-formed rtf - inconsistent use of braces.\n");
 }
-
 
 int shutdown_parser(){
   // todo: close the file stream
