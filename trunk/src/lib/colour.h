@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <eina_array.h>
 typedef struct colour{
-  char r,g,b;
+  unsigned char r,g,b;
   char string[9];
 }COLOUR;
 int ertf_colour_table(FILE *);
