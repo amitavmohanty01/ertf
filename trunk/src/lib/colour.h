@@ -1,11 +1,21 @@
-#ifndef COLOUR_H
-#define COLOUR_H
+#ifndef ERTF_COLOR_H_
+#define ERTF_COLOR_H_
+
+
 #include <stdio.h>
+
 #include <eina_array.h>
-typedef struct colour{
-  unsigned char r,g,b;
+
+typedef struct Ertf_Color{
   char string[9];
-}COLOUR;
-int ertf_colour_table(FILE *);
-Eina_Array *colour_table;
-#endif
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+} Ertf_Color;
+
+int ertf_color_table(FILE *);
+
+Eina_Array *color_table;
+
+
+#endif /* ERTF_COLOR_H_ */

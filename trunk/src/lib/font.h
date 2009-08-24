@@ -1,7 +1,10 @@
-#ifndef FONT_H
-#define FONT_H
+#ifndef ERTF_FONT_H_
+#define ERTF_FONT_H_
+
+
 #include <stdio.h>
 #include <eina_array.h>
+
 /*
  * Supported font families:
  * 1. Roman
@@ -11,12 +14,17 @@
  * 5. decor
  * 6. tech
  */
-typedef struct font_node{
-  int number;
+
+typedef struct Ertf_Font_Node{
+  char name[20];
   char family[7];
+  int number;
   // todo: a font family name may be replaced by an eina string share
-  char name[20];  
-}FONT;
+} Ertf_Font_Node;
+
 Eina_Array *font_table;
+
 int ertf_font_table(FILE *);
-#endif
+
+
+#endif /* ERTF_FONT_H_ */

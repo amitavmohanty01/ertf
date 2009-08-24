@@ -1,40 +1,51 @@
-#include "stylesheet.h"
-#include "input.h"
-#include "colour.h"
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
-static int ertf_stylesheet_add(FILE *);
-int ertf_stylesheet_parse(FILE *fp){
+#include "stylesheet.h"
+#include "input.h"
+#include "colour.h"
+
+
+static int _ertf_stylesheet_add(FILE *);
+
+
+int ertf_stylesheet_parse(FILE *fp)
+{
   int c;
 
   // todo: remove debug msg
   printf("Inside stylesheet parser.\n");
 
   // initialize eina array module
-  if(!eina_array_init()){
+  if (!eina_array_init())
+  {
     fprintf(stderr, "Error during initialization of eina error module.\n");
     return 0;
   }
 
   // create an eina array
-  stylesheet_table=eina_array_new(7);
-  if(!stylesheet_table){
+  stylesheet_table = eina_array_new(7);
+  if (!stylesheet_table)
+  {
     eina_array_shutdown();
     // In case of success, the eina array module shall be shut down by ertf
     // clean up functions when the app is closed.
     return 0;
   }
 
-  while((c=fgetc(fp))!=EOF){
-    switch(c){
+  while ((c = fgetc(fp)) != EOF)
+  {
+    switch (c)
+    {
     case '{':
-      if(!ertf_stylesheet_add(fp)){
+      if (!_ertf_stylesheet_add(fp))
+      {
 	fprintf(stderr, "ertf_stylesheet_parse: Ill-formed rtf.\n");
 	return 0;
       }
-      if((c=fgetc(fp))==EOF || c!='}'){
+      if ((c = fgetc(fp)) == EOF || c!='}')
+      {
 	// end braces for each style is consumed here.
 	goto err_loop;
       }      
@@ -61,17 +72,24 @@ int ertf_stylesheet_parse(FILE *fp){
 }
 
 
-static int ertf_stylesheet_add(FILE *fp){
-  int c;
+static int
+_ertf_stylesheet_add(FILE *fp)
+{
   char buf[12];
-  STYLE *style=(STYLE *)malloc(sizeof(STYLE));
-  unsigned int colour_max = eina_array_count_get(colour_table);
+  int c;
+  Ertf_Stylesheet *style;
+  unsigned int colour_max;
+
+  style = (Ertf_Stylesheet *)malloc(sizeof(Ertf_Stylesheet));
+  colour_max = eina_array_count_get(color_table);
 
   // todo: remove debug msg
   printf("Inside stylesheet entry parser.\n");
 
-  while((c=fgetc(fp))!=EOF){
-    switch(c){
+  while ((c = fgetc(fp)) != EOF)
+  {
+    switch (c)
+    {
     case '\\':// get the control word
       fscanf(fp, "%[^ 0123456789\\]", buf);
       // read until a delimiter is encountered
@@ -79,18 +97,24 @@ static int ertf_stylesheet_add(FILE *fp){
 
       // todo: use pattern matching technique / hashing and benchmark them
       // to decide the optimal alternative to the if-else ladder
-      switch(buf[0]){
+      switch (buf[0])
+      {
       case 'c':
-	if(strcmp(buf+1,"f")==0){
+	if (strcmp(buf + 1,"f") == 0)
+        {
 	  // read the colour table entry number
 	  fscanf(fp, "%u", &style->foreground_colour);
-	  if(style->foreground_colour >= colour_max){
+	  if (style->foreground_colour >= colour_max)
+          {
 	    fprintf(fp, "ertf_stylesheet_add: stylesheet colour not in colour table\n");
 	    goto error;
 	  }
-	}else if(strcmp(buf+1, "b")==0){
+	}
+        else if (strcmp(buf + 1, "b") == 0)
+        {
 	  fscanf(fp, "%u", &style->background_colour);
-	  if(style->background_colour >= colour_max){
+	  if (style->background_colour >= colour_max)
+          {
 	    fprintf(fp, "ertf_stylesheet_add: stylesheet colour not in colour table\n");
 	    goto error;
 	  }
@@ -98,61 +122,86 @@ static int ertf_stylesheet_add(FILE *fp){
 	break;
 
       case 's':
-	if(buf[1] == '\0'){
+	if (buf[1] == '\0')
+        {
 	  // read font number
 	  fscanf(fp, "%d", &style->style_number);
-	  if(feof(fp)){
+	  if (feof(fp))
+          {
 	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading stylesheet number");
 	    goto error;
 	  }
-	}else if (strcmp(buf+1,"basedon")==0){
+	}
+        else if (strcmp(buf + 1,"basedon") == 0)
+        {
 	  fscanf(fp, "%d", &c);
-	  if(feof(fp)){
+	  if (feof(fp))
+          {
 	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading style number");
 	    goto error;
 	  }
 	  //todo: copy relevant parts of the style
-	}else if (strcmp(buf+1, "next")==0){
+	}
+        else if (strcmp(buf + 1, "next") == 0)
+        {
 	  fscanf(fp, "%d", &c);
-	  if(feof(fp)){
+	  if (feof(fp))
+          {
 	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading paragraph number");
 	    goto error;
 	  }
 	  // todo: set relevant paragraphs for the style
-	}else{// unrecognised/unsupported tag
+	}
+        else
+        {
+          // unrecognised/unsupported tag
 	  // todo: check if NOR conversion simplifies it
-	  while((c=fgetc(fp))!= EOF  && c != '\\')
+	  while ((c = fgetc(fp)) != EOF  && c != '\\')
 	    ;
-	  if(c == EOF){
+	  if (c == EOF)
+          {
 	    fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
 	    goto error;
-	  }else if (c=='\\'){
+	  }
+          else if (c == '\\')
+          {
 	    ungetc(c, fp);
 	  }
 	}
 	break;
 
       case 'f':
-	if(buf[1] == '\0'){
+	if (buf[1] == '\0')
+        {
 	  fscanf(fp, "%u", &style->font_number);
-	  if(feof(fp)){
+	  if (feof(fp))
+          {
 	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading font number");
 	    goto error;
 	  }
-	}else if(strcmp(buf+1, "s")==0){
+	}
+        else if (strcmp(buf + 1, "s") == 0)
+        {
 	  fscanf(fp, "%u", &style->font_size);
-	  if(feof(fp)){
+	  if (feof(fp))
+          {
 	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading font number");
 	    goto error;
 	  }
-	}else{// unrecognised/unsupported tag
+	}
+        else
+        {
+          // unrecognised/unsupported tag
 	  // todo: check if NOR conversion simplifies it
-	  while((c=fgetc(fp))!= EOF  && c != '\\')
+	  while ((c = fgetc(fp)) != EOF  && c != '\\')
 	    ;
-	  if(c == EOF){
+	  if (c == EOF)
+          {
 	    fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
 	    goto error;
-	  }else if (c=='\\'){
+	  }
+          else if (c == '\\')
+          {
 	    ungetc(c, fp);
 	  }
 	}	
@@ -160,12 +209,15 @@ static int ertf_stylesheet_add(FILE *fp){
 
       default:// skip unrecognised/unsupported control word
 	// todo: check if NOR conversion simplifies it
-	while((c=fgetc(fp))!= EOF  && c != '\\')
+	while ((c = fgetc(fp)) != EOF  && c != '\\')
 	  ;
-	if(c == EOF){
+	if (c == EOF)
+        {
 	  fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
 	  goto error;
-	}else if (c=='\\'){
+	}
+        else if (c == '\\')
+        {
 	  ungetc(c, fp);
 	}
       }
@@ -174,9 +226,10 @@ static int ertf_stylesheet_add(FILE *fp){
       // parse group
     case '{':
       // todo: check if NOR conversion simplifies it
-      while((c=fgetc(fp))!= EOF  && c != '}')
+      while ((c = fgetc(fp)) != EOF  && c != '}')
 	;
-      if(c == EOF){
+      if(c == EOF)
+      {
 	fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised group\n");
 	goto error;
       }
@@ -188,7 +241,8 @@ static int ertf_stylesheet_add(FILE *fp){
 
     case ' ':// get style name
       fscanf(fp, "%[^;]", style->name);
-      if(feof(fp)){
+      if (feof(fp))
+      {
 	fprintf(stderr, "ertf_stylesheet_add: end of file encountered while reading stylesheet name.\n");
 	goto error;
       }
@@ -202,6 +256,7 @@ static int ertf_stylesheet_add(FILE *fp){
   // end of file is reached
   // todo: remove debug statement in final version
   fprintf(stderr, "ertf_font_add: Ill-formed rtf.\n");
+
  error:
   free(style);
   return 0;
