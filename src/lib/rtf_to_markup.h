@@ -1,4 +1,10 @@
-#ifndef RTF_TO_MARKUP_H
-#define RTF_TO_MARKUP_H
-int ertf_paragraph_translate(FILE *);
+#ifndef ERTF_RTF_TO_MARKUP_H_
+#define ERTF_RTF_TO_MARKUP_H_
+
+#include <stdio.h>
+
+
+int ertf_paragraph_translate(FILE *, int);
+
+
 #endif

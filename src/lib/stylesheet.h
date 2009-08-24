@@ -1,9 +1,18 @@
-#ifndef STYLESHEET_H
-#define STYLESHEET_H
+#ifndef ERTF_STYLESHEET_H_
+#define ERTF_STYLESHEET_H_
+
+
 #include <eina_array.h>
 #include <stdio.h>
+
 Eina_Array *stylesheet_table;
-typedef struct{
+
+typedef struct Ertf_Stylesheet
+{
+  char name[20];
+  // assumption: style names won't be longer than 20 chars
+  // todo: find exceptions to the assumption and frequency of their occurrence
+
   int set;
   // used to check multiple occurence of the same tag and also during generating
   // the style string
@@ -14,15 +23,14 @@ typedef struct{
   unsigned int font_number;
   // indicates entry number in font table
 
-  char name[20];
-  // assumption: style names won't be longer than 20 chars
-  // todo: find exceptions to the assumption and frequency of their occurrence
-
   unsigned int font_size;
   // todo: check what font sizes shall be invalid, i.e. the upper bound
 
   unsigned int foreground_colour;// indicates entry number in colour table
   unsigned int background_colour;// indicates entry number in colour table
-}STYLE;
+} Ertf_Stylesheet;
+
 int ertf_stylesheet_parse(FILE *);
-#endif
+
+
+#endif /* ERTF_STYLESHEET_H_ */

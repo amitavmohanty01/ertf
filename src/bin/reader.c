@@ -1,3 +1,8 @@
+#include <string.h>
+
+//#define NDEBUG
+#include <assert.h>
+
 #include "input.h"
 #include "font.h"
 #include "colour.h"
@@ -5,9 +10,6 @@
 #include "stylesheet.h"
 #include "GUI.h"
 #include "rtf_to_markup.h"
-#include <string.h>
-//#define NDEBUG
-#include <assert.h>
 
 FILE *fstream;
 
@@ -15,7 +17,8 @@ FILE *fstream;
 // decremented when a `}' is encountered. If by the end of the parsing phase,
 // the counter is non-zero, the rtf file is erroneous and a message to displayed
 // to the user.
-int bracecount=0;
+
+int bracecount = 0;
 int default_font_node; // for \deff<N> control word
 int version;
 char charset[6];
@@ -24,11 +27,17 @@ void readloop();
 void init_parser();
 int shutdown_parser();
 
-int main(int argc, char **argv){
+int
+main(int argc, char **argv)
+{
   assert(argc > 1);
-  if((fstream = fopen(argv[1], "r"))== NULL){
+
+  if ((fstream = fopen(argv[1], "r")) == NULL)
+  {
     fprintf(stderr, "Cannot open %s\n", argv[1]);
-  }else{
+  }
+  else
+  {
     // todo: use setvbuf() to properly buffer the stream before reading
     init_parser();
     // when the markup is generated, the parser can be shut down
@@ -40,24 +49,35 @@ int main(int argc, char **argv){
 }
 
 
-void init_parser(){
-  int c;// to allow for EOF
+void
+init_parser()
+{
   char str[5];
+  int c;// to allow for EOF
 
-  if((c=getc(fstream)) == EOF){
+  if ((c = getc(fstream)) == EOF)
+  {
     // todo:display blank textblock for empty file
-  }else if(c!='{'){
+  }
+  else if (c != '{')
+  {
     // An rtf file should start with `{\rtf'
     fprintf(stderr, "invalid rtf file\n");
-  }else if(fscanf(fstream, "%4s", str), strcmp(str, "\\rtf")!=0 ){
-    fprintf(stderr, "rtf version unspecified.\n");
-  }else if((fscanf(fstream, "%d\\%c", &version, &str[0]), str[0] != 'a') &&
+  }
+  else if (fscanf(fstream, "%4s", str), strcmp(str, "\\rtf") != 0 )
+  {
+    fprintf(stderr, "rtf version unspecif ied.\n");
+  }
+  else if ((fscanf(fstream, "%d\\%c", &version, &str[0]), str[0] != 'a') &&
 	   str[0] != 'p' &&
 	   str[0] != 'm'
-	   ){
-    // todo:improve the if condition for full word checking
+	   )
+  {
+    // todo:improve the if  condition for full word checking
     fprintf(stderr, "charset not defined\n");
-  }else{
+  }
+  else
+  {
     //increase brace count
     bracecount++;
 
@@ -71,14 +91,18 @@ void init_parser(){
 }
 
 
-void readloop(){
-  int c;
+void
+readloop()
+{
   char control_word[30];
+  int c;
 
-  ertf_markup_position=0;
-  while((c=getc(fstream))!=EOF){
+  ertf_markup_position = 0;
+  while ((c = getc(fstream)) != EOF)
+  {
     //todo:connect c to the required stream to read characters
-    switch(c){
+    switch (c)
+    {
     case '{':
       bracecount++;
       break;
@@ -92,38 +116,52 @@ void readloop(){
       CHECK_EOF(fstream, "readloop: EOF encountered.\n", return);
 
       /* font table */
-      if(strcmp(control_word, "fonttbl")==0){
-	if(ertf_font_table(fstream)){
+      if (strcmp(control_word, "fonttbl") == 0)
+      {
+	if (ertf_font_table(fstream))
+        {
 	  // todo: check for success from return value
 	  printf("Successfully created font table.\n");
 	  bracecount--;
-	}else
+	}
+        else
 	  printf("failure in creating font table.\n");
 
-	/* colour table */
-      }else if(strcmp(control_word, "colortbl")==0){
-	if(ertf_colour_table(fstream)){
-	  printf("Successfully created colour table.\n");
+	/* color table */
+      }
+      else if (strcmp(control_word, "colortbl") == 0)
+      {
+	if (ertf_color_table(fstream))
+        {
+	  printf("Successfully created color table.\n");
 	  bracecount--;
-	}else
-	  printf("failure in creating colour table.\n");
+	}
+        else
+	  printf("failure in creating color table.\n");
 
 	/* stylesheet */
-      }else if(strcmp(control_word, "stylesheet")==0){
-	if(ertf_stylesheet_parse(fstream)){
+      }
+      else if (strcmp(control_word, "stylesheet") == 0)
+      {
+	if (ertf_stylesheet_parse(fstream))
+        {
 	  printf("Successfully created stylesheet table.\n");
 	  bracecount--;
-	}else
+	}
+        else
 	  printf("failure in creating stylesheet table.\n");
       }
 
       /* paragraph */
-      else if(strcmp(control_word, "pard")==0){	
+      else if (strcmp(control_word, "pard") == 0)
+      {
 	strcpy(markup+ertf_markup_position, "<p>");
-	ertf_markup_position+=3;	
-	if(ertf_paragraph_translate(fstream, 0)){
+	ertf_markup_position += 3;	
+	if (ertf_paragraph_translate(fstream, 0))
+        {
 	  printf("Successfully parsed a paragraph.\n");
-	}else
+	}
+        else
 	  printf("failure parsing parapgraph.\n");
       }
 
@@ -134,27 +172,30 @@ void readloop(){
     }
   }
 
-  markup[ertf_markup_position]='\0';
+  markup[ertf_markup_position] = '\0';
   printf("%d\n%s\n", ertf_markup_position, markup);
-  // When end-of-file is reached, check if parsing is complete. In case,
+  // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
-  if(bracecount)
+  if (bracecount)
     fprintf(stderr, "readloop: Ill-formed rtf - inconsistent use of braces.\n");
 }
 
-int shutdown_parser(){
+int
+shutdown_parser()
+{
   // todo: close the file stream
   fclose(fstream);
-  // free colour tables used by the parser
-  if(colour_table)
-    eina_array_free(colour_table);
-  if(font_table)
+  // free color tables used by the parser
+  if (color_table)
+    eina_array_free(color_table);
+  if (font_table)
     eina_array_free(font_table);
-  if(stylesheet_table)
+  if (stylesheet_table)
     eina_array_free(stylesheet_table);
 
   // shutdown eina array module
-  if(!eina_array_shutdown())
+  if (!eina_array_shutdown())
     return 0;
+
   return 1;
 }

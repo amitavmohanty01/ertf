@@ -1,6 +1,7 @@
-#ifndef SUMMARY_H
-#define SUMMARY_H
-int ertf_summary(FILE *);
+#ifndef ERTF_SUMMARY_H_
+#define ERTF_SUMMARY_H_
+
+
 typedef struct summary{
   // todo: check if there should be a limitation to the length of the strings
   char *author;
@@ -17,6 +18,11 @@ typedef struct summary{
   long int chars;
   int internal_ID;
   // todo: add time variables
-}INFO;
-INFO *doc_info;
-#endif
+} Ertf_Info;
+
+Ertf_Info *doc_info;
+
+int ertf_summary(FILE *);
+
+
+#endif /* ERTF_SUMMARY_H_ */
