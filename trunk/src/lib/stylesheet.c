@@ -81,6 +81,11 @@ _ertf_stylesheet_add(FILE *fp)
   unsigned int colour_max;
 
   style = (Ertf_Stylesheet *)malloc(sizeof(Ertf_Stylesheet));
+  if (!style)
+  {
+    fprintf(stderr, "_ertf_stylesheet_add: out of memory while allocating style node.\n");
+    return 0;
+  }
   colour_max = eina_array_count_get(color_table);
 
   // todo: remove debug msg

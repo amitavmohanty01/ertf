@@ -42,8 +42,14 @@ ertf_color_table(FILE *fp)
     switch (c)
     {
       Ertf_Color *node;
+
     case ';':// indicates default color
       node = (Ertf_Color *)malloc(sizeof(Ertf_Color));
+      if (!node)
+      {
+	fprintf(stderr, "ertf_color_table: short of memory while allocating color node.\n");
+	return 0;
+      }
       // todo: assign default RGB values to this node
       eina_array_push(color_table, node);
       break;
@@ -90,7 +96,11 @@ _ertf_color_add(FILE *fp)
   int c;
 
   node = (Ertf_Color *)malloc(sizeof(Ertf_Color));
-
+  if (!node)
+  {
+    fprintf(stderr, "_ertf_color_add: short of memory while allocating color node.\n");
+    return 0;
+  }
   // todo: remove debug msg
   printf("Inside color entry parser.\n");
 
@@ -146,6 +156,11 @@ _ertf_color_generate_markup(void)
   Ertf_Color *node;
 
   node = (Ertf_Color *)malloc(sizeof(Ertf_Color));
+  if (!node)
+  {
+    fprintf(stderr, "_ertf_color_generate_markup: ");
+    // todo: change return value to reflect failure
+  }
 
   EINA_ARRAY_ITER_NEXT(color_table, i, node, iterator){
     sprintf(node->string, "%x%x%xff", node->r, node->g, node->b);
