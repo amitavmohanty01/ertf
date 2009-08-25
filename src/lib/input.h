@@ -15,5 +15,6 @@
 int ertf_markup_position;
 char markup[2048];
 
+int ertf_markup_add(char *, int);
 
 #endif /* ERTF_INPUT_H_ */

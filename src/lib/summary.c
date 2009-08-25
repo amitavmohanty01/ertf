@@ -18,6 +18,11 @@ ertf_summary(FILE *fp)
   int c;
 
   doc_info = (Ertf_Info *)malloc(sizeof(Ertf_Info));
+  if (!doc_info)
+  {
+    fprintf(stderr, "ertf_summary: out of memory while allocating doc_info.\n");
+    return 0;
+  }
 
   // default values
   doc_info->author = NULL;

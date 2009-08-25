@@ -78,11 +78,9 @@ _ertf_font_add(FILE *fp)
   Ertf_Font_Node *node;
 
   node = (Ertf_Font_Node *)malloc(sizeof(Ertf_Font_Node));
-  // todo: rare situation these days, so the check may be removed.
 
-  // Vincent: NO !! all mem alloc must be checked. Always.
   if (!node)
-    fprintf(stderr, "Out of memory.\n");
+    fprintf(stderr, "_ertf_font_add: Out of memory while allocating font node.\n");
 
   // todo: remove debug msg
   printf("Inside font entry parser.\n");

@@ -4,14 +4,9 @@
 
 #include "input.h"
 
-// \plain is ignored and the text part is copied as markup and evas
 // textblock uses the style set by default
 
-// todo: \deleted not implemented in the initial version
-
 // \dn<N> translates to ?
-
-// \f translates to ?
 
 // \strike translates to <strikethough=on ...>
 
@@ -24,11 +19,9 @@ ertf_paragraph_translate(FILE *fp, int align)
 {
   char buf[12];
   int c;
+
   char fontset = 0;
-  /*
-  strcpy(markup+ertf_markup_position, "<p>");
-  ertf_markup_position+=3;
-  */
+
   while((c = fgetc(fp)) != EOF)
   {
     switch(c)
@@ -164,7 +157,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	ungetc(c, fp);
       }
 
-      /* unsupported/unrecognised control tag */
+      /* unsupported or unrecognised control tag */
       else
       {
 	fprintf(stderr, "ertf_paragraph_translate: skipped control tag `%s'\n", buf);
