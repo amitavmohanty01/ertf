@@ -13,7 +13,7 @@
 /* The indicator to current location shall be maintained by the accessing*/
 /* programs. */
 int ertf_markup_position;
-char markup[2048];
+char *markup;
 
 int ertf_markup_add(char *, int);
 
