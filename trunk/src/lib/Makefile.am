@@ -5,6 +5,7 @@ lib_LTLIBRARIES = libertf.la
 libertf_la_SOURCES = \
 colour.c \
 font.c \
+input.c \
 rtf_to_markup.c \
 stylesheet.c \
 summary.c
