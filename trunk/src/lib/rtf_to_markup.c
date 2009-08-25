@@ -54,21 +54,18 @@ ertf_paragraph_translate(FILE *fp, int align)
       else if (strcmp(buf, "rtlch") == 0)
       {
 	// todo: either insert align=right in markup or in a style
-	strcpy(markup+ertf_markup_position, "<right>");
-	ertf_markup_position += 7;
+	ertf_markup_add("<right>", 7);
 
 	if (!ertf_paragraph_translate(fp, 1))
 	  return 0;
-	strcpy(markup + ertf_markup_position, "</right>");
-	ertf_markup_position += 8;
+	ertf_markup_add("</right>", 8);
       }
 
       /* end of paragraph */
       else if (strcmp(buf, "par") == 0)
       {
 	// todo: ensure that </p> is defined in style string
-	strcpy(markup + ertf_markup_position, "</p>");
-	ertf_markup_position += 4;
+	ertf_markup_add("</p>", 4);
 	goto success;
       }
 
@@ -109,12 +106,10 @@ ertf_paragraph_translate(FILE *fp, int align)
       else if (strcmp(buf, "ul") == 0)
       {
 	// todo: check if underline colour needs to be specified
-	strcpy(markup + ertf_markup_position, "<underline=on>");
-	ertf_markup_position +=  14;
+	ertf_markup_add("<underline=on>", 14);
 	if (!ertf_paragraph_translate(fp, align))
 	  return 0;
-	strcpy(markup + ertf_markup_position, "</>");
-	ertf_markup_position += 3;
+	ertf_markup_add("</>", 3);
       }
 
       /* font size */
@@ -126,9 +121,9 @@ ertf_paragraph_translate(FILE *fp, int align)
 	 * back to character for markup
 	 */
 
-	strcpy(markup + ertf_markup_position, "<font_size=");
-	ertf_markup_position += 11;
+	ertf_markup_add("<font_size=", 11);
 
+	// todo: use ertf_markup_add() in the following
 	while (isdigit(c = fgetc(fp)))
 	{
 	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while getting font size.\n", return 0);
@@ -136,8 +131,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	  ertf_markup_position++;
 	}
 	ungetc(c, fp);
-	markup[ertf_markup_position] = '>';
-	ertf_markup_position++;
+	ertf_markup_add(">", 1);
 	fontset = 1;
 	}
 	else 
@@ -186,8 +180,7 @@ ertf_paragraph_translate(FILE *fp, int align)
     default:
       if (c == '\n')
       {
-	strcpy(markup + ertf_markup_position, "<br>");
-	ertf_markup_position += 4;
+	ertf_markup_add("<br>", 4);
       }
       else
       {
@@ -203,8 +196,7 @@ ertf_paragraph_translate(FILE *fp, int align)
  success:
   if (fontset)
   {
-    strcpy(markup + ertf_markup_position, "</>");
-    ertf_markup_position += 3;
+    ertf_markup_add("</>", 3);
   }
 
   return 1;
