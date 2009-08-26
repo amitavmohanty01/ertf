@@ -163,7 +163,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	        c != '}')
 	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF reached while skipping"
 		    " control info.\n", return 0);
-	ungetc(c, fp);	
+	ungetc(c, fp);
       }
       break;
 
@@ -184,8 +184,7 @@ ertf_paragraph_translate(FILE *fp, int align)
       }
       else
       {
-	markup[ertf_markup_position] = c;
-	ertf_markup_position++;
+	ertf_markup_add(&c, 1);
       }
     }
   }
