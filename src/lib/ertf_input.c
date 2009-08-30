@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "input.h"
+#include "ertf_input.h"
 #include "ertf_private.h"
 
 

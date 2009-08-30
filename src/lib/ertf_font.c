@@ -8,8 +8,8 @@
 
 #include <eina_array.h>
 
-#include "font.h"
-#include "input.h"
+#include "ertf_font.h"
+#include "ertf_input.h"
 #include "ertf_private.h"
 
 
@@ -44,9 +44,7 @@ int ertf_font_table(FILE *fp)
     switch (c)
     {
     case '{':// indicates more than one fonts likely
-      printf ("adding 1\n");
       if (!_ertf_font_add(fp)) goto err_loop;
-      printf ("added 1\n");
 
       if ((c = fgetc(fp)) == EOF && c != '}')
       {
@@ -56,12 +54,10 @@ int ertf_font_table(FILE *fp)
       break;
 
     case '}':// end of font table group; time to return
-      printf ("we return\n");
       return 1;// successful return
 
     case '\\':
       ungetc(c, fp);
-      printf ("adding 2\n");
       if (!_ertf_font_add(fp)) goto err_loop;
       break;
 
@@ -78,7 +74,7 @@ int ertf_font_table(FILE *fp)
 static int
 _ertf_font_add(FILE *fp)
 {
-  char buf[10];
+  char buf[1000];
   unsigned char c;
   Ertf_Font_Node *node;
 
@@ -92,53 +88,42 @@ _ertf_font_add(FILE *fp)
 
   while ((c = (unsigned char)fgetc(fp)) != EOF)
   {
-    printf ("c : *%c*\n", c);
     switch (c)
     {
     case '\\': //encountered a control word      
       fscanf(fp, "%[^ 0123456789]", buf);
-      printf ("backslash\n");
       CHECK_EOF(fp, "ertf_fond_add: Ill-formed rtf.\n", goto error);
 
       if (strcmp(buf, "f") == 0)
       {
-        printf ("1\n");
 	fscanf(fp, "%d", &node->number);
-        printf ("10\n");
       }
       else if (strcmp(buf, "fRoman") == 0)
       {
-        printf ("2\n");
 	strcpy(node->family, "Roman");
       }
       else if (strcmp(buf, "fswiss") == 0)
       {
-        printf ("3\n");
 	strcpy(node->family, "swiss");
       }
       else if (strcmp(buf, "fmodern") == 0)
       {
-        printf ("4\n");
 	strcpy(node->family, "modern");
       }
       else if (strcmp(buf, "fscript") == 0)
       {
-        printf ("5\n");
 	strcpy(node->family, "script");
       }
       else if (strcmp(buf, "fdecor") == 0)
       {
-        printf ("6\n");
 	strcpy(node->family, "decor");
       }
       else if (strcmp(buf, "ftech") == 0)
       {
-        printf ("7\n");
 	strcpy(node->family, "tech");
       }
       else if (strcmp(buf, "fnil") == 0)
       {
-        printf ("8\n");
 	strcpy(node->family, "default");
 	// todo: after the multiple occurence check, the font family checks can
 	// be modified to be done only once and rather have a bitwise check
@@ -166,9 +151,7 @@ _ertf_font_add(FILE *fp)
       break;
 
     case ';':// end of font entry
-      printf ("100\n");
       eina_array_push(font_table, node);
-      printf ("101\n");
       return 1;// successful return
 
     default:
