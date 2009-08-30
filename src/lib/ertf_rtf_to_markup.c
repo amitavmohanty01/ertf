@@ -8,6 +8,7 @@
 
 #include "ertf_input.h"
 #include "ertf_private.h"
+#include "ertf_color.h"
 
 
 // textblock uses the style set by default
@@ -27,14 +28,13 @@ ertf_paragraph_translate(FILE *fp, int align)
   int c;
 
   char fontset = 0;
+  char foregroundset = 0;
+  char backgroundset = 0;
 
   while((c = fgetc(fp)) != EOF)
   {
     switch(c)
     {
-      /*case '\n':// ignore it
-	continue;*/
-
       /* get control word */
     case '\\':
       fscanf(fp, "%[^ 0123456789\\{}]", buf);
@@ -147,6 +147,40 @@ ertf_paragraph_translate(FILE *fp, int align)
 	}
       }
 
+      /* handle foreground colour */
+      else if (strcmp(buf, "cf") == 0)
+      {
+	Ertf_Color *node;
+	if (foregroundset)
+	{
+	  ertf_markup_add("</>", 3);
+	}
+	ertf_markup_add("<color=#", 8);
+	fscanf(fp, "%d", &c);
+	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading colour number.\n", return 0);
+	node = (Ertf_Color *) eina_array_data_get(color_table, c);
+	ertf_markup_add(node->string, 8);
+	ertf_markup_add(">", 1);
+	foregroundset++;
+      }
+
+      /* handle background colour */
+      else if (strcmp(buf, "cb") == 0)
+      {
+	Ertf_Color *node;	
+	if (backgroundset)
+	{
+	  ertf_markup_add("</>", 3);
+	}
+	ertf_markup_add("<backing=on backing_color=#", 27);
+	fscanf(fp, "%d", &c);
+	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading background colour number.\n", return 0);
+	node = (Ertf_Color *)eina_array_data_get(color_table, c-1);
+	ertf_markup_add(node->string, 8);
+	ertf_markup_add(">", 1);
+	backgroundset++;
+      }
+
       /* handle target */
       else if (strcmp(buf, "*") == 0)
       {
@@ -200,6 +234,14 @@ ertf_paragraph_translate(FILE *fp, int align)
 
  success:
   if (fontset)
+  {
+    ertf_markup_add("</>", 3);
+  }
+  if (foregroundset)
+  {
+    ertf_markup_add("</>", 3);
+  }
+  if (backgroundset)
   {
     ertf_markup_add("</>", 3);
   }
