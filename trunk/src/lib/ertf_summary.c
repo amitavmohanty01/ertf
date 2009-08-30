@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "summary.h"
+#include "ertf_summary.h"
 
 
 Ertf_Info *doc_info;

@@ -7,11 +7,11 @@ extern "C" {
 #endif
 
 #include "ertf_main.h"
-#include "input.h"
-#include "font.h"
-#include "colour.h"
-#include "summary.h"
-#include "stylesheet.h"
+#include "ertf_input.h"
+#include "ertf_font.h"
+#include "ertf_color.h"
+#include "ertf_summary.h"
+#include "ertf_stylesheet.h"
 
 #ifdef __cplusplus
 }

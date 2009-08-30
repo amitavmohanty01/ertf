@@ -7,7 +7,7 @@
 
 #include <eina_array.h>
 
-#include "colour.h"
+#include "ertf_color.h"
 #include "ertf_private.h"
 
 

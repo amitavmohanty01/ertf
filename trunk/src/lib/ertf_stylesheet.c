@@ -8,9 +8,9 @@
 
 #include <eina_array.h>
 
-#include "stylesheet.h"
-#include "input.h"
-#include "colour.h"
+#include "ertf_stylesheet.h"
+#include "ertf_input.h"
+#include "ertf_color.h"
 #include "ertf_private.h"
 
 
