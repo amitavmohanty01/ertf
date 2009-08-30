@@ -2,10 +2,8 @@
 #define ERTF_STYLESHEET_H_
 
 
-#include <eina_array.h>
 #include <stdio.h>
 
-Eina_Array *stylesheet_table;
 
 typedef struct Ertf_Stylesheet
 {

@@ -1,8 +1,17 @@
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
-#include "colour.h"
+#include <eina_array.h>
 
+#include "colour.h"
+#include "ertf_private.h"
+
+
+Eina_Array *color_table;
 
 static int _ertf_color_add(FILE *);
 static void _ertf_color_generate_markup(void);
@@ -19,18 +28,10 @@ ertf_color_table(FILE *fp)
   // todo: remove debug msg
   printf("Inside color table handler.\n");
 
-  // initialize eina array module
-  if (!eina_array_init())
-  {
-    fprintf(stderr, "Error during initialization of eina error module.\n");
-    return 0;
-  }
-
   // create an eina array
   color_table = eina_array_new(7);
   if (!color_table)
   {
-    eina_array_shutdown();
     // In case of success, the eina array module shall be shut down by ertf
     // clean up functions when the app is closed.
     return 0;

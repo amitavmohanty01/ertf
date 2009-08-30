@@ -1,10 +1,19 @@
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 
+#include <eina_array.h>
+
 #include "font.h"
 #include "input.h"
+#include "ertf_private.h"
 
+
+Eina_Array *font_table;
 
 static int _ertf_font_add(FILE *);
 
@@ -20,18 +29,10 @@ int ertf_font_table(FILE *fp)
   // todo: remove debug msg
   printf("Inside font table handler.\n");
 
-  // initialize eina array module
-  if (!eina_array_init())
-  {
-    fprintf(stderr, "Error during initialization of eina error module.\n");
-    return 0;
-  }
-
   // create an eina array
   font_table = eina_array_new(7);
   if (!font_table)
   {
-    eina_array_shutdown();
     // In case of success, the eina array module shall be shut down by ertf
     // clean up functions when the app is closed.
     // todo: check for the same before final release
@@ -43,7 +44,9 @@ int ertf_font_table(FILE *fp)
     switch (c)
     {
     case '{':// indicates more than one fonts likely
+      printf ("adding 1\n");
       if (!_ertf_font_add(fp)) goto err_loop;
+      printf ("added 1\n");
 
       if ((c = fgetc(fp)) == EOF && c != '}')
       {
@@ -53,10 +56,12 @@ int ertf_font_table(FILE *fp)
       break;
 
     case '}':// end of font table group; time to return
+      printf ("we return\n");
       return 1;// successful return
 
     case '\\':
       ungetc(c, fp);
+      printf ("adding 2\n");
       if (!_ertf_font_add(fp)) goto err_loop;
       break;
 
@@ -74,7 +79,7 @@ static int
 _ertf_font_add(FILE *fp)
 {
   char buf[10];
-  int c;
+  unsigned char c;
   Ertf_Font_Node *node;
 
   node = (Ertf_Font_Node *)malloc(sizeof(Ertf_Font_Node));
@@ -85,44 +90,55 @@ _ertf_font_add(FILE *fp)
   // todo: remove debug msg
   printf("Inside font entry parser.\n");
 
-  while ((c = fgetc(fp)) != EOF)
+  while ((c = (unsigned char)fgetc(fp)) != EOF)
   {
+    printf ("c : *%c*\n", c);
     switch (c)
     {
     case '\\': //encountered a control word      
       fscanf(fp, "%[^ 0123456789]", buf);
+      printf ("backslash\n");
       CHECK_EOF(fp, "ertf_fond_add: Ill-formed rtf.\n", goto error);
 
       if (strcmp(buf, "f") == 0)
       {
+        printf ("1\n");
 	fscanf(fp, "%d", &node->number);
+        printf ("10\n");
       }
       else if (strcmp(buf, "fRoman") == 0)
       {
+        printf ("2\n");
 	strcpy(node->family, "Roman");
       }
       else if (strcmp(buf, "fswiss") == 0)
       {
+        printf ("3\n");
 	strcpy(node->family, "swiss");
       }
       else if (strcmp(buf, "fmodern") == 0)
       {
+        printf ("4\n");
 	strcpy(node->family, "modern");
       }
       else if (strcmp(buf, "fscript") == 0)
       {
+        printf ("5\n");
 	strcpy(node->family, "script");
       }
       else if (strcmp(buf, "fdecor") == 0)
       {
+        printf ("6\n");
 	strcpy(node->family, "decor");
       }
       else if (strcmp(buf, "ftech") == 0)
       {
+        printf ("7\n");
 	strcpy(node->family, "tech");
       }
       else if (strcmp(buf, "fnil") == 0)
       {
+        printf ("8\n");
 	strcpy(node->family, "default");
 	// todo: after the multiple occurence check, the font family checks can
 	// be modified to be done only once and rather have a bitwise check
@@ -150,7 +166,9 @@ _ertf_font_add(FILE *fp)
       break;
 
     case ';':// end of font entry
+      printf ("100\n");
       eina_array_push(font_table, node);
+      printf ("101\n");
       return 1;// successful return
 
     default:

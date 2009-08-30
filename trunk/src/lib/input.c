@@ -1,7 +1,18 @@
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "input.h"
+#include "ertf_private.h"
+
+
+/* The indicator to current location shall be maintained by the accessing*/
+/* programs. */
+int ertf_markup_position;
+char *markup;
 
 /* keep track of the buffer's current size */
 int current_size = 0;

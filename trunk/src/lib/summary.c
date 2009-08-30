@@ -1,9 +1,15 @@
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "summary.h"
 
+
+Ertf_Info *doc_info;
 
 static int _ertf_resolve_control_word(FILE *);
 

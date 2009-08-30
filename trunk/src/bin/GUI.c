@@ -4,9 +4,16 @@
 #include <Ecore.h>
 #include <Ecore_Evas.h>
 
+#include "Ertf.h"
 #include "GUI.h"
-#include "input.h"
+#include "ertf_private.h"
 
+
+static void
+_cb_delete (Ecore_Evas *ee)
+{
+  ecore_main_loop_quit();
+}
 
 int
 init_gui()
@@ -23,6 +30,7 @@ init_gui()
   /* create our Ecore_Evas and show it */
   ee = ecore_evas_new("software_x11", 0, 0, 1024, 768, NULL);
   ecore_evas_title_set(ee, "Ertf");
+  ecore_evas_callback_delete_request_set(ee, _cb_delete);
   ecore_evas_show(ee);
 
   /* get a pointer our new Evas canvas */

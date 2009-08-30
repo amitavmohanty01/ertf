@@ -20,8 +20,6 @@ typedef struct summary{
   // todo: add time variables
 } Ertf_Info;
 
-Ertf_Info *doc_info;
-
 int ertf_summary(FILE *);
 
 
