@@ -1,11 +1,20 @@
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
+#include <eina_array.h>
+
 #include "stylesheet.h"
 #include "input.h"
 #include "colour.h"
+#include "ertf_private.h"
 
+
+Eina_Array *stylesheet_table;
 
 static int _ertf_stylesheet_add(FILE *);
 
@@ -17,18 +26,10 @@ int ertf_stylesheet_parse(FILE *fp)
   // todo: remove debug msg
   printf("Inside stylesheet parser.\n");
 
-  // initialize eina array module
-  if (!eina_array_init())
-  {
-    fprintf(stderr, "Error during initialization of eina error module.\n");
-    return 0;
-  }
-
   // create an eina array
   stylesheet_table = eina_array_new(7);
   if (!stylesheet_table)
   {
-    eina_array_shutdown();
     // In case of success, the eina array module shall be shut down by ertf
     // clean up functions when the app is closed.
     return 0;

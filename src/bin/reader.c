@@ -3,13 +3,9 @@
 //#define NDEBUG
 #include <assert.h>
 
-#include "input.h"
-#include "font.h"
-#include "colour.h"
-#include "summary.h"
-#include "stylesheet.h"
+#include "Ertf.h"
 #include "GUI.h"
-#include "rtf_to_markup.h"
+#include "ertf_private.h"
 
 FILE *fstream;
 
@@ -38,12 +34,15 @@ main(int argc, char **argv)
   }
   else
   {
+    if (!ertf_init())
+      return -1;
     // todo: use setvbuf() to properly buffer the stream before reading
     init_parser();
     // when the markup is generated, the parser can be shut down
     shutdown_parser();
     init_gui();
     shutdown_gui();
+    ertf_shutdown();
   }
   return 0;
 }
@@ -193,10 +192,6 @@ shutdown_parser()
     eina_array_free(font_table);
   if (stylesheet_table)
     eina_array_free(stylesheet_table);
-
-  // shutdown eina array module
-  if (!eina_array_shutdown())
-    return 0;
 
   return 1;
 }
