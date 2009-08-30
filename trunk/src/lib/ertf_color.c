@@ -164,6 +164,6 @@ _ertf_color_generate_markup(void)
   }
 
   EINA_ARRAY_ITER_NEXT(color_table, i, node, iterator){
-    sprintf(node->string, "%x%x%xff", node->r, node->g, node->b);
+    sprintf(node->string, "%02x%02x%02xff", node->r, node->g, node->b);
   }
 }
