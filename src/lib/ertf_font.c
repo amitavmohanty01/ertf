@@ -13,7 +13,7 @@
 #include "ertf_private.h"
 
 
-Eina_Array *font_table;
+Eina_Array *font_table = NULL;
 
 static int _ertf_font_add(FILE *);
 
@@ -75,7 +75,7 @@ static int
 _ertf_font_add(FILE *fp)
 {
   char buf[1000];
-  unsigned char c;
+  int c;
   Ertf_Font_Node *node;
 
   node = (Ertf_Font_Node *)malloc(sizeof(Ertf_Font_Node));
@@ -86,7 +86,7 @@ _ertf_font_add(FILE *fp)
   // todo: remove debug msg
   printf("Inside font entry parser.\n");
 
-  while ((c = (unsigned char)fgetc(fp)) != EOF)
+  while ((c = fgetc(fp)) != EOF)
   {
     switch (c)
     {

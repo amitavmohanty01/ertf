@@ -5,6 +5,10 @@
 #include <eina_array.h>
 
 
+extern unsigned char _ertf_default_color_r;
+extern unsigned char _ertf_default_color_g;
+extern unsigned char _ertf_default_color_b;
+
 extern Eina_Array *color_table;
 extern Eina_Array *font_table;
 extern Eina_Array *stylesheet_table;
