@@ -7,15 +7,15 @@
 #include <ctype.h>
 
 #include "ertf_input.h"
-#include "ertf_private.h"
 #include "ertf_color.h"
+#include "ertf_private.h"
 
 
 // textblock uses the style set by default
 
 // \dn<N> translates to ?
 
-// \strike translates to <strikethough=on ...>
+// \strike translates to <strikethrough=on ...>
 
 // \scaps translates to ?
 
@@ -126,15 +126,11 @@ ertf_paragraph_translate(FILE *fp, int align)
 	/* use the digit character instead of reading an int and converting it 
 	 * back to character for markup
 	 */
-
 	ertf_markup_add("<font_size=", 11);
-
-	// todo: use ertf_markup_add() in the following
 	while (isdigit(c = fgetc(fp)))
 	{
 	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while getting font size.\n", return 0);
-	  markup[ertf_markup_position] = c;
-	  ertf_markup_position++;
+	  ertf_markup_add(&c, 1);
 	}
 	ungetc(c, fp);
 	ertf_markup_add(">", 1);

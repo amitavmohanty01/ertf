@@ -11,7 +11,7 @@
 #include "ertf_private.h"
 
 
-Eina_Array *color_table;
+Eina_Array *color_table = NULL;
 
 static int _ertf_color_add(FILE *);
 static void _ertf_color_generate_markup(void);
@@ -51,7 +51,9 @@ ertf_color_table(FILE *fp)
 	fprintf(stderr, "ertf_color_table: short of memory while allocating color node.\n");
 	return 0;
       }
-      // todo: assign default RGB values to this node
+      node->r = _ertf_default_color_r;
+      node->g = _ertf_default_color_g;
+      node->b = _ertf_default_color_b;
       eina_array_push(color_table, node);
       break;
 

@@ -100,8 +100,7 @@ readloop()
   markup = NULL;
 
   while ((c = getc(fstream)) != EOF)
-  {
-    //todo:connect c to the required stream to read characters
+  {    
     switch (c)
     {
     case '{':
@@ -120,8 +119,7 @@ readloop()
       if (strcmp(control_word, "fonttbl") == 0)
       {
 	if (ertf_font_table(fstream))
-        {
-	  // todo: check for success from return value
+        {	
 	  printf("Successfully created font table.\n");
 	  bracecount--;
 	}
@@ -183,9 +181,8 @@ readloop()
 int
 shutdown_parser()
 {
-  // todo: close the file stream
   fclose(fstream);
-  // free color tables used by the parser
+  // free tables used by the parser
   if (color_table)
     eina_array_free(color_table);
   if (font_table)
