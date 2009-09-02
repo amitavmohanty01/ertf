@@ -158,13 +158,6 @@ _ertf_color_generate_markup(void)
   unsigned int i;
   Ertf_Color *node;
 
-  node = (Ertf_Color *)malloc(sizeof(Ertf_Color));
-  if (!node)
-  {
-    fprintf(stderr, "_ertf_color_generate_markup: ");
-    // todo: change return value to reflect failure
-  }
-
   EINA_ARRAY_ITER_NEXT(color_table, i, node, iterator){
     sprintf(node->string, "%02x%02x%02xff", node->r, node->g, node->b);
   }
