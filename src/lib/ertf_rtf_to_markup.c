@@ -37,7 +37,7 @@ ertf_paragraph_translate(FILE *fp, int align)
     {
       /* get control word */
     case '\\':
-      fscanf(fp, "%[^ 0123456789\\{}]", buf);
+      fscanf(fp, "%[^ 0123456789\\{}\n]", buf);
       CHECK_EOF(fp, "ertf_paragraph_translate: end-of-file encountered while "
 		"retrieving control word.\n", return 0);
 
@@ -49,7 +49,6 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* get the style number */
       else if (strcmp(buf, "s") == 0)
       {
-	// todo: ensure that all stylesheet entries have been parsed
 	// todo: add the relevant style string to markup
 	fgetc(fp);
 	CHECK_EOF(fp, "ertf_paragraph_translate: end-of-file encountered while "
@@ -104,15 +103,39 @@ ertf_paragraph_translate(FILE *fp, int align)
       {
 	if (!isdigit(c = fgetc(fp)))
 	  ungetc(c, fp);
-	CHECK_EOF(fp, "ertf_group_translate: EOF encountered while checking for bold text.\n", return 0);
+	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for bold text.\n", return 0);
 	// todo: find relevant markup
       }
 
       /* underline */
       else if (strcmp(buf, "ul") == 0)
       {
-	// todo: check if underline colour needs to be specified
-	ertf_markup_add("<underline=on>", 14);
+	char temp[6];
+	Ertf_Color *node;
+	
+	fscanf(fp, "%5s", temp);
+	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for underline colour.\n", return 0);
+	if (strcmp(temp, "\\uldc") == 0)
+	{
+	  fscanf(fp, "%d", &c);
+	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for colour number for underlining.\n", return 0);
+	  node = (Ertf_Color *)eina_array_data_get(color_table, c);
+	  ertf_markup_add("<underline=on underline_color=#", 31);
+	  ertf_markup_add(node->string, 8);
+	  ertf_markup_add(">", 1);	  
+	}
+	else
+	  ertf_markup_add("<underline=on>", 14);
+
+	if (!ertf_paragraph_translate(fp, align))
+	  return 0;
+	ertf_markup_add("</>", 3);
+      }
+
+      /* double underline */
+      else if (strcmp(buf, "uldb") == 0)
+      {
+	ertf_markup_add("<underline=double>", 18);
 	if (!ertf_paragraph_translate(fp, align))
 	  return 0;
 	ertf_markup_add("</>", 3);
@@ -123,9 +146,6 @@ ertf_paragraph_translate(FILE *fp, int align)
       {
 	if (fontset == 0)
 	{
-	/* use the digit character instead of reading an int and converting it 
-	 * back to character for markup
-	 */
 	ertf_markup_add("<font_size=", 11);
 	while (isdigit(c = fgetc(fp)))
 	{
@@ -155,6 +175,10 @@ ertf_paragraph_translate(FILE *fp, int align)
 	fscanf(fp, "%d", &c);
 	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading colour number.\n", return 0);
 	node = (Ertf_Color *) eina_array_data_get(color_table, c);
+	if(!node){
+	  printf("invalid node.");
+	  exit(1);
+	}
 	ertf_markup_add(node->string, 8);
 	ertf_markup_add(">", 1);
 	foregroundset++;
@@ -171,7 +195,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	ertf_markup_add("<backing=on backing_color=#", 27);
 	fscanf(fp, "%d", &c);
 	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading background colour number.\n", return 0);
-	node = (Ertf_Color *)eina_array_data_get(color_table, c-1);
+	node = (Ertf_Color *)eina_array_data_get(color_table, c);
 	ertf_markup_add(node->string, 8);
 	ertf_markup_add(">", 1);
 	backgroundset++;

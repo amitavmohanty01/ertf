@@ -143,7 +143,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%d", &c);
 	  if (feof(fp))
           {
-	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading style number");
+	    fprintf(stderr, "ertf_stylesheet_add: end of file reached while reading style number");
 	    goto error;
 	  }
 	  //todo: copy relevant parts of the style
@@ -153,7 +153,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%d", &c);
 	  if (feof(fp))
           {
-	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading paragraph number");
+	    fprintf(stderr, "ertf_stylesheet_add: end of file reached while reading paragraph number");
 	    goto error;
 	  }
 	  // todo: set relevant paragraphs for the style
@@ -247,11 +247,7 @@ _ertf_stylesheet_add(FILE *fp)
 
     case ' ':// get style name
       fscanf(fp, "%[^;]", style->name);
-      if (feof(fp))
-      {
-	fprintf(stderr, "ertf_stylesheet_add: end of file encountered while reading stylesheet name.\n");
-	goto error;
-      }
+      CHECK_EOF(fp, "ertf_stylesheet_add: end of file encountered while reading stylesheet name.\n", goto error);
       break;
 
     default:
