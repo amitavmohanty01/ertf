@@ -408,7 +408,7 @@ _smart_clip_set(Evas_Object *obj, Evas_Object * clip)
   sd = evas_object_smart_data_get(obj);
   if (!sd) return;
   evas_object_clip_set(sd->obj, clip);
-  evas_object_clip_set(sd->textblock);
+  evas_object_clip_set(sd->textblock, clip);
 }
 
 static void
