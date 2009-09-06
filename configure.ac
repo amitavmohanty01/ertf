@@ -35,7 +35,7 @@ PKG_PROG_PKG_CONFIG
 
 ### Checks for libraries
 
-PKG_CHECK_MODULES([ERTF], [eina-0])
+PKG_CHECK_MODULES([ERTF], [evas eina-0])
 PKG_CHECK_MODULES([ECORE_EVAS], [ecore-evas])
 
 

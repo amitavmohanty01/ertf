@@ -9,7 +9,8 @@ ertf_font.h \
 ertf_input.h \
 ertf_rtf_to_markup.h \
 ertf_stylesheet.h \
-ertf_summary.h
+ertf_summary.h \
+esmart_rtf.h
 
 lib_LTLIBRARIES = libertf.la
 
@@ -20,7 +21,8 @@ ertf_font.c \
 ertf_input.c \
 ertf_rtf_to_markup.c \
 ertf_stylesheet.c \
-ertf_summary.c
+ertf_summary.c \
+esmart_rtf.c
 
 libertf_la_CPPFLAGS = @ERTF_CFLAGS@
 libertf_la_LIBADD = @ERTF_LIBS@
