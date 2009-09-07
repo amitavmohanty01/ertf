@@ -12,6 +12,7 @@ extern "C" {
 #include "ertf_color.h"
 #include "ertf_summary.h"
 #include "ertf_stylesheet.h"
+#include "ertf_document.h"
 
 #ifdef __cplusplus
 }

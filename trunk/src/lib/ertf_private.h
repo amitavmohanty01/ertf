@@ -2,7 +2,7 @@
 #define ERTF_PRIVATE_H_
 
 
-#include <eina_array.h>
+#include <Eina.h>
 
 
 extern unsigned char _ertf_default_color_r;

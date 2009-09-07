@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <eina_array.h>
+#include <Eina.h>
 
 #include "ertf_color.h"
 #include "ertf_private.h"
