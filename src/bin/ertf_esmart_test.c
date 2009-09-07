@@ -19,7 +19,6 @@ main(int argc, char *argv[])
   Ecore_Evas           *ee;
   Evas                 *evas;
   Evas_Object          *o;
-  Evas_Textblock_Style *st;
 
   if (argc < 2)
     {

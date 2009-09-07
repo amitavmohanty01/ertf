@@ -6,7 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <eina_array.h>
+#include <Eina.h>
 
 #include "ertf_stylesheet.h"
 #include "ertf_input.h"

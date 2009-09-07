@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#include <eina_array.h>
+#include <Eina.h>
 
 #include "ertf_main.h"
 
@@ -20,7 +20,7 @@ ertf_init(void)
   if (_ertf_initcount)
     goto finish_init;
 
-  if (!eina_array_init())
+  if (!eina_init())
   {
     fprintf(stderr, "Could not initialize eina array module.\n");
     return 0;
@@ -35,7 +35,7 @@ ertf_shutdown(void)
 {
   if (_ertf_initcount != 1) goto finish_shutdown;
 
-  eina_array_shutdown();
+  eina_shutdown();
 
  finish_shutdown:
   return --_ertf_initcount;
