@@ -30,6 +30,9 @@ ertf_paragraph_translate(FILE *fp, int align)
   char fontset = 0;
   char foregroundset = 0;
   char backgroundset = 0;
+  unsigned char current_r = _ertf_default_color_r;
+  unsigned char current_g = _ertf_default_color_g;
+  unsigned char current_b = _ertf_default_color_b;
 
   while((c = fgetc(fp)) != EOF)
   {
@@ -111,11 +114,12 @@ ertf_paragraph_translate(FILE *fp, int align)
       else if (strcmp(buf, "ul") == 0)
       {
 	char temp[6];
+	char color[10];
 	Ertf_Color *node;
 	
-	fscanf(fp, "%5s", temp);
+	fscanf(fp, "%4s", temp);	
 	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for underline colour.\n", return 0);
-	if (strcmp(temp, "\\uldc") == 0)
+	if (strcmp(temp, "\\ulc") == 0)
 	{
 	  fscanf(fp, "%d", &c);
 	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for colour number for underlining.\n", return 0);
@@ -125,7 +129,12 @@ ertf_paragraph_translate(FILE *fp, int align)
 	  ertf_markup_add(">", 1);	  
 	}
 	else
-	  ertf_markup_add("<underline=on>", 14);
+	{
+	  ertf_markup_add("<underline=on underline_color=#", 31);
+	  sprintf(color, "%02x%02x%02xff", current_r, current_g, current_b);
+	  ertf_markup_add(color, 8);
+	  ertf_markup_add(">", 1);
+	}
 
 	if (!ertf_paragraph_translate(fp, align))
 	  return 0;
@@ -182,6 +191,9 @@ ertf_paragraph_translate(FILE *fp, int align)
 	ertf_markup_add(node->string, 8);
 	ertf_markup_add(">", 1);
 	foregroundset++;
+	current_r = node->r;
+	current_g = node->g;
+	current_b = node->b;
       }
 
       /* handle background colour */
@@ -199,6 +211,19 @@ ertf_paragraph_translate(FILE *fp, int align)
 	ertf_markup_add(node->string, 8);
 	ertf_markup_add(">", 1);
 	backgroundset++;
+      }
+
+      /* handle strikethrough */
+      else if (strcmp(buf, "strike") == 0)
+      {
+	char color[9];
+	ertf_markup_add("<strikethrough=on strikethrough_color=#", 39);
+	sprintf(color, "%02x%02x%02xff", current_r, current_g, current_b);
+	ertf_markup_add(color, 8);
+	ertf_markup_add(">", 1);
+	if (!ertf_paragraph_translate(fp, align))
+	  return 0;
+	ertf_markup_add("</>", 3);
       }
 
       /* handle target */
