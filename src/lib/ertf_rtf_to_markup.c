@@ -15,8 +15,6 @@
 
 // \dn<N> translates to ?
 
-// \strike translates to <strikethrough=on ...>
-
 // \scaps translates to ?
 
 // \uld translates to ?
@@ -30,6 +28,7 @@ ertf_paragraph_translate(FILE *fp, int align)
   char fontset = 0;
   char foregroundset = 0;
   char backgroundset = 0;
+  char strikethroughset = 0;
   unsigned char current_r = _ertf_default_color_r;
   unsigned char current_g = _ertf_default_color_g;
   unsigned char current_b = _ertf_default_color_b;
@@ -216,14 +215,15 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* handle strikethrough */
       else if (strcmp(buf, "strike") == 0)
       {
-	char color[9];
-	ertf_markup_add("<strikethrough=on strikethrough_color=#", 39);
-	sprintf(color, "%02x%02x%02xff", current_r, current_g, current_b);
-	ertf_markup_add(color, 8);
-	ertf_markup_add(">", 1);
-	if (!ertf_paragraph_translate(fp, align))
-	  return 0;
-	ertf_markup_add("</>", 3);
+	if (!strikethroughset)
+	{
+	  char color[9];
+	  ertf_markup_add("<strikethrough=on strikethrough_color=#", 39);
+	  sprintf(color, "%02x%02x%02xff", current_r, current_g, current_b);
+	  ertf_markup_add(color, 8);
+	  ertf_markup_add(">", 1);
+	  strikethroughset++;
+	}
       }
 
       /* handle target */
@@ -232,7 +232,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	/* They not supported in the prototype. */
 	while ((c = fgetc(fp)) != EOF && c != '}')
 	  ;
-	CHECK_EOF(fp, "ertf_group_translate: EOF reached while handling unsupported target.\n", return 0);
+	CHECK_EOF(fp, "ertf_paragraph_translate: EOF reached while handling unsupported target.\n", return 0);
 	ungetc(c, fp);
       }
 
@@ -260,7 +260,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 
       /* end of group */
     case '}':
-      goto success;
+	goto success;
 
     default:
       if (c == '\n')
@@ -287,6 +287,10 @@ ertf_paragraph_translate(FILE *fp, int align)
     ertf_markup_add("</>", 3);
   }
   if (backgroundset)
+  {
+    ertf_markup_add("</>", 3);
+  }
+  if (strikethroughset)
   {
     ertf_markup_add("</>", 3);
   }
