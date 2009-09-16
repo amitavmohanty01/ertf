@@ -87,7 +87,7 @@ ertf_paragraph_translate(FILE *fp, int align)
       {
 	if (!isdigit(c = fgetc(fp)))
 	  ungetc(c, fp);
-	CHECK_EOF(fp, "ertf_group_translate: EOF encountered while checking for italicisation.\n", return 0);
+	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for italicisation.\n", return 0);
 	// todo: find relevant markup
       }
 
@@ -96,7 +96,7 @@ ertf_paragraph_translate(FILE *fp, int align)
       {
 	if (!isdigit(c = fgetc(fp)))
 	  ungetc(c, fp);
-	CHECK_EOF(fp, "ertf_group_translate: EOF encountered while checking for bold text.\n", return 0);
+	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for bold text.\n", return 0);
 	// todo: find relevant markup
       }
 
@@ -265,7 +265,8 @@ ertf_paragraph_translate(FILE *fp, int align)
     default:
       if (c == '\n')
       {
-	ertf_markup_add("<br>", 4);
+	//ertf_markup_add("<br>", 4);
+	/* Since unnecessary newlines are added by rtf writers, they are ignored. The tag <br> is used when \line is encountered. */
       }
       else
       {
