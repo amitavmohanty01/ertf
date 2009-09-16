@@ -116,28 +116,38 @@ ertf_paragraph_translate(FILE *fp, int align)
 	char color[10];
 	Ertf_Color *node;
 	
-	fscanf(fp, "%4s", temp);	
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for underline colour.\n", return 0);
-	if (strcmp(temp, "\\ulc") == 0)
+	if ((c = getc(fp)) == 0)
 	{
-	  fscanf(fp, "%d", &c);
-	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for colour number for underlining.\n", return 0);
-	  node = (Ertf_Color *)eina_array_data_get(color_table, c);
-	  ertf_markup_add("<underline=on underline_color=#", 31);
-	  ertf_markup_add(node->string, 8);
-	  ertf_markup_add(">", 1);	  
+	  ertf_markup_add("</>", 3);
+	  goto success;
 	}
 	else
 	{
-	  ertf_markup_add("<underline=on underline_color=#", 31);
-	  sprintf(color, "%02x%02x%02xff", current_r, current_g, current_b);
-	  ertf_markup_add(color, 8);
-	  ertf_markup_add(">", 1);
-	}
+	  ungetc(c, fp);
+	  fscanf(fp, "%4s", temp);	
+	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for underline colour.\n", return 0);
+	  if (strcmp(temp, "\\ulc") == 0)
+	    {
+	      fscanf(fp, "%d", &c);
+	      CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for colour number for underlining.\n", return 0);
+	      node = (Ertf_Color *)eina_array_data_get(color_table, c);
+	      ertf_markup_add("<underline=on underline_color=#", 31);
+	      ertf_markup_add(node->string, 8);
+	      ertf_markup_add(">", 1);	  
+	    }
+	  else
+	    {
+	      ertf_markup_add("<underline=on underline_color=#", 31);
+	      sprintf(color, "%02x%02x%02xff", current_r, current_g, current_b);
+	      ertf_markup_add(color, 8);
+	      ertf_markup_add(">", 1);
+	    }
 
-	if (!ertf_paragraph_translate(fp, align))
-	  return 0;
-	ertf_markup_add("</>", 3);
+	  if (!ertf_paragraph_translate(fp, align))
+	    return 0;
+	  ertf_markup_add("</>", 3);
+	  goto success;
+	}
       }
 
       /* double underline */
@@ -152,17 +162,18 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* font size */
       else if (strcmp(buf, "fs") == 0)
       {
+	char store[10];	
+
 	if (fontset == 0)
 	{
-	ertf_markup_add("<font_size=", 11);
-	while (isdigit(c = fgetc(fp)))
-	{
+	  ertf_markup_add("<font_size=", 11);
+	  fscanf(fp, "%d", &c);
 	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while getting font size.\n", return 0);
-	  ertf_markup_add(&c, 1);
-	}
-	ungetc(c, fp);
-	ertf_markup_add(">", 1);
-	fontset = 1;
+	  c /= 2;
+	  sprintf(store, "%d", c);
+	  ertf_markup_add(store, strlen(store));
+	  ertf_markup_add(">", 1);
+	  fontset = 1;
 	}
 	else 
 	{
@@ -240,7 +251,7 @@ ertf_paragraph_translate(FILE *fp, int align)
       else
       {
 	fprintf(stderr, "ertf_paragraph_translate: skipped control tag `%s'\n", buf);
-
+      }
 	/* read till next delimiter */
 	while ((c = fgetc(fp)) != '\\' &&
 	        c != ' ' &&
@@ -248,8 +259,9 @@ ertf_paragraph_translate(FILE *fp, int align)
 	        c != '}')
 	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF reached while skipping"
 		    " control info.\n", return 0);
+	if (c != ' ')
 	ungetc(c, fp);
-      }
+      
       break;
 
       /* handle group */
