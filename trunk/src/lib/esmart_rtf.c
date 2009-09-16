@@ -91,12 +91,12 @@ esmart_rtf_file_set(Evas_Object *obj, const char *filename)
   }
   else if (c != '{')
   {
-    // An rtf file should start with `{\rtf'
+    // An rtf file should start with `{'
     goto free_f;
   }
   else if (fscanf(sd->f, "%4s", str), strcmp(str, "\\rtf") != 0 )
   {
-    fprintf(stderr, "rtf version unspecif ied.\n");
+    fprintf(stderr, "rtf version unspecified.\n");
   }
   else if ((fscanf(sd->f, "%d\\%c", &sd->version, &str[0]), str[0] != 'a') &&
 	   str[0] != 'p' &&
