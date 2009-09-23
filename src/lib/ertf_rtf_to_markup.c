@@ -10,15 +10,6 @@
 #include "ertf_color.h"
 #include "ertf_private.h"
 
-
-// textblock uses the style set by default
-
-// \dn<N> translates to ?
-
-// \scaps translates to ?
-
-// \uld translates to ?
-
 int
 ertf_paragraph_translate(FILE *fp, int align)
 {
@@ -40,6 +31,15 @@ ertf_paragraph_translate(FILE *fp, int align)
     {
       /* get control word */
     case '\\':
+      /* handle special characters */
+      if ((c = getc(fp)) == '\\' || c == '{' || c == '}')
+      {
+	ertf_markup_add(&c, 1);
+	break;
+      }
+      else
+	ungetc(c, fp);
+
       fscanf(fp, "%[^ 0123456789\\{}\n]", buf);
       CHECK_EOF(fp, "ertf_paragraph_translate: end-of-file encountered while "
 		"retrieving control word.\n", return 0);
