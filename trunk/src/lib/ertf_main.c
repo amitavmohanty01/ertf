@@ -12,6 +12,14 @@ unsigned char _ertf_default_color_r = 0;
 unsigned char _ertf_default_color_g = 0;
 unsigned char _ertf_default_color_b = 0;
 
+/* The following values are in twips. */
+extern int _ertf_default_paper_width   = 12240;
+extern int _ertf_default_paper_height  = 15840;
+extern int _ertf_default_left_margin   = 1800;
+extern int _ertf_default_right_margin  = 1800;
+extern int _ertf_default_top_margin    = 1440;
+extern int _ertf_default_bottom_margin = 1440;
+
 static int _ertf_initcount = 0;
 
 int

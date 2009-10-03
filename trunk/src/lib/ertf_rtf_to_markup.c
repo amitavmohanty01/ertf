@@ -32,8 +32,15 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* get control word */
     case '\\':
       /* handle special characters */
-      if ((c = getc(fp)) == '\\' || c == '{' || c == '}')
+      if ((c = getc(fp)) == '\\' || c == '{' || c == '}' || c == '\'')
       {
+	if (c == '\'')
+	{
+	  char hex[3];
+	  fscanf(fp, "%2s", hex);
+	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading hexadecimal value of character.\n", return 0);
+	  c = atoi(hex);
+	}
 	ertf_markup_add(&c, 1);
 	break;
       }
@@ -198,6 +205,8 @@ ertf_paragraph_translate(FILE *fp, int align)
 	  ertf_markup_add("<font_size=", 11);
 	  fscanf(fp, "%d", &c);
 	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while getting font size.\n", return 0);
+	  /* integer divison yields the floor value, which is used as the font size as fractional font size is currently not supported */
+	  // todo: implement support for fractional font size in text block.
 	  c /= 2;
 	  sprintf(store, "%d", c);
 	  ertf_markup_add(store, strlen(store));
@@ -290,7 +299,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 		  " control info.\n", return 0);
       if (c != ' ')
 	ungetc(c, fp);
-      
+
       break;
 
       /* handle group */
