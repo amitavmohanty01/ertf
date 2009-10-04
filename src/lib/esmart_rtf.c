@@ -281,7 +281,7 @@ _smart_add(Evas_Object *obj)
 
   st = evas_textblock_style_new();
   evas_textblock_style_set(st,
-                           "DEFAULT='font=Vera,Kochi font_size=8 align=left color=#000000 wrap=word'"
+                           "DEFAULT='font=Vera,Kochi font_size=8 align=left color=#000000 wrap=word left_margin=+12 right_margin=+12'"
                            "center='+ font=Vera,Kochi font_size=10 align=center'"
                            "/center='- \n'"
                            "right='+ font=Vera,Kochi font_size=10 align=right'"
@@ -289,7 +289,7 @@ _smart_add(Evas_Object *obj)
                            "blockquote='+ left_margin=+24 right_margin=+24 font=Vera,Kochi font_size=10 align=left'"
                            "h1='+ font_size=20'"
                            "red='+ color=#ff0000'"
-                           "p='+ font=Vera,Kochi font_size=10 align=left'"
+                           "p='+ font=Vera,Kochi font_size=10 align=left left_margin=+12 right_margin=+12'"
                            "/p='- \n'"
                            "br='\n'"
                            "tab='\t'");
