@@ -99,7 +99,7 @@ _ertf_stylesheet_add(FILE *fp)
     case '\\':// get the control word
       fscanf(fp, "%[^ 0123456789\\]", buf);
       // read until a delimiter is encountered
-      CHECK_EOF(fp, "ertf_stylesheet_add: Ill-formed rtf.\n", goto error);
+      CHECK_EOF(fp, "_ertf_stylesheet_add: Ill-formed rtf.\n", goto error);
 
       // todo: use pattern matching technique / hashing and benchmark them
       // to decide the optimal alternative to the if-else ladder
@@ -112,7 +112,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%u", &style->foreground_colour);
 	  if (style->foreground_colour >= colour_max)
           {
-	    fprintf(fp, "ertf_stylesheet_add: stylesheet colour not in colour table\n");
+	    fprintf(fp, "_ertf_stylesheet_add: stylesheet colour not in colour table\n");
 	    goto error;
 	  }
 	}
@@ -121,7 +121,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%u", &style->background_colour);
 	  if (style->background_colour >= colour_max)
           {
-	    fprintf(fp, "ertf_stylesheet_add: stylesheet colour not in colour table\n");
+	    fprintf(fp, "_ertf_stylesheet_add: stylesheet colour not in colour table\n");
 	    goto error;
 	  }
 	}
@@ -134,7 +134,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%d", &style->style_number);
 	  if (feof(fp))
           {
-	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading stylesheet number");
+	    fprintf(stderr, "_ertf_stylesheet: end of file reached while reading stylesheet number");
 	    goto error;
 	  }
 	}
@@ -143,7 +143,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%d", &c);
 	  if (feof(fp))
           {
-	    fprintf(stderr, "ertf_stylesheet_add: end of file reached while reading style number");
+	    fprintf(stderr, "_ertf_stylesheet_add: end of file reached while reading style number");
 	    goto error;
 	  }
 	  //todo: copy relevant parts of the style
@@ -153,7 +153,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%d", &c);
 	  if (feof(fp))
           {
-	    fprintf(stderr, "ertf_stylesheet_add: end of file reached while reading paragraph number");
+	    fprintf(stderr, "_ertf_stylesheet_add: end of file reached while reading paragraph number");
 	    goto error;
 	  }
 	  // todo: set relevant paragraphs for the style
@@ -166,7 +166,7 @@ _ertf_stylesheet_add(FILE *fp)
 	    ;
 	  if (c == EOF)
           {
-	    fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
+	    fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
 	    goto error;
 	  }
           else if (c == '\\')
@@ -182,7 +182,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%u", &style->font_number);
 	  if (feof(fp))
           {
-	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading font number");
+	    fprintf(stderr, "_ertf_stylesheet: end of file reached while reading font number");
 	    goto error;
 	  }
 	}
@@ -191,7 +191,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%u", &style->font_size);
 	  if (feof(fp))
           {
-	    fprintf(stderr, "ertf_stylesheet_add; end of file reached while reading font number");
+	    fprintf(stderr, "_ertf_stylesheet: end of file reached while reading font number");
 	    goto error;
 	  }
 	}
@@ -203,7 +203,7 @@ _ertf_stylesheet_add(FILE *fp)
 	    ;
 	  if (c == EOF)
           {
-	    fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
+	    fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
 	    goto error;
 	  }
           else if (c == '\\')
@@ -219,7 +219,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  ;
 	if (c == EOF)
         {
-	  fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
+	  fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
 	  goto error;
 	}
         else if (c == '\\')
@@ -236,7 +236,7 @@ _ertf_stylesheet_add(FILE *fp)
 	;
       if(c == EOF)
       {
-	fprintf(stderr, "ertf_stylesheet_add: end of file encountered while skipping unrecognised group\n");
+	fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised group\n");
 	goto error;
       }
       break;
@@ -247,11 +247,11 @@ _ertf_stylesheet_add(FILE *fp)
 
     case ' ':// get style name
       fscanf(fp, "%[^;]", style->name);
-      CHECK_EOF(fp, "ertf_stylesheet_add: end of file encountered while reading stylesheet name.\n", goto error);
+      CHECK_EOF(fp, "_ertf_stylesheet_add: end of file encountered while reading stylesheet name.\n", goto error);
       break;
 
     default:
-      fprintf(stderr, "ertf_stylesheet_add: unrecognised control character `%c'.\n", c);
+      fprintf(stderr, "_ertf_stylesheet_add: unrecognised control character `%c'.\n", c);
       goto error;
     }
   }

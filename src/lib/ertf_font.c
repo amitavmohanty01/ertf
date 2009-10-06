@@ -136,7 +136,7 @@ _ertf_font_add(FILE *fp)
 	  ;
 	if(c == EOF)
         {
-	  fprintf(stderr, "ertf_font_add: end of file encountered while skipping unrecognised tag\n");
+	  fprintf(stderr, "_ertf_font_add: end of file encountered while skipping unrecognised tag\n");
 	  goto error;
 	}
         else if (c == '\\')
@@ -147,7 +147,7 @@ _ertf_font_add(FILE *fp)
       break;
 
     case ' ':fscanf(fp, "%[^;]", node->name);
-      CHECK_EOF(fp, "ertf_font_add: end of file encountered while reading font name. \n", goto error);
+      CHECK_EOF(fp, "_ertf_font_add: end of file encountered while reading font name. \n", goto error);
       break;
 
     case ';':// end of font entry
@@ -156,13 +156,13 @@ _ertf_font_add(FILE *fp)
 
     default:
       // todo: remove debug statement in final version
-      fprintf(stderr, "ertf_font_add: unrecognised control character '%c'.\n", c);
+      fprintf(stderr, "_ertf_font_add: unrecognised control character '%c'.\n", c);
       goto error;
     }
   }
   // end of file is reached
   // todo: remove debug statement in final version
-  fprintf(stderr, "ertf_font_add: Ill-formed rtf.\n");
+  fprintf(stderr, "_ertf_font_add: Ill-formed rtf.\n");
 
  error:
   free(node);
