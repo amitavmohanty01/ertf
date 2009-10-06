@@ -170,7 +170,7 @@ ertf_document_parse(Ertf_Document *doc)
 
       if (feof(doc->stream))
       {
-        fprintf(stderr, "readloop: EOF encountered.\n");
+        fprintf(stderr, "ertf_document_parse: EOF encountered.\n");
         return 0;
       }
 
@@ -225,7 +225,7 @@ ertf_document_parse(Ertf_Document *doc)
       break;
 
     default:
-      fprintf(stderr, "readloop: skipped control char `%c'\n", c);
+      fprintf(stderr, "ertf_document_parse: skipped control char `%c'\n", c);
     }
   }
 
@@ -234,7 +234,7 @@ ertf_document_parse(Ertf_Document *doc)
   // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
   if (doc->bracecount)
-    fprintf(stderr, "readloop: Ill-formed rtf - inconsistent use of braces.\n");
+    fprintf(stderr, "ertf_document_parse: Ill-formed rtf - inconsistent use of braces.\n");
 
   return 1;
 }

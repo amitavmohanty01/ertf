@@ -62,7 +62,7 @@ ertf_color_table(FILE *fp)
       if (_ertf_color_add(fp))
 	continue;
       else
-	fprintf(stderr, "colortbl: Ill-formed rtf\n");
+	fprintf(stderr, "ertf_color_table: Ill-formed rtf\n");
       break;
 
     case '}':// end of color table
@@ -71,12 +71,12 @@ ertf_color_table(FILE *fp)
       return 1;
 
     default:
-      fprintf(stderr, "colortbl: Ill-formed rtf");
+      fprintf(stderr, "ertf_color_table: Ill-formed rtf");
       return 0;
     }
   }
 
-  fprintf(stderr, "End of file reached in color table.\n");
+  fprintf(stderr, "ertf_color_table: End of file reached in color table.\n");
   return 0;
 }
 
@@ -124,7 +124,7 @@ _ertf_color_add(FILE *fp)
 	if (!(set & GREEN))
 	  node->g = index;
 	else
-	  fprintf(stderr, "ertf_color_add: multiple values for same color.\n");
+	  fprintf(stderr, "_ertf_color_add: multiple values for same color.\n");
 	// todo: confirm if this should only be logged and not stopped at
       }
       else if (strcmp(color, "\\red") == 0)
@@ -141,7 +141,7 @@ _ertf_color_add(FILE *fp)
       eina_array_push(color_table, node);
       return 1;
     default:
-      fprintf(stderr, "ertf_color_add: Ill-formed rtf file.\n");
+      fprintf(stderr, "_ertf_color_add: Ill-formed rtf file.\n");
       goto err;
     }    
   }
