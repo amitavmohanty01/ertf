@@ -66,7 +66,7 @@ int ertf_font_table(FILE *fp)
   }
 
  err_loop:
-  fprintf(stderr, "Incorrect termination of file. Probably corrupted.\n");
+  fprintf(stderr, "ertf_font_table: Incorrect termination of file. Probably corrupted.\n");
   return 0;// unsuccessful return
 }
 
@@ -83,6 +83,7 @@ _ertf_font_add(FILE *fp)
   if (!node)
     fprintf(stderr, "_ertf_font_add: Out of memory while allocating font node.\n");
 
+  node->status = 0;
   // todo: remove debug msg
   printf("Inside font entry parser.\n");
 
@@ -91,36 +92,43 @@ _ertf_font_add(FILE *fp)
     switch (c)
     {
     case '\\': //encountered a control word      
-      fscanf(fp, "%[^ 0123456789]", buf);
-      CHECK_EOF(fp, "ertf_fond_add: Ill-formed rtf.\n", goto error);
+      fscanf(fp, "%[^ 0123456789\\]", buf);
+      CHECK_EOF(fp, "_ertf_fond_add: Ill-formed rtf.\n", goto error);
 
       if (strcmp(buf, "f") == 0)
       {
 	fscanf(fp, "%d", &node->number);
+	CHECK_EOF(fp, "_ertf_font_add: EOF encountered while reading font number.\n", return 0);
       }
-      else if (strcmp(buf, "fRoman") == 0)
+      else if (strcmp(buf, "froman") == 0)
       {
 	strcpy(node->family, "Roman");
+	node->status |= FAMILY_SET;
       }
       else if (strcmp(buf, "fswiss") == 0)
       {
 	strcpy(node->family, "swiss");
+	node->status |= FAMILY_SET;
       }
       else if (strcmp(buf, "fmodern") == 0)
       {
 	strcpy(node->family, "modern");
+	node->status |= FAMILY_SET;
       }
       else if (strcmp(buf, "fscript") == 0)
       {
 	strcpy(node->family, "script");
+	node->status |= FAMILY_SET;
       }
       else if (strcmp(buf, "fdecor") == 0)
       {
 	strcpy(node->family, "decor");
+	node->status |= FAMILY_SET;
       }
       else if (strcmp(buf, "ftech") == 0)
       {
 	strcpy(node->family, "tech");
+	node->status |= FAMILY_SET;
       }
       else if (strcmp(buf, "fnil") == 0)
       {
@@ -129,30 +137,38 @@ _ertf_font_add(FILE *fp)
 	// be modified to be done only once and rather have a bitwise check
 	// run each time
       }
+      else if (strcmp(buf, "fcharset") == 0)
+      {
+	fscanf(fp, "%d", &node->charset);
+	CHECK_EOF(fp, "_ertf_font_add: EOF encountered while reading charset.", return 0);
+	node->status |= CHARSET_SET;
+      }
       else
       {
         // skip unrecognised or unsupported tag
 	while ((c = fgetc(fp)) != EOF  && c != '\\' && !isdigit(c))
 	  ;
-	if(c == EOF)
-        {
-	  fprintf(stderr, "_ertf_font_add: end of file encountered while skipping unrecognised tag\n");
-	  goto error;
-	}
-        else if (c == '\\')
+	CHECK_EOF(fp, "_ertf_font_add: end of file encountered while skipping unrecognised tag\n", goto error);
+        if (c == '\\')
         {
 	  ungetc(c, fp);
 	}
       }
       break;
 
-    case ' ':fscanf(fp, "%[^;]", node->name);
+    case ' ':fscanf(fp, "%[^;{]", node->name);
+      // font tables can also contains groups, especially specifying alternative fonts
       CHECK_EOF(fp, "_ertf_font_add: end of file encountered while reading font name. \n", goto error);
       break;
 
     case ';':// end of font entry
       eina_array_push(font_table, node);
       return 1;// successful return
+
+    case '{':// group
+      while((c = fgetc(fp)) != '}')
+	;
+      break;
 
     default:
       // todo: remove debug statement in final version

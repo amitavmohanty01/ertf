@@ -19,6 +19,7 @@ int _ertf_default_left_margin   = 1800;
 int _ertf_default_right_margin  = 1800;
 int _ertf_default_top_margin    = 1440;
 int _ertf_default_bottom_margin = 1440;
+int _ertf_default_font = 0;
 
 static int _ertf_initcount = 0;
 

@@ -8,6 +8,7 @@
 
 #include "ertf_input.h"
 #include "ertf_color.h"
+#include "ertf_font.h"
 #include "ertf_private.h"
 
 int
@@ -111,10 +112,24 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* font entry number */
       else if (strcmp(buf, "f") == 0)
       {
-	if (!isdigit(c = fgetc(fp)))
-	  ungetc(c, fp);
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for bold text.\n", return 0);
+	Ertf_Font_Node *font;	
+
 	// todo: find relevant markup
+	fscanf(fp, "%d", &c);
+	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for font number.\n", return 0);
+	font = eina_array_data_get(font_table, c);	
+      }
+
+      /* line break */
+      else if (strcmp(buf, "line") == 0)
+      {
+	ertf_markup_add("<br>", 4);
+      }
+
+      /* tab */
+      else if (strcmp(buf, "tab") == 0)
+      {
+	ertf_markup_add("<tab>", 5);
       }
 
       /* underline */
@@ -351,4 +366,34 @@ ertf_paragraph_translate(FILE *fp, int align)
   }
 
   return 1;
+}
+
+char s[1024] = "";
+
+char *
+ertf_textblock_style_generate()
+{
+  char buf[256] = "";
+  Ertf_Font_Node *font;
+  Eina_Array_Iterator iterator;
+  unsigned int i;
+
+  // todo: use functions in ertf_input.c generate style string of exact size
+  if (!font_table)
+  {
+    printf("font table is cleared.\n");
+    return NULL;
+  }
+  font = eina_array_data_get(font_table, _ertf_default_font);
+  sprintf(buf, "DEFAULT='font=%s,%s font_size=12 align=left color=#%02x%02x%02xff wrap=word left_margin=+12 right_margin=+12'", font->name, font->family, _ertf_default_color_r, _ertf_default_color_g, _ertf_default_color_b);
+  strcat(s, buf);
+
+  EINA_ARRAY_ITER_NEXT(font_table, i, font, iterator)
+  {
+    printf("%d# %s\n", i, font->family);
+  }
+
+  printf("%s\n", s);
+
+  return s;
 }

@@ -15,7 +15,6 @@ FILE *fstream;
 // to the user.
 
 int bracecount = 0;
-int default_font_node; // for \deff<N> control word
 int version;
 char charset[6];
 
@@ -38,6 +37,7 @@ main(int argc, char **argv)
       return -1;
     // todo: use setvbuf() to properly buffer the stream before reading
     init_parser();
+    ertf_textblock_style_generate();
     // when the markup is generated, the parser can be shut down
     shutdown_parser();
     init_gui();
@@ -65,7 +65,7 @@ init_parser()
   }
   else if (fscanf(fstream, "%4s", str), strcmp(str, "\\rtf") != 0 )
   {
-    fprintf(stderr, "rtf version unspecif ied.\n");
+    fprintf(stderr, "rtf version unspecified.\n");
   }
   else if ((fscanf(fstream, "%d\\%c", &version, &str[0]), str[0] != 'a') &&
 	   str[0] != 'p' &&
@@ -161,6 +161,18 @@ readloop()
 	}
         else
 	  printf("failure parsing parapgraph.\n");
+      }
+
+      /* default font */
+      else if (strcmp(control_word, "deff") == 0)
+      {
+	fscanf(fstream, "%d", &_ertf_default_font);
+      }
+
+      /* unrecognised control word */
+      else
+      {
+	fprintf(stderr, "readloop: skipping unrecognised control word %s\n", control_word);
       }
 
       break;
