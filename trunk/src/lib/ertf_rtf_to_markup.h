@@ -5,6 +5,8 @@
 #include <stdio.h>
 
 
+char *ertf_textblock_style_generate();
+
 int ertf_paragraph_translate(FILE *, int);
 
 

@@ -16,6 +16,8 @@ extern int _ertf_default_right_margin;
 extern int _ertf_default_top_margin;
 extern int _ertf_default_bottom_margin;
 
+extern int _ertf_default_font;
+
 extern Eina_Array *color_table;
 extern Eina_Array *font_table;
 extern Eina_Array *stylesheet_table;
