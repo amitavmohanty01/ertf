@@ -23,6 +23,7 @@ init_gui()
   Evas_Object *textblock;
   Evas_Object *background;
   Evas_Textblock_Style *st;
+  char *s;
 
   /* initialize libraries */
   ecore_evas_init();
@@ -51,7 +52,11 @@ init_gui()
   // todo: remove the name if not required
   evas_object_name_set(textblock, "textblock");
 
-  // todo: replace the string by style_string defined in GUI.h
+  s = ertf_textblock_style_get();
+  if (s)
+    printf("%s\n", s);
+
+  // evas_textblock_style_set(st, s);
   evas_textblock_style_set(st,
 			   "DEFAULT='font=Vera,Kochi font_size=8 align=left color=#000000 wrap=word left_margin=+12 right_margin=+12'"
 			   "center='+ font=Vera,Kochi font_size=10 align=center'"
@@ -66,7 +71,7 @@ init_gui()
 			   "br='\n'"
 			   "tab='\t'"
 			   );
-  evas_object_name_set(textblock, "textblock");
+  //  evas_textblock_style_set(st,"DEFAULT='font=Times New Roman,Roman font_size=12 align=left color=#000000ff wrap=word left_margin=+12 right_margin=+12'br='\n'tab='\t'p='+ font=Times New Roman,Roman font_size=12 align=left left_margin=+12 right_margin=+12'/p='- \n'center='+ font=Times New Roman,Roman font_size=12 align=center'/center='- \n'right='+ font=Times New Roman,Roman font_size=12 align=right'/right='- \n'");
   evas_object_textblock_style_set(textblock, st);
   evas_textblock_style_free(st);
   evas_object_textblock_clear(textblock);

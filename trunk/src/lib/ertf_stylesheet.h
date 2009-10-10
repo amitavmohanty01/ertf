@@ -30,5 +30,7 @@ typedef struct Ertf_Stylesheet
 
 int ertf_stylesheet_parse(FILE *);
 
+char *ertf_textblock_style_get();
+
 
 #endif /* ERTF_STYLESHEET_H_ */
