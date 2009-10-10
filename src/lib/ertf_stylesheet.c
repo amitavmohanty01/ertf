@@ -11,13 +11,14 @@
 #include "ertf_stylesheet.h"
 #include "ertf_input.h"
 #include "ertf_color.h"
+#include "ertf_font.h"
 #include "ertf_private.h"
 
 
 Eina_Array *stylesheet_table;
 
 static int _ertf_stylesheet_add(FILE *);
-
+static void _ertf_textblock_style_generate();
 
 int ertf_stylesheet_parse(FILE *fp)
 {
@@ -53,6 +54,7 @@ int ertf_stylesheet_parse(FILE *fp)
       break;
 
     case '}':// end of stylesheets
+      _ertf_textblock_style_generate();
       return 1;// successful return
 
     case '\n':// todo: check whether newline character is a valid delimiter?
@@ -262,4 +264,46 @@ _ertf_stylesheet_add(FILE *fp)
  error:
   free(style);
   return 0;
+}
+
+char ertf_style_string[1024] = "";
+
+static void
+_ertf_textblock_style_generate()
+{
+  char buf[256] = "";
+  Ertf_Font_Node *font;
+  Eina_Array_Iterator iterator;
+  unsigned int i;
+
+  // todo: use functions in ertf_input.c generate style string of exact size
+  if (!font_table)
+  {
+    printf("font table is cleared.\n");
+    return NULL;
+  }
+  font = eina_array_data_get(font_table, _ertf_default_font);  
+  sprintf(buf, "DEFAULT='font=%s,%s font_size=12 align=left color=#%02x%02x%02xff wrap=word left_margin=+12 right_margin=+12'", font->name, font->family, _ertf_default_color_r, _ertf_default_color_g, _ertf_default_color_b);
+  strcat(ertf_style_string, buf);
+  sprintf(buf, "br='\n'");
+  strcat(ertf_style_string, buf);
+  sprintf(buf, "tab='\t'");
+  strcat(ertf_style_string, buf);
+  sprintf(buf, "p='+ font=%s,%s font_size=12 align=left left_margin=+12 right_margin=+12'/p='- \n'", font->name, font->family);
+  strcat(ertf_style_string, buf);
+  sprintf(buf, "center='+ font=%s,%s font_size=12 align=center'/center='- \n'", font->name, font->family);
+  strcat(ertf_style_string, buf);
+  sprintf(buf, "right='+ font=%s,%s font_size=12 align=right'/right='- \n'", font->name, font->family);
+  strcat(ertf_style_string, buf);
+
+  EINA_ARRAY_ITER_NEXT(font_table, i, font, iterator)
+  {
+    printf("%d# %s\n", i, font->family);
+  }
+}
+
+char *
+ertf_textblock_style_get()
+{
+  return ertf_style_string;
 }

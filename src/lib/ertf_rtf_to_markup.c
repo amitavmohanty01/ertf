@@ -367,33 +367,3 @@ ertf_paragraph_translate(FILE *fp, int align)
 
   return 1;
 }
-
-char s[1024] = "";
-
-char *
-ertf_textblock_style_generate()
-{
-  char buf[256] = "";
-  Ertf_Font_Node *font;
-  Eina_Array_Iterator iterator;
-  unsigned int i;
-
-  // todo: use functions in ertf_input.c generate style string of exact size
-  if (!font_table)
-  {
-    printf("font table is cleared.\n");
-    return NULL;
-  }
-  font = eina_array_data_get(font_table, _ertf_default_font);
-  sprintf(buf, "DEFAULT='font=%s,%s font_size=12 align=left color=#%02x%02x%02xff wrap=word left_margin=+12 right_margin=+12'", font->name, font->family, _ertf_default_color_r, _ertf_default_color_g, _ertf_default_color_b);
-  strcat(s, buf);
-
-  EINA_ARRAY_ITER_NEXT(font_table, i, font, iterator)
-  {
-    printf("%d# %s\n", i, font->family);
-  }
-
-  printf("%s\n", s);
-
-  return s;
-}

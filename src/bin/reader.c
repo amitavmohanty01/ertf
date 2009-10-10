@@ -36,8 +36,7 @@ main(int argc, char **argv)
     if (!ertf_init())
       return -1;
     // todo: use setvbuf() to properly buffer the stream before reading
-    init_parser();
-    ertf_textblock_style_generate();
+    init_parser();    
     // when the markup is generated, the parser can be shut down
     shutdown_parser();
     init_gui();
