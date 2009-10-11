@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #include <Eina.h>
 
@@ -271,7 +272,7 @@ _ertf_textblock_style_generate()
   Ertf_Font_Node *font;
   Eina_Array_Iterator iterator;
   unsigned int i;
-
+  
   // todo: use functions in ertf_input.c generate style string of exact size
   font = eina_array_data_get(font_table, _ertf_default_font);  
   sprintf(buf, "DEFAULT='font=%s font_size=12 align=left color=#%02x%02x%02xff wrap=word left_margin=+12 right_margin=+12'", font->family, _ertf_default_color_r, _ertf_default_color_g, _ertf_default_color_b);
