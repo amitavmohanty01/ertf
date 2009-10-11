@@ -4,6 +4,11 @@
 
 #include <stdio.h>
 
+#define STYLE_NAME_SET 1
+#define STYLE_FONT_SET 2
+#define STYLE_FONT_SIZE_SET 4
+#define STYLE_FOREGROUND_SET 8
+#define STYLE_BACKGROUND_SET 16
 
 typedef struct Ertf_Stylesheet
 {

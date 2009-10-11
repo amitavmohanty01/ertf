@@ -53,25 +53,8 @@ init_gui()
   evas_object_name_set(textblock, "textblock");
 
   s = ertf_textblock_style_get();
-  if (s)
-    printf("%s\n", s);
-
-  // evas_textblock_style_set(st, s);
-  evas_textblock_style_set(st,
-			   "DEFAULT='font=Vera,Kochi font_size=8 align=left color=#000000 wrap=word left_margin=+12 right_margin=+12'"
-			   "center='+ font=Vera,Kochi font_size=10 align=center'"
-			   "/center='- \n'"
-			   "right='+ font=Vera,Kochi font_size=10 align=right'"
-			   "/right='- \n'"
-			   "blockquote='+ left_margin=+24 right_margin=+24 font=Vera,Kochi font_size=10 align=left'"
-			   "h1='+ font_size=20'"
-			   "red='+ color=#ff0000'"
-			   "p='+ font=Vera,Kochi font_size=10 align=left left_margin=+12 right_margin=+12'"
-			   "/p='- \n'"
-			   "br='\n'"
-			   "tab='\t'"
-			   );
-  //  evas_textblock_style_set(st,"DEFAULT='font=Times New Roman,Roman font_size=12 align=left color=#000000ff wrap=word left_margin=+12 right_margin=+12'br='\n'tab='\t'p='+ font=Times New Roman,Roman font_size=12 align=left left_margin=+12 right_margin=+12'/p='- \n'center='+ font=Times New Roman,Roman font_size=12 align=center'/center='- \n'right='+ font=Times New Roman,Roman font_size=12 align=right'/right='- \n'");
+  printf("%s\n", s); 
+  evas_textblock_style_set(st, s);
   evas_object_textblock_style_set(textblock, st);
   evas_textblock_style_free(st);
   evas_object_textblock_clear(textblock);
@@ -79,8 +62,6 @@ init_gui()
   evas_object_move(textblock, 0, 0);
   evas_object_resize(textblock, 1024, 768);
   evas_object_show(textblock);
-
-  /* todo: add callbacks as required */
   
   /* start the main event loop */
   ecore_main_loop_begin();
