@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <math.h>
 
 #include <Evas.h>
 #include <Ecore.h>
@@ -24,6 +25,7 @@ init_gui()
   Evas_Object *background;
   Evas_Textblock_Style *st;
   char *s;
+  int w, h, dpi;
 
   /* initialize libraries */
   ecore_evas_init();
@@ -32,6 +34,13 @@ init_gui()
   ee = ecore_evas_new("software_x11", 0, 0, 1024, 768, NULL);
   ecore_evas_title_set(ee, "Ertf");
   ecore_evas_callback_delete_request_set(ee, _cb_delete);
+
+  /* calculate textblock size */
+  // todo: actually this should be scrren size. if the textblock size is more, scroll bars should be supplied.
+  dpi = ecore_x_dpi_get();
+  w = (int) ceilf(_ertf_default_paper_width / 1440.0f * dpi);
+  h = (int) ceilf(_ertf_default_paper_height / 1440.0f * dpi);  
+  ecore_evas_resize(ee, w, h);
   ecore_evas_show(ee);
 
   /* get a pointer our new Evas canvas */
@@ -41,7 +50,7 @@ init_gui()
   background = evas_object_rectangle_add(evas);
   evas_object_color_set(background, 255, 255, 255, 255);
   evas_object_move(background, 0, 0);
-  evas_object_resize(background, 1024, 768);
+  evas_object_resize(background, w, h);
   evas_object_name_set(background, "background");
   evas_object_show(background);
 
@@ -52,15 +61,14 @@ init_gui()
   // todo: remove the name if not required
   evas_object_name_set(textblock, "textblock");
 
-  s = ertf_textblock_style_get();
-  printf("%s\n", s); 
+  s = ertf_textblock_style_get();   
   evas_textblock_style_set(st, s);
   evas_object_textblock_style_set(textblock, st);
   evas_textblock_style_free(st);
   evas_object_textblock_clear(textblock);
   evas_object_textblock_text_markup_set(textblock, markup);
   evas_object_move(textblock, 0, 0);
-  evas_object_resize(textblock, 1024, 768);
+  evas_object_resize(textblock, w, h);
   evas_object_show(textblock);
   
   /* start the main event loop */
