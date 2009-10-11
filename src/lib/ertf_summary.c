@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "ertf_summary.h"
+#include "ertf_input.h"
 
 
 Ertf_Info *doc_info;
@@ -85,11 +86,7 @@ _ertf_resolve_control_word(FILE *fp)
   }
   fscanf(fp, "%[^ ]", control_word);
   // get control word
-  if (feof(fp))
-  {
-    fprintf(stderr, "End of file reached.\n");
-    return 0;
-  }
+  CHECK_EOF(fp, "End of file reached.\n", return 0);
 
   // resolve the control word
   switch (control_word[0])
@@ -132,6 +129,6 @@ _ertf_resolve_control_word(FILE *fp)
   }
 
  skip:
-  fprintf(stderr, "summary: skipping control tag %s\n", control_word);
+  fprintf(stderr, "_ertf_resolve_control_word: skipping control tag %s\n", control_word);
   return 1;
 }

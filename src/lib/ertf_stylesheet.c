@@ -117,6 +117,7 @@ _ertf_stylesheet_add(FILE *fp)
 	    fprintf(fp, "_ertf_stylesheet_add: stylesheet colour not in colour table\n");
 	    goto error;
 	  }
+	  style->set |= STYLE_FOREGROUND_SET;
 	}
         else if (strcmp(buf + 1, "b") == 0)
         {
@@ -126,17 +127,18 @@ _ertf_stylesheet_add(FILE *fp)
 	    fprintf(fp, "_ertf_stylesheet_add: stylesheet colour not in colour table\n");
 	    goto error;
 	  }
+	  style->set |= STYLE_BACKGROUND_SET;
 	}
 	break;
 
       case 's':
 	if (buf[1] == '\0')
         {
-	  // read font number
+	  // read style number
 	  fscanf(fp, "%d", &style->style_number);
 	  if (feof(fp))
           {
-	    fprintf(stderr, "_ertf_stylesheet: end of file reached while reading stylesheet number");
+	    fprintf(stderr, "_ertf_stylesheet_add: end of file reached while reading stylesheet number");
 	    goto error;
 	  }
 	}
@@ -182,20 +184,14 @@ _ertf_stylesheet_add(FILE *fp)
 	if (buf[1] == '\0')
         {
 	  fscanf(fp, "%u", &style->font_number);
-	  if (feof(fp))
-          {
-	    fprintf(stderr, "_ertf_stylesheet: end of file reached while reading font number");
-	    goto error;
-	  }
+	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading font number", goto error);
+	  style->set |= STYLE_FONT_SET;
 	}
         else if (strcmp(buf + 1, "s") == 0)
         {
 	  fscanf(fp, "%u", &style->font_size);
-	  if (feof(fp))
-          {
-	    fprintf(stderr, "_ertf_stylesheet: end of file reached while reading font number");
-	    goto error;
-	  }
+	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading font number", goto error);
+	  style->set |= STYLE_FONT_SIZE_SET;
 	}
         else
         {
@@ -277,23 +273,18 @@ _ertf_textblock_style_generate()
   unsigned int i;
 
   // todo: use functions in ertf_input.c generate style string of exact size
-  if (!font_table)
-  {
-    printf("font table is cleared.\n");
-    return NULL;
-  }
   font = eina_array_data_get(font_table, _ertf_default_font);  
-  sprintf(buf, "DEFAULT='font=%s,%s font_size=12 align=left color=#%02x%02x%02xff wrap=word left_margin=+12 right_margin=+12'", font->name, font->family, _ertf_default_color_r, _ertf_default_color_g, _ertf_default_color_b);
+  sprintf(buf, "DEFAULT='font=%s font_size=12 align=left color=#%02x%02x%02xff wrap=word left_margin=+12 right_margin=+12'", font->family, _ertf_default_color_r, _ertf_default_color_g, _ertf_default_color_b);
   strcat(ertf_style_string, buf);
   sprintf(buf, "br='\n'");
   strcat(ertf_style_string, buf);
   sprintf(buf, "tab='\t'");
   strcat(ertf_style_string, buf);
-  sprintf(buf, "p='+ font=%s,%s font_size=12 align=left left_margin=+12 right_margin=+12'/p='- \n'", font->name, font->family);
+  sprintf(buf, "p='+ font=%s font_size=12 align=left left_margin=+12 right_margin=+12'/p='- \n'", font->family);
   strcat(ertf_style_string, buf);
-  sprintf(buf, "center='+ font=%s,%s font_size=12 align=center'/center='- \n'", font->name, font->family);
+  sprintf(buf, "center='+ font=%s font_size=12 align=center'/center='- \n'", font->family);
   strcat(ertf_style_string, buf);
-  sprintf(buf, "right='+ font=%s,%s font_size=12 align=right'/right='- \n'", font->name, font->family);
+  sprintf(buf, "right='+ font=%s font_size=12 align=right'/right='- \n'", font->family);
   strcat(ertf_style_string, buf);
 
   EINA_ARRAY_ITER_NEXT(font_table, i, font, iterator)
