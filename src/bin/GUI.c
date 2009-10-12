@@ -36,7 +36,7 @@ init_gui()
   ecore_evas_callback_delete_request_set(ee, _cb_delete);
 
   /* calculate textblock size */
-  // todo: actually this should be scrren size. if the textblock size is more, scroll bars should be supplied.
+  // todo: actually this should be screen size. if the textblock size is more, scroll bars should be supplied.
   dpi = ecore_x_dpi_get();
   w = (int) ceilf(_ertf_default_paper_width / 1440.0f * dpi);
   h = (int) ceilf(_ertf_default_paper_height / 1440.0f * dpi);  
@@ -61,7 +61,8 @@ init_gui()
   // todo: remove the name if not required
   evas_object_name_set(textblock, "textblock");
 
-  s = ertf_textblock_style_get();   
+  s = ertf_textblock_style_get();
+  printf("%s\n", s);  
   evas_textblock_style_set(st, s);
   evas_object_textblock_style_set(textblock, st);
   evas_textblock_style_free(st);

@@ -22,6 +22,7 @@ main(int argc, char *argv[])
   Evas_Object          *background;
   Evas_Textblock_Style *st;
   Ertf_Document        *doc;
+  int                   w, h, dpi;
 
   if (argc < 2)
     {
@@ -39,8 +40,14 @@ main(int argc, char *argv[])
   if (!ee)
     goto shutdown_ertf;
 
-  ecore_evas_title_set(ee, "Ertf Smart test");
+  ecore_evas_title_set(ee, "Ertf Evas test");
   ecore_evas_callback_delete_request_set(ee, _ertf_cb_delete);
+  /* calculate textblock size */
+  // todo: actually this should be screen size. if the textblock size is more, scroll bars should be supplied.
+  dpi = ecore_x_dpi_get();
+  w = (int) ceilf(_ertf_default_paper_width / 1440.0f * dpi);
+  h = (int) ceilf(_ertf_default_paper_height / 1440.0f * dpi);  
+  ecore_evas_resize(ee, w, h);
   ecore_evas_show(ee);
 
   evas = ecore_evas_get(ee);
@@ -66,7 +73,7 @@ main(int argc, char *argv[])
   background = evas_object_rectangle_add(evas);
   evas_object_color_set(background, 255, 255, 255, 255);
   evas_object_move(background, 0, 0);
-  evas_object_resize(background, 1024, 768);
+  evas_object_resize(background, w, h);
   evas_object_name_set(background, "background");
   evas_object_show(background);
 
@@ -98,7 +105,7 @@ main(int argc, char *argv[])
   evas_object_textblock_clear(textblock);
   evas_object_textblock_text_markup_set(textblock, markup);
   evas_object_move(textblock, 0, 0);
-  evas_object_resize(textblock, 1024, 768);
+  evas_object_resize(textblock, w, h);
   evas_object_show(textblock);
 
   ecore_main_loop_begin ();
