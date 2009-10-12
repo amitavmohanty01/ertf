@@ -156,11 +156,7 @@ _ertf_stylesheet_add(FILE *fp)
         else if (strcmp(buf + 1, "next") == 0)
         {
 	  fscanf(fp, "%d", &c);
-	  if (feof(fp))
-          {
-	    fprintf(stderr, "_ertf_stylesheet_add: end of file reached while reading paragraph number");
-	    goto error;
-	  }
+	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading paragraph number", goto error);
 	  // todo: set relevant paragraphs for the style
 	}
         else
@@ -179,6 +175,13 @@ _ertf_stylesheet_add(FILE *fp)
 	    ungetc(c, fp);
 	  }
 	}
+	break;
+
+      case '*':
+	while((c = fgetc(fp)) != EOF && c != ';')
+	  ;
+	CHECK_EOF(fp, "_ertf_stylesheet_add: EOF encountered while skipping spcial style group.\n", goto error);
+	ungetc(c, fp);
 	break;
 
       case 'f':
@@ -202,7 +205,7 @@ _ertf_stylesheet_add(FILE *fp)
 	    ;
 	  if (c == EOF)
           {
-	    fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
+	    fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag \n");
 	    goto error;
 	  }
           else if (c == '\\')
@@ -213,7 +216,6 @@ _ertf_stylesheet_add(FILE *fp)
 	break;
 
       default:// skip unrecognised/unsupported control word
-	// todo: check if NOR conversion simplifies it
 	while ((c = fgetc(fp)) != EOF  && c != '\\')
 	  ;
 	if (c == EOF)
@@ -229,8 +231,7 @@ _ertf_stylesheet_add(FILE *fp)
       break;
 
       // parse group
-    case '{':
-      // todo: check if NOR conversion simplifies it
+    case '{':      
       while ((c = fgetc(fp)) != EOF  && c != '}')
 	;
       if(c == EOF)
@@ -256,7 +257,7 @@ _ertf_stylesheet_add(FILE *fp)
   }
   // end of file is reached
   // todo: remove debug statement in final version
-  fprintf(stderr, "ertf_font_add: Ill-formed rtf.\n");
+  fprintf(stderr, "_ertf_stylesheet_add: Ill-formed rtf.\n");
 
  error:
   free(style);
