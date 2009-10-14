@@ -162,10 +162,71 @@ readloop()
 	  printf("failure parsing parapgraph.\n");
       }
 
+      /* handle groups */
+      /*
+      else if (strcmp(control_word, "*") == 0)
+      {
+	while((c = fgetc(fstream) != EOF &&  c != '}'))
+	  ;
+	bracecount--;
+      }
+      */
+
       /* default font */
       else if (strcmp(control_word, "deff") == 0)
       {
-	fscanf(fstream, "%d", &_ertf_default_font);
+	fscanf(fstream, "%d", &_ertf_default_font);      
+      }
+
+      /* handle paper height */
+      else if (strcmp(control_word, "paperh") == 0)
+      {
+	fscanf(fstream, "%d", &_ertf_paper_height);
+      }
+
+      /* handle paper width */
+      else if (strcmp(control_word, "paperw") == 0)
+      {
+	fscanf(fstream, "%d", &_ertf_paper_width);
+      }
+
+      /* handle left margin */
+      else if (strcmp(control_word, "margl") == 0)
+      {
+	fscanf(fstream, "%d", &_ertf_left_margin);
+      }
+
+      /* handle right margin */
+      else if (strcmp(control_word, "margr") == 0)
+      {
+	fscanf(fstream, "%d", &_ertf_right_margin);
+      }
+
+      /* handle top margin */
+      else if (strcmp(control_word, "margt") == 0)
+      {
+	fscanf(fstream, "%d", &_ertf_top_margin);
+      }
+
+      /* handle bottom margin */
+      else if (strcmp(control_word, "margb") == 0)
+      {
+	fscanf(fstream, "%d", &_ertf_bottom_margin);
+      }
+
+      /* default tab size in twips */
+      else if (strcmp(control_word, "deftab") == 0)
+      {
+	fscanf(fstream, "%d", &c);
+	// todo: look for possible implementation in textblock, otherwise the tag is useless.
+      }
+
+      else if (strcmp(control_word, "info") == 0)
+      {
+	if (ertf_summary(fstream))
+	  printf("Successfully parsed information section.\n");
+	else
+	  printf("failure parsing information about the file.\n");
       }
 
       /* unrecognised control word */

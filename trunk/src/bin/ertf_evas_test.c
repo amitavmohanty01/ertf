@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <math.h>
 #include <stdio.h>
 
 #include <Ecore_Evas.h>
@@ -45,8 +46,8 @@ main(int argc, char *argv[])
   /* calculate textblock size */
   // todo: actually this should be screen size. if the textblock size is more, scroll bars should be supplied.
   dpi = ecore_x_dpi_get();
-  w = (int) ceilf(_ertf_default_paper_width / 1440.0f * dpi);
-  h = (int) ceilf(_ertf_default_paper_height / 1440.0f * dpi);  
+  w = (int) ceilf(_ertf_paper_width / 1440.0f * dpi);
+  h = (int) ceilf(_ertf_paper_height / 1440.0f * dpi);  
   ecore_evas_resize(ee, w, h);
   ecore_evas_show(ee);
 

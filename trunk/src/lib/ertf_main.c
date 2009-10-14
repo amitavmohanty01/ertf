@@ -12,13 +12,14 @@ unsigned char _ertf_default_color_r = 0;
 unsigned char _ertf_default_color_g = 0;
 unsigned char _ertf_default_color_b = 0;
 
-/* The following values are in twips. */
-int _ertf_default_paper_width   = 12240;
-int _ertf_default_paper_height  = 15840;
-int _ertf_default_left_margin   = 1800;
-int _ertf_default_right_margin  = 1800;
-int _ertf_default_top_margin    = 1440;
-int _ertf_default_bottom_margin = 1440;
+/* The following values are default values in twips. */
+int _ertf_paper_width   = 12240;
+int _ertf_paper_height  = 15840;
+int _ertf_left_margin   = 1800;
+int _ertf_right_margin  = 1800;
+int _ertf_top_margin    = 1440;
+int _ertf_bottom_margin = 1440;
+
 int _ertf_default_font = 0;
 
 static int _ertf_initcount = 0;

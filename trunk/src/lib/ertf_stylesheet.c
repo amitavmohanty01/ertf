@@ -278,15 +278,19 @@ _ertf_textblock_style_generate()
   font = eina_array_data_get(font_table, _ertf_default_font);  
   sprintf(buf, "DEFAULT='font=%s font_size=12 align=left color=#%02x%02x%02xff wrap=word left_margin=+12 right_margin=+12'", font->family, _ertf_default_color_r, _ertf_default_color_g, _ertf_default_color_b);
   strcat(ertf_style_string, buf);
+  sprintf(buf, "bold='+ font=%s:style=Bold wrap=word font_size=12'", font->family);
+  strcat(ertf_style_string, buf);
+  sprintf(buf, "/bold='-'");
+  strcat(ertf_style_string, buf);
   sprintf(buf, "br='\n'");
   strcat(ertf_style_string, buf);
   sprintf(buf, "tab='\t'");
   strcat(ertf_style_string, buf);
-  sprintf(buf, "p='+ font=%s font_size=12 align=left left_margin=+12 right_margin=+12'/p='- \n'", font->family);
+  sprintf(buf, "p='+ font=%s font_size=12 align=left wrap=word left_margin=+12 right_margin=+12'/p='- \n'", font->family);
   strcat(ertf_style_string, buf);
   sprintf(buf, "center='+ font=%s font_size=12 align=center'/center='- \n'", font->family);
   strcat(ertf_style_string, buf);
-  sprintf(buf, "right='+ font=%s font_size=12 align=right'/right='- \n'", font->family);
+  sprintf(buf, "right='+ align=right left_margin=+12 right_margin=+12'/right='- align=left'");
   strcat(ertf_style_string, buf);
 
   EINA_ARRAY_ITER_NEXT(font_table, i, font, iterator)
