@@ -84,9 +84,9 @@ _ertf_resolve_control_word(FILE *fp)
     fprintf(stderr, "Ill-formed rtf.\n");
     return 0;
   }
-  fscanf(fp, "%[^ ]", control_word);
+  fscanf(fp, "%[^ \\]", control_word);
   // get control word
-  CHECK_EOF(fp, "End of file reached.\n", return 0);
+  CHECK_EOF(fp, "_ertf_resolve_control_word: End of file reached while reading control word.\n", return 0);
 
   // resolve the control word
   switch (control_word[0])
@@ -94,12 +94,15 @@ _ertf_resolve_control_word(FILE *fp)
   case 'a':// \author
     if (strcmp(control_word + 1, "uthor") == 0)
     {
-      // the keyword is actually \author
-      // todo: process it
+      char *s;
+      s = (char *)malloc(256);
+      fscanf(fp, "%[^}]", s);
+      doc_info->author = s;
       return 1;
     }
     else
       goto skip;
+    break;
   case 'b':// \buptime
   case 'c':// \creatim, \comment
   case 'd':// \doccomm, \dy
