@@ -14,8 +14,6 @@ Ertf_Info *doc_info;
 
 static int _ertf_resolve_control_word(FILE *);
 
-// todo: deal with the case of multiple \info tags
-
 /*
  * This function is called when \info tag is encountered.
  */
@@ -23,7 +21,7 @@ int
 ertf_summary(FILE *fp)
 {
   int c;
-
+  int braces = 1;
   doc_info = (Ertf_Info *)malloc(sizeof(Ertf_Info));
   if (!doc_info)
   {
@@ -52,15 +50,23 @@ ertf_summary(FILE *fp)
   {
     switch(c)
     {
+    case '\\':ungetc(c, fp);
     case '{':
+      if (c == '{')
+	braces++;
+      printf("%d\t", braces);
       if (_ertf_resolve_control_word(fp))
 	break;
       else
 	goto error;
-    case '}':return 1;
+    case '}':
+      braces--;
+      printf("%d\n", braces);
+      if (braces == 0)
+	return 1;
+      break;
     default:
-      fprintf(stderr, "ertf_summary: Ill-formatted rtf file.\n");
-      goto error;
+      fprintf(stderr, "ertf_summary: skipping control character %c\n", c);      
     }
   }
 
@@ -76,15 +82,14 @@ static int
 _ertf_resolve_control_word(FILE *fp)
 {
   // keeping it a multiple of four
-  char control_word[12];
+  char control_word[20];
   int c;
-
   if ((c = fgetc(fp)) == EOF || c != '\\')
   {
-    fprintf(stderr, "Ill-formed rtf.\n");
+    fprintf(stderr, "_ertf_resolve_control_word: Ill-formed rtf.\n");
     return 0;
   }
-  fscanf(fp, "%[^ \\]", control_word);
+  fscanf(fp, "%[^ \\0123456789{}]", control_word);
   // get control word
   CHECK_EOF(fp, "_ertf_resolve_control_word: End of file reached while reading control word.\n", return 0);
 
@@ -97,6 +102,7 @@ _ertf_resolve_control_word(FILE *fp)
       char *s;
       s = (char *)malloc(256);
       fscanf(fp, "%[^}]", s);
+      CHECK_EOF(fp, "_ertf_resolve_control_word: EOF encountered while reading author name.\n", return 0);
       doc_info->author = s;
       return 1;
     }
@@ -118,6 +124,21 @@ _ertf_resolve_control_word(FILE *fp)
   case 's':// \subject
   case 't':// \title
   case 'v':// \version, \vern
+    if (strcmp(control_word + 1, "ersion") == 0)
+    {
+      fscanf(fp, "%d", &doc_info->version);
+      CHECK_EOF(fp, "_ertf_resolve_control_word: EOF encountered while reading version.\n", return 0);
+      return 1;
+    }
+    else if (strcmp(control_word + 1, "ern") == 0)
+    {
+      fscanf(fp, "%d", &doc_info->internal_version);
+      CHECK_EOF(fp, "_ertf_resolve_control_word: EOF encountered while reading internal version number.\n", return 0);
+      return 1;
+    }
+    else
+      goto skip;
+  break;
   case 'y':// \yr
     if (strcmp(control_word + 1, "r") == 0)
     {
