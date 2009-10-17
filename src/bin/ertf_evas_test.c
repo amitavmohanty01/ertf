@@ -24,6 +24,7 @@ main(int argc, char *argv[])
   Evas_Textblock_Style *st;
   Ertf_Document        *doc;
   int                   w, h, dpi;
+  char                 *s;
 
   if (argc < 2)
     {
@@ -82,24 +83,9 @@ main(int argc, char *argv[])
   textblock = evas_object_textblock_add(evas);
   st = evas_textblock_style_new();
 
-  // todo: remove the name if not required
-  evas_object_name_set(textblock, "textblock");
-
-  // todo: replace the string by style_string defined in GUI.h
-  evas_textblock_style_set(st,
-			   "DEFAULT='font=Vera,Kochi font_size=8 align=left color=#000000 wrap=word left_margin=+12 right_margin=+12'"
-			   "center='+ font=Vera,Kochi font_size=10 align=center'"
-			   "/center='- \n'"
-			   "right='+ font=Vera,Kochi font_size=10 align=right'"
-			   "/right='- \n'"
-			   "blockquote='+ left_margin=+24 right_margin=+24 font=Vera,Kochi font_size=10 align=left'"
-			   "h1='+ font_size=20'"
-			   "red='+ color=#ff0000'"
-			   "p='+ font=Vera,Kochi font_size=10 align=left left_margin=+12 right_margin=+12'"
-			   "/p='- \n'"
-			   "br='\n'"
-			   "tab='\t'"
-			   );
+  s = ertf_textblock_style_get();
+  printf("%s\n", s);
+  evas_textblock_style_set(st, s);
   evas_object_name_set(textblock, "textblock");
   evas_object_textblock_style_set(textblock, st);
   evas_textblock_style_free(st);

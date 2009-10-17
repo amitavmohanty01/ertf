@@ -108,7 +108,7 @@ readloop()
     case '}':
       bracecount--;
       break;
-    case '\\'://todo:perform the control operation
+    case '\\'://todo: perform the control operation
       fscanf(fstream, "%[^ {\\;0123456789]", control_word);
       // Interestingly, a semi-colon delimits the "\colortbl" keyword sometimes
 
@@ -161,16 +161,6 @@ readloop()
         else
 	  printf("failure parsing parapgraph.\n");
       }
-
-      /* handle groups */
-      /*
-      else if (strcmp(control_word, "*") == 0)
-      {
-	while((c = fgetc(fstream) != EOF &&  c != '}'))
-	  ;
-	bracecount--;
-      }
-      */
 
       /* default font */
       else if (strcmp(control_word, "deff") == 0)

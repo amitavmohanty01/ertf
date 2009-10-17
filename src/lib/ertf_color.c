@@ -71,7 +71,7 @@ ertf_color_table(FILE *fp)
       return 1;
 
     default:
-      fprintf(stderr, "ertf_color_table: Ill-formed rtf");
+      fprintf(stderr, "ertf_color_table: Ill-formed rtf.\n");
       return 0;
     }
   }

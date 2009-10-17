@@ -23,6 +23,7 @@ ertf_paragraph_translate(FILE *fp, int align)
   char strikethroughset = 0;
   char underlineset = 0;
   char boldset = 0;
+  char italicset = 0;
   unsigned char current_r = _ertf_default_color_r;
   unsigned char current_g = _ertf_default_color_g;
   unsigned char current_b = _ertf_default_color_b;
@@ -96,9 +97,23 @@ ertf_paragraph_translate(FILE *fp, int align)
       else if (strcmp(buf, "i") == 0) 
       {
 	if (!isdigit(c = fgetc(fp)))
+	{
 	  ungetc(c, fp);
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for italicisation.\n", return 0);
-	// todo: find relevant markup
+	  if (!italicset)
+	  {
+	    ertf_markup_add("<em>", 4);
+	    italicset++;
+	  }
+	}
+	else
+	{
+	  if (italicset)
+	  {
+	    ertf_markup_add("</em>", 5);
+	    italicset = 0;
+	  }
+	}
+	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for italicisation.\n", return 0);	
       }
 
       /* bold text */
@@ -362,6 +377,10 @@ ertf_paragraph_translate(FILE *fp, int align)
   if (boldset)
   {
     ertf_markup_add("</bold>", 7);
+  }
+  if (italicset)
+  {
+    ertf_markup_add("</em>", 5);
   }
   if (fontset)
   {

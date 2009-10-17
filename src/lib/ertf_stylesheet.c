@@ -281,6 +281,9 @@ _ertf_textblock_style_generate()
   sprintf(buf, "bold='+ font=%s:style=Bold wrap=word font_size=12'", font->family);
   strcat(ertf_style_string, buf);
   sprintf(buf, "/bold='-'");
+  sprintf(buf, "em='+ font=%s:style=Oblique wrap=word font_size=12'", font->family);
+  strcat(ertf_style_string, buf);
+  sprintf(buf, "/em='-'");
   strcat(ertf_style_string, buf);
   sprintf(buf, "br='\n'");
   strcat(ertf_style_string, buf);

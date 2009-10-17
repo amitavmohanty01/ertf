@@ -222,6 +222,69 @@ ertf_document_parse(Ertf_Document *doc)
 	  printf("failure parsing parapgraph.\n");
       }
 
+      /* default font */
+      else if (strcmp(control_word, "deff") == 0)
+      {
+	fscanf(doc->stream, "%d", &_ertf_default_font);      
+      }
+
+      /* handle paper height */
+      else if (strcmp(control_word, "paperh") == 0)
+      {
+	fscanf(doc->stream, "%d", &_ertf_paper_height);
+      }
+
+      /* handle paper width */
+      else if (strcmp(control_word, "paperw") == 0)
+      {
+	fscanf(doc->stream, "%d", &_ertf_paper_width);
+      }
+
+      /* handle left margin */
+      else if (strcmp(control_word, "margl") == 0)
+      {
+	fscanf(doc->stream, "%d", &_ertf_left_margin);
+      }
+
+      /* handle right margin */
+      else if (strcmp(control_word, "margr") == 0)
+      {
+	fscanf(doc->stream, "%d", &_ertf_right_margin);
+      }
+
+      /* handle top margin */
+      else if (strcmp(control_word, "margt") == 0)
+      {
+	fscanf(doc->stream, "%d", &_ertf_top_margin);
+      }
+
+      /* handle bottom margin */
+      else if (strcmp(control_word, "margb") == 0)
+      {
+	fscanf(doc->stream, "%d", &_ertf_bottom_margin);
+      }
+
+      /* default tab size in twips */
+      else if (strcmp(control_word, "deftab") == 0)
+      {
+	fscanf(doc->stream, "%d", &c);
+	// todo: look for possible implementation in textblock, otherwise the tag is useless.
+      }
+
+      else if (strcmp(control_word, "info") == 0)
+      {
+	if (ertf_summary(doc->stream))
+	  printf("Successfully parsed information section.\n");
+	else
+	  printf("failure parsing information about the file.\n");
+      }
+
+      /* unrecognised control word */
+      else
+      {
+	fprintf(stderr, "ertf_document_parse: skipping unrecognised control word %s\n", control_word);
+      }
+
       break;
 
     default:
