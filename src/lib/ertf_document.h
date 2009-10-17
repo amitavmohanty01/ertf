@@ -21,5 +21,9 @@ const char *ertf_document_charset_get(Ertf_Document *doc);
 
 int ertf_document_parse(Ertf_Document *doc);
 
+void ertf_document_size_get(Ertf_Document *doc, int *width, int *height);
+
+void ertf_document_margin_get(Ertf_Document *doc, int *left, int *right, int *top, int *bottom);
+
 
 #endif /* __ERTF_DOCUMENT_H__ */

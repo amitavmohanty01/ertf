@@ -243,25 +243,25 @@ ertf_document_parse(Ertf_Document *doc)
       /* handle left margin */
       else if (strcmp(control_word, "margl") == 0)
       {
-	fscanf(doc->stream, "%d", &_ertf_left_margin);
+	fscanf(doc->stream, "%d", &_ertf_margin_left);
       }
 
       /* handle right margin */
       else if (strcmp(control_word, "margr") == 0)
       {
-	fscanf(doc->stream, "%d", &_ertf_right_margin);
+	fscanf(doc->stream, "%d", &_ertf_margin_right);
       }
 
       /* handle top margin */
       else if (strcmp(control_word, "margt") == 0)
       {
-	fscanf(doc->stream, "%d", &_ertf_top_margin);
+	fscanf(doc->stream, "%d", &_ertf_margin_top);
       }
 
       /* handle bottom margin */
       else if (strcmp(control_word, "margb") == 0)
       {
-	fscanf(doc->stream, "%d", &_ertf_bottom_margin);
+	fscanf(doc->stream, "%d", &_ertf_margin_bottom);
       }
 
       /* default tab size in twips */
@@ -318,4 +318,32 @@ ertf_document_charset_get(Ertf_Document *doc)
     return NULL;
 
   return doc->charset;
+}
+
+void
+ertf_document_size_get(Ertf_Document *doc, int *width, int *height)
+{
+  if (!doc)
+    return;
+
+  if (width)
+    *width = _ertf_paper_width;
+  if (height)
+    *height = _ertf_paper_height;
+}
+
+void
+ertf_document_margin_get(Ertf_Document *doc, int *left, int *right, int *top, int *bottom)
+{
+  if (!doc)
+    return;
+
+  if (left)
+    *left = _ertf_margin_left;
+  if (right)
+    *right = _ertf_margin_right;
+  if (top)
+    *top = _ertf_margin_top;
+  if (bottom)
+    *bottom = _ertf_margin_bottom;
 }
