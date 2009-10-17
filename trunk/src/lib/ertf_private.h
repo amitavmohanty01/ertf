@@ -11,10 +11,10 @@ extern unsigned char _ertf_default_color_b;
 
 extern int _ertf_paper_width;
 extern int _ertf_paper_height;
-extern int _ertf_left_margin;
-extern int _ertf_right_margin;
-extern int _ertf_top_margin;
-extern int _ertf_bottom_margin;
+extern int _ertf_margin_left;
+extern int _ertf_margin_right;
+extern int _ertf_margin_top;
+extern int _ertf_margin_bottom;
 
 extern int _ertf_default_font;
 

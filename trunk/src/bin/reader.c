@@ -183,25 +183,25 @@ readloop()
       /* handle left margin */
       else if (strcmp(control_word, "margl") == 0)
       {
-	fscanf(fstream, "%d", &_ertf_left_margin);
+	fscanf(fstream, "%d", &_ertf_margin_left);
       }
 
       /* handle right margin */
       else if (strcmp(control_word, "margr") == 0)
       {
-	fscanf(fstream, "%d", &_ertf_right_margin);
+	fscanf(fstream, "%d", &_ertf_margin_right);
       }
 
       /* handle top margin */
       else if (strcmp(control_word, "margt") == 0)
       {
-	fscanf(fstream, "%d", &_ertf_top_margin);
+	fscanf(fstream, "%d", &_ertf_margin_top);
       }
 
       /* handle bottom margin */
       else if (strcmp(control_word, "margb") == 0)
       {
-	fscanf(fstream, "%d", &_ertf_bottom_margin);
+	fscanf(fstream, "%d", &_ertf_margin_bottom);
       }
 
       /* default tab size in twips */
