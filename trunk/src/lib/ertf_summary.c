@@ -53,15 +53,13 @@ ertf_summary(FILE *fp)
     case '\\':ungetc(c, fp);
     case '{':
       if (c == '{')
-	braces++;
-      printf("%d\t", braces);
+	braces++;      
       if (_ertf_resolve_control_word(fp))
 	break;
       else
 	goto error;
     case '}':
       braces--;
-      printf("%d\n", braces);
       if (braces == 0)
 	return 1;
       break;
@@ -89,9 +87,10 @@ _ertf_resolve_control_word(FILE *fp)
     fprintf(stderr, "_ertf_resolve_control_word: Ill-formed rtf.\n");
     return 0;
   }
-  fscanf(fp, "%[^ \\0123456789{}]", control_word);
+  //fscanf(fp, "%[^ \\0123456789{}]", control_word);
   // get control word
-  CHECK_EOF(fp, "_ertf_resolve_control_word: End of file reached while reading control word.\n", return 0);
+  if (ertf_tag_get(fp, control_word))
+    fprintf(stderr, "_ertf_resolve_control_word: End of file reached while reading control word.\n");
 
   // resolve the control word
   switch (control_word[0])

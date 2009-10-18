@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "ertf_document.h"
 #include "ertf_private.h"
@@ -327,9 +328,9 @@ ertf_document_size_get(Ertf_Document *doc, int *width, int *height)
     return;
 
   if (width)
-    *width = _ertf_paper_width;
+    *width = (int) ceilf(_ertf_paper_width / 1440.0f * _twip_scale_factor);
   if (height)
-    *height = _ertf_paper_height;
+    *height = (int) ceilf(_ertf_paper_height / 1440.0f * _twip_scale_factor);
 }
 
 void

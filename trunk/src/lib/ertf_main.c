@@ -21,6 +21,8 @@ int _ertf_margin_top    = 1440;
 int _ertf_margin_bottom = 1440;
 
 int _ertf_default_font = 0;
+/* Usually, this is the screen dpi */
+int _twip_scale_factor = 86;
 
 static int _ertf_initcount = 0;
 
@@ -57,4 +59,10 @@ ertf_default_color_set(unsigned char r, unsigned char g, unsigned char b)
   _ertf_default_color_r = r;
   _ertf_default_color_g = g;
   _ertf_default_color_b = b;
+}
+
+void
+ertf_twip_scale_factor_set(int a)
+{
+  _twip_scale_factor = a;
 }

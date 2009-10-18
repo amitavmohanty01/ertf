@@ -52,3 +52,11 @@ ertf_markup_add(char *string, int len)
   ertf_markup_position += len;
   return 1;
 }
+
+int
+ertf_tag_get(FILE *fp, char *s)
+{
+  fscanf(fp, "%[^ 0123456789;\\{}\n]", s);
+  CHECK_EOF(fp, "", return 1);
+  return 0;
+}

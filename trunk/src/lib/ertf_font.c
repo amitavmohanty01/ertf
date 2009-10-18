@@ -92,8 +92,12 @@ _ertf_font_add(FILE *fp)
     switch (c)
     {
     case '\\': //encountered a control word      
-      fscanf(fp, "%[^ 0123456789\\]", buf);
-      CHECK_EOF(fp, "_ertf_fond_add: Ill-formed rtf.\n", goto error);
+      //fscanf(fp, "%[^ 0123456789\\]", buf);
+      if (ertf_tag_get(fp, buf))
+      {
+	fprintf(stderr, "_ertf_fond_add: Ill-formed rtf.\n");
+	goto error;
+      }
 
       if (strcmp(buf, "f") == 0)
       {
@@ -156,7 +160,8 @@ _ertf_font_add(FILE *fp)
       }
       break;
 
-    case ' ':fscanf(fp, "%[^;{]", node->name);
+    case ' ':
+      fscanf(fp, "%[^;{]", node->name);
       // font tables can also contains groups, especially specifying alternative fonts
       CHECK_EOF(fp, "_ertf_font_add: end of file encountered while reading font name. \n", goto error);
       break;
@@ -170,14 +175,11 @@ _ertf_font_add(FILE *fp)
 	;
       break;
 
-    default:
-      // todo: remove debug statement in final version
-      fprintf(stderr, "_ertf_font_add: unrecognised control character '%c'.\n", c);
-      goto error;
+    default:      
+      fprintf(stderr, "_ertf_font_add: unrecognised control character '%c'.\n", c);      
     }
   }
-  // end of file is reached
-  // todo: remove debug statement in final version
+  // end of file is reached  
   fprintf(stderr, "_ertf_font_add: Ill-formed rtf.\n");
 
  error:
