@@ -17,6 +17,7 @@ extern int _ertf_margin_top;
 extern int _ertf_margin_bottom;
 
 extern int _ertf_default_font;
+extern int _twip_scale_factor;
 
 extern Eina_Array *color_table;
 extern Eina_Array *font_table;

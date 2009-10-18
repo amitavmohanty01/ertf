@@ -100,12 +100,14 @@ _ertf_stylesheet_add(FILE *fp)
     switch (c)
     {
     case '\\':// get the control word
-      fscanf(fp, "%[^ 0123456789\\]", buf);
+      // fscanf(fp, "%[^ 0123456789\\]", buf);
       // read until a delimiter is encountered
-      CHECK_EOF(fp, "_ertf_stylesheet_add: Ill-formed rtf.\n", goto error);
+      if(ertf_tag_get(fp, buf))
+      {
+	fprintf(stderr, "_ertf_stylesheet_add: Ill-formed rtf.\n");
+	goto error;
+      }
 
-      // todo: use pattern matching technique / hashing and benchmark them
-      // to decide the optimal alternative to the if-else ladder
       switch (buf[0])
       {
       case 'c':
@@ -137,20 +139,12 @@ _ertf_stylesheet_add(FILE *fp)
         {
 	  // read style number
 	  fscanf(fp, "%d", &style->style_number);
-	  if (feof(fp))
-          {
-	    fprintf(stderr, "_ertf_stylesheet_add: end of file reached while reading stylesheet number");
-	    goto error;
-	  }
+	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading stylesheet number", goto error);
 	}
         else if (strcmp(buf + 1,"basedon") == 0)
         {
 	  fscanf(fp, "%d", &c);
-	  if (feof(fp))
-          {
-	    fprintf(stderr, "_ertf_stylesheet_add: end of file reached while reading style number");
-	    goto error;
-	  }
+	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading style number", goto error);
 	  //todo: copy relevant parts of the style
 	}
         else if (strcmp(buf + 1, "next") == 0)

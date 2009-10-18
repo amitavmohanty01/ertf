@@ -114,7 +114,7 @@ _ertf_color_add(FILE *fp)
     case '\\':
       ungetc(c, fp);
       fscanf(fp, "%[^0123456789]", color);
-      if (feof(fp)) goto err;
+      if(feof(fp)) goto err;
 
       fscanf(fp, "%d", &index);// todo: do error checking for range of rgb value
       if (feof(fp)) goto err;

@@ -94,7 +94,7 @@ readloop()
 {
   char control_word[30];
   int c;
-
+  
   ertf_markup_position = 0;
   markup = NULL;
 
