@@ -49,10 +49,12 @@ ertf_paragraph_translate(FILE *fp, int align)
       }
       else
 	ungetc(c, fp);
-
-      //fscanf(fp, "%[^ 0123456789\\{}\n]", buf);
+      
       if (ertf_tag_get(fp, buf))
+      {
 	fprintf(stderr, "ertf_paragraph_translate: end-of-file encountered while retrieving control word.\n");
+	return 0;
+      }
 
       /* reset to default character formatting */
       if (strcmp(buf, "plain") == 0)
