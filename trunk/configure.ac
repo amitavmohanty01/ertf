@@ -25,6 +25,16 @@ AC_SUBST(version_info)
 
 ### Additional options to configure
 
+use_dpi="no"
+AC_ARG_ENABLE([dpi],
+   AC_HELP_STRING([--enable-dpi], [enable dpi. @<:@default==disabled@:>@]),
+   [use_dpi="yes"],
+   [use_dpi="no"])
+
+if test "x${use_dpi}" = "xyes" ; then
+   AC_DEFINE(USE_DPI, 1, [Set to 1 if DPI is used])
+fi
+
 
 ### Checks for programs
 AC_PROG_CC
@@ -79,6 +89,8 @@ echo "------------------------------------------------------------------------"
 echo
 echo
 echo "Configuration Options Summary:"
+echo
+echo "  DPI..................: ${use_dpi}"
 echo
 echo "  Installation.........: make install"
 echo
