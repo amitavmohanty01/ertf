@@ -99,8 +99,7 @@ _ertf_stylesheet_add(FILE *fp)
   {
     switch (c)
     {
-    case '\\':// get the control word
-      // fscanf(fp, "%[^ 0123456789\\]", buf);
+    case '\\':// get the control word      
       // read until a delimiter is encountered
       if(ertf_tag_get(fp, buf))
       {

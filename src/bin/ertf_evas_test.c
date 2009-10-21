@@ -25,6 +25,7 @@ main(int argc, char *argv[])
   Ertf_Document        *doc;
   int                   w, h, dpi;
   char                 *s;
+  Evas_Coord x,y,h1,w1;
 
   if (argc < 2)
     {
@@ -103,6 +104,8 @@ main(int argc, char *argv[])
   printf("%d %d\n", w, h);
   evas_object_textblock_size_formatted_get(textblock, &w, &h);
   printf("%d %d\n", w, h);
+  if(evas_object_textblock_line_number_geometry_get(textblock, 5, &x, &y, &w1, &h1))
+    printf("%d %d %d %d\n", x, y, w1, h1);
   // trial code end
 
   ecore_main_loop_begin ();

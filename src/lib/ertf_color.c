@@ -71,8 +71,7 @@ ertf_color_table(FILE *fp)
       return 1;
 
     default:
-      fprintf(stderr, "ertf_color_table: Ill-formed rtf.\n");
-      return 0;
+      fprintf(stderr, "ertf_color_table: skipping control character %c.\n", c);      
     }
   }
 
@@ -141,8 +140,7 @@ _ertf_color_add(FILE *fp)
       eina_array_push(color_table, node);
       return 1;
     default:
-      fprintf(stderr, "_ertf_color_add: Ill-formed rtf file.\n");
-      goto err;
+      fprintf(stderr, "_ertf_color_add: skipped control character %c.\n", c);      
     }    
   }
 

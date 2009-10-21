@@ -87,10 +87,12 @@ _ertf_resolve_control_word(FILE *fp)
     fprintf(stderr, "_ertf_resolve_control_word: Ill-formed rtf.\n");
     return 0;
   }
-  //fscanf(fp, "%[^ \\0123456789{}]", control_word);
   // get control word
   if (ertf_tag_get(fp, control_word))
+  {
     fprintf(stderr, "_ertf_resolve_control_word: End of file reached while reading control word.\n");
+    return 0;
+  }
 
   // resolve the control word
   switch (control_word[0])

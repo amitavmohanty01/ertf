@@ -96,7 +96,7 @@ esmart_rtf_file_set(Evas_Object *obj, const char *filename)
   }
   else if (fscanf(sd->f, "%4s", str), strcmp(str, "\\rtf") != 0 )
   {
-    fprintf(stderr, "rtf version unspecified.\n");
+    fprintf(stderr, "esmart_rtf_file_set: rtf version unspecified.\n");
   }
   else if ((fscanf(sd->f, "%d\\%c", &sd->version, &str[0]), str[0] != 'a') &&
 	   str[0] != 'p' &&
@@ -104,7 +104,7 @@ esmart_rtf_file_set(Evas_Object *obj, const char *filename)
 	   )
   {
     // todo:improve the if  condition for full word checking
-    fprintf(stderr, "charset not defined\n");
+    fprintf(stderr, "esmart_rtf_file_set: charset not defined\n");
   }
   else
   {
@@ -131,13 +131,13 @@ esmart_rtf_file_set(Evas_Object *obj, const char *filename)
     case '}':
       sd->bracecount--;
       break;
-    case '\\'://todo:perform the control operation
+    case '\\':
       fscanf(sd->f, "%[^ {\\;0123456789]", control_word);
       // Interestingly, a semi-colon delimits the "\colortbl" keyword sometimes
 
       if (feof(sd->f))
       {
-          fprintf(stderr, "readloop: EOF encountered.\n");
+          fprintf(stderr, "esmart_rtf_file_set: EOF encountered.\n");
           goto free_f;
       }
 
@@ -201,14 +201,14 @@ esmart_rtf_file_set(Evas_Object *obj, const char *filename)
   // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
   if (sd->bracecount)
-    fprintf(stderr, "readloop: Ill-formed rtf - inconsistent use of braces.\n");
+    fprintf(stderr, "esmart_rtf_file_set: Ill-formed rtf - inconsistent use of braces.\n");
 
   evas_object_textblock_text_markup_set(sd->textblock, markup);
 
   return EINA_TRUE;
 
  free_f:
-  fprintf(stderr, "invalid rtf file\n");
+  fprintf(stderr, "esmart_rtf_file_set: invalid rtf file\n");
   fclose(sd->f);
   sd->f = NULL;
  free_filename:
