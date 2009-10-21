@@ -1,11 +1,6 @@
 MAINTAINERCLEANFILES = Makefile.in
 
-bin_PROGRAMS = reader ertf_evas_test ertf_esmart_test
-
-reader_SOURCES = reader.c GUI.c
-
-reader_CPPFLAGS = -I$(top_srcdir)/src/lib @ECORE_EVAS_CFLAGS@
-reader_LDADD = @ECORE_EVAS_LIBS@ $(top_builddir)/src/lib/libertf.la
+bin_PROGRAMS = ertf_evas_test ertf_esmart_test
 
 ertf_evas_test_SOURCES = ertf_evas_test.c
 
