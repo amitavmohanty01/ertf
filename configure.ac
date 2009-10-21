@@ -4,7 +4,7 @@ AC_CONFIG_SRCDIR([configure.ac])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 
-AM_INIT_AUTOMAKE(1.6 dist-bzip2)
+AM_INIT_AUTOMAKE([1.6 dist-bzip2])
 
 AC_LIBTOOL_WIN32_DLL
 define([AC_LIBTOOL_LANG_CXX_CONFIG], [:])dnl
@@ -49,6 +49,8 @@ PKG_CHECK_MODULES([ECORE_EVAS], [ecore-evas])
 
 
 ### Checks for compiler characteristics
+
+AM_PROG_CC_C_O
 
 
 ### Checks for linker characteristics
