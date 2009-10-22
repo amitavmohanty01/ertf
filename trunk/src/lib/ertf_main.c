@@ -6,7 +6,9 @@
 
 #include <Eina.h>
 
+#include "Ertf.h"
 #include "ertf_main.h"
+#include "ertf_private.h"
 
 unsigned char _ertf_default_color_r = 0;
 unsigned char _ertf_default_color_g = 0;
@@ -47,6 +49,7 @@ ertf_shutdown(void)
 {
   if (_ertf_initcount != 1) goto finish_shutdown;
 
+  _ertf_cleanup();
   eina_shutdown();
 
  finish_shutdown:
@@ -65,4 +68,40 @@ void
 ertf_twip_scale_factor_set(int a)
 {
   _twip_scale_factor = a;
+}
+
+void
+_ertf_cleanup()
+{
+  if (color_table)
+  {
+    Eina_Array_Iterator iterator;
+    Ertf_Color         *color;
+    unsigned int        i;
+
+    EINA_ARRAY_ITER_NEXT(color_table, i, color, iterator)
+      free(color);
+    eina_array_free(color_table);
+  }
+  if (font_table)
+  {
+    Eina_Array_Iterator iterator;
+    Ertf_Font_Node     *font;
+    unsigned int        i;
+
+    EINA_ARRAY_ITER_NEXT(font_table, i, font, iterator)
+      free(font);
+    eina_array_free(font_table);
+  }
+  if (stylesheet_table)
+  {
+    Eina_Array_Iterator iterator;
+    Ertf_Stylesheet    *stylesheet;
+    unsigned int        i;
+
+    EINA_ARRAY_ITER_NEXT(stylesheet_table, i, stylesheet, iterator)
+      free(stylesheet);
+    eina_array_free(stylesheet_table);
+  }
+  // todo: add summary info cleanup
 }

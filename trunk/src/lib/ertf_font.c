@@ -84,7 +84,6 @@ _ertf_font_add(FILE *fp)
     fprintf(stderr, "_ertf_font_add: Out of memory while allocating font node.\n");
 
   node->status = 0;
-  // todo: remove debug msg
   printf("Inside font entry parser.\n");
 
   while ((c = fgetc(fp)) != EOF)
@@ -92,7 +91,6 @@ _ertf_font_add(FILE *fp)
     switch (c)
     {
     case '\\': //encountered a control word      
-      //fscanf(fp, "%[^ 0123456789\\]", buf);
       if (ertf_tag_get(fp, buf))
       {
 	fprintf(stderr, "_ertf_fond_add: Ill-formed rtf.\n");

@@ -58,13 +58,11 @@ main(int argc, char *argv[])
   if (!ertf_document_header_get(doc))
     goto free_doc;
 
-  /* calculate textblock size */
-  // todo: actually this should be screen size. if the textblock size is more, scroll bars should be supplied.
-  // these lines should execute only if --enable-dpi is on
+#ifdef USE_DPI
   dpi = ecore_x_dpi_get();
   ertf_twip_scale_factor_set(dpi);
-  // else the default scale factor shall be used or the scale factor provided by the user by the statement
-  // ertf_twip_scale_factor_set(<user's value>);
+#endif
+  
   ertf_document_size_get(doc, &w, &h);
   ecore_evas_resize(ee, w, h);
   ecore_evas_show(ee);
@@ -75,6 +73,7 @@ main(int argc, char *argv[])
   printf ("Filename : %s\n", ertf_document_filename_get(doc));
   printf ("Version  : %d\n", ertf_document_version_get(doc));
   printf ("Charset  : %s\n", ertf_document_charset_get(doc));
+  // printf ("markup   : %s\n", doc->markup);
 
   /* background */
   background = evas_object_rectangle_add(evas);
@@ -88,6 +87,7 @@ main(int argc, char *argv[])
   textblock = evas_object_textblock_add(evas);
   st = evas_textblock_style_new();
 
+  // todo create a member 'style' in the document structure and use that
   s = ertf_textblock_style_get();
   printf("%s\n", s);
   evas_textblock_style_set(st, s);
@@ -95,6 +95,7 @@ main(int argc, char *argv[])
   evas_object_textblock_style_set(textblock, st);
   evas_textblock_style_free(st);
   evas_object_textblock_clear(textblock);
+  // todo: replace markup by doc->markup
   evas_object_textblock_text_markup_set(textblock, markup);
   evas_object_move(textblock, 0, 0);
   evas_object_resize(textblock, w, h);
@@ -113,6 +114,8 @@ main(int argc, char *argv[])
   ertf_document_free(doc);
   ertf_shutdown();
   ecore_evas_shutdown();
+  // conditional
+  ecore_x_shutdown();
 
   return EXIT_SUCCESS;
 
