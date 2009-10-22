@@ -51,6 +51,8 @@ ertf_document_free(Ertf_Document *doc)
     fclose(doc->stream);
   if (doc->filename)
     free(doc->filename);
+  if (doc->markup)
+    free(doc->markup);
   free(doc);
 }
 
@@ -166,10 +168,7 @@ ertf_document_parse(Ertf_Document *doc)
       doc->bracecount--;
       break;
     case '\\'://todo:perform the control operation
-      fscanf(doc->stream, "%[^ {\\;0123456789]", control_word);
-      // Interestingly, a semi-colon delimits the "\colortbl" keyword sometimes
-
-      if (feof(doc->stream))
+      if (ertf_tag_get(doc->stream, control_word))
       {
         fprintf(stderr, "ertf_document_parse: EOF encountered.\n");
         return 0;
@@ -294,12 +293,13 @@ ertf_document_parse(Ertf_Document *doc)
   }
 
   markup[ertf_markup_position] = '\0';
-  printf("%d\nmarkup:\n%s\n", ertf_markup_position, markup);
+  doc->markup = markup;
+  printf("%d\nmarkup:\n%s\n", ertf_markup_position, doc->markup);
   // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
   if (doc->bracecount)
     fprintf(stderr, "ertf_document_parse: Ill-formed rtf - inconsistent use of braces.\n");
-
+  
   return 1;
 }
 
