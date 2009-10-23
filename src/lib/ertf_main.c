@@ -28,6 +28,8 @@ int _twip_scale_factor = 86;
 
 static int _ertf_initcount = 0;
 
+static void _ertf_cleanup();
+
 int
 ertf_init(void)
 {
@@ -70,7 +72,7 @@ ertf_twip_scale_factor_set(int a)
   _twip_scale_factor = a;
 }
 
-void
+static void
 _ertf_cleanup()
 {
   if (color_table)

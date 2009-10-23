@@ -12,14 +12,6 @@
 #include "ertf_private.h"
 
 
-enum Ertf_Charset
-{
-  ansi,
-  mac,
-  pc,
-  pca
-};
-
 struct Ertf_Document
 {
   char *filename;
@@ -28,9 +20,11 @@ struct Ertf_Document
   int   markup_position;
   int   version;
   int   bracecount;
-  enum Ertf_Charset charset;
+  enum Ertf_Document_Charset charset;
   // todo: add a member for summary information of the document
 };
+
+static int _ertf_document_group_skip(Ertf_Document *doc);
 
 Ertf_Document *
 ertf_document_new(void)
@@ -138,19 +132,19 @@ ertf_document_header_get(Ertf_Document *doc)
       /* charset tags */
       else if (strcmp(tag, "ansi") == 0)
       {
-	doc->charset = ansi;
+	doc->charset = ERTF_DOCUMENT_CHARSET_ANSI;
       }
       else if (strcmp(tag, "mac") == 0)
       {
-	doc->charset = mac;
+	doc->charset = ERTF_DOCUMENT_CHARSET_MAC;
       }
       else if (strcmp(tag, "pc") == 0)
       {
-	doc->charset = pc;
+	doc->charset = ERTF_DOCUMENT_CHARSET_PC;
       }
       else if (strcmp(tag, "pca") == 0)
       {
-	doc->charset = pca;
+	doc->charset = ERTF_DOCUMENT_CHARSET_PCA;
       }
       /* default font */
       else if (strcmp(tag, "deff") == 0)
@@ -246,6 +240,11 @@ ertf_document_parse(Ertf_Document *doc)
         else
 	  printf("failure parsing parapgraph.\n");
       }
+      else if (strcmp(control_word, "*") == 0)
+      {
+	if (_ertf_document_group_skip(doc))
+	  fprintf(stderr, "ertf_document_parse: EOF encountered while skipping group\n");
+      }
 
       /* handle paper height */
       else if (strcmp(control_word, "paperh") == 0)
@@ -331,14 +330,14 @@ ertf_document_version_get(Ertf_Document *doc)
   return doc->version;
 }
 
-/*const char *
+enum Ertf_Document_Charset
 ertf_document_charset_get(Ertf_Document *doc)
 {
   if (!doc)
-    return NULL;
+    return ERTF_DOCUMENT_CHARSET_UNKNOWN;
 
   return doc->charset;
-  }*/
+}
 
 void
 ertf_document_size_get(Ertf_Document *doc, int *width, int *height)
@@ -366,4 +365,25 @@ ertf_document_margin_get(Ertf_Document *doc, int *left, int *right, int *top, in
     *top = (int) ceilf(_ertf_margin_top / 1440.0f * _twip_scale_factor);
   if (bottom)
     *bottom = (int) ceilf(_ertf_margin_bottom / 1440.0f * _twip_scale_factor);
+}
+
+static int
+_ertf_document_group_skip(Ertf_Document *doc)
+{
+  int c, brace = 0;
+  while((c = fgetc(doc->stream)) != EOF)
+  {
+    if (c == '{')
+      brace++;
+    else if (c == '}')
+    {
+      if (brace != 0)
+	brace--;
+      else
+	return 0; // success
+    }
+    else
+      ; // skip
+  }
+  return 1; // error
 }
