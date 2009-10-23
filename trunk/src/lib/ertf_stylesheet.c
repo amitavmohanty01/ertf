@@ -25,15 +25,11 @@ int ertf_stylesheet_parse(FILE *fp)
 {
   int c;
 
-  // todo: remove debug msg
   printf("Inside stylesheet parser.\n");
-
-  // create an eina array
+  
   stylesheet_table = eina_array_new(7);
   if (!stylesheet_table)
-  {
-    // In case of success, the eina array module shall be shut down by ertf
-    // clean up functions when the app is closed.
+  {    
     return 0;
   }
 
@@ -92,7 +88,6 @@ _ertf_stylesheet_add(FILE *fp)
   }
   colour_max = eina_array_count_get(color_table);
 
-  // todo: remove debug msg
   printf("Inside stylesheet entry parser.\n");
 
   while ((c = fgetc(fp)) != EOF)
@@ -100,7 +95,6 @@ _ertf_stylesheet_add(FILE *fp)
     switch (c)
     {
     case '\\':// get the control word      
-      // read until a delimiter is encountered
       if(ertf_tag_get(fp, buf))
       {
 	fprintf(stderr, "_ertf_stylesheet_add: Ill-formed rtf.\n");
@@ -135,8 +129,7 @@ _ertf_stylesheet_add(FILE *fp)
 
       case 's':
 	if (buf[1] == '\0')
-        {
-	  // read style number
+        {	  
 	  fscanf(fp, "%d", &style->style_number);
 	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading stylesheet number", goto error);
 	}

@@ -61,7 +61,8 @@ int ertf_font_table(FILE *fp)
       if (!_ertf_font_add(fp)) goto err_loop;
       break;
 
-    default: goto err_loop;
+    default:
+      fprintf(stderr, "ertf_font_table: skipped control character %c\n", c);
     }
   }
 
