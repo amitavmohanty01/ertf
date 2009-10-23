@@ -8,18 +8,28 @@
 #include <math.h>
 
 #include "ertf_document.h"
+#include "ertf_input.h"
 #include "ertf_private.h"
 
+
+enum Ertf_Charset
+{
+  ansi,
+  mac,
+  pc,
+  pca
+};
 
 struct Ertf_Document
 {
   char *filename;
   FILE *stream;
   char *markup;
-  char  charset[6];
   int   markup_position;
   int   version;
   int   bracecount;
+  enum Ertf_Charset charset;
+  // todo: add a member for summary information of the document
 };
 
 Ertf_Document *
@@ -34,7 +44,7 @@ ertf_document_new(void)
   doc->filename = NULL;
   doc->stream = NULL;
   doc->markup = NULL;
-  doc->charset[0] = '\0';
+  //  doc->charset[0] = '\0';
   doc->version = -1;
   doc->bracecount = 0;
 
@@ -109,40 +119,55 @@ ertf_document_header_get(Ertf_Document *doc)
   if (!doc || !doc->stream)
     return 0;
 
-  if ((c = getc(doc->stream)) == EOF)
+  while ((c = getc(doc->stream)) != EOF)
   {
-    // todo:display blank textblock for empty file
+    switch (c)
+    {
+      char tag [30];
+    case '{':
+      ungetc(c, doc->stream);
+      return 1;
+    case '\\':
+      if(ertf_tag_get(doc->stream, tag))
+      {
+	fprintf(stderr, "ertf_document_header_get: encountered EOF while reading control tag.\n");
+	return 0;
+      }
+      if (strcmp(tag, "rtf") == 0)
+	fscanf(doc->stream, "%d", &doc->version);
+      /* charset tags */
+      else if (strcmp(tag, "ansi") == 0)
+      {
+	doc->charset = ansi;
+      }
+      else if (strcmp(tag, "mac") == 0)
+      {
+	doc->charset = mac;
+      }
+      else if (strcmp(tag, "pc") == 0)
+      {
+	doc->charset = pc;
+      }
+      else if (strcmp(tag, "pca") == 0)
+      {
+	doc->charset = pca;
+      }
+      /* default font */
+      else if (strcmp(tag, "deff") == 0)
+      {
+	fscanf(doc->stream, "%d", &_ertf_default_font);      
+      }
+      else
+      {
+	fprintf(stderr, "ertf_document_header_get: unrecognised control tag %s\n", tag);
+      }
+      break;
+    default:
+      fprintf(stderr, "ertf_document_header_get: unrecognised control character %c.\n", c);
+    }
   }
-  else if (c != '{')
-  {
-    // An rtf file should start with `{\rtf'
-    fprintf(stderr, "RTF file must begin with {\\rtf\n");
-    return 0;
-  }
-  else if (fscanf(doc->stream, "%4s", str), strcmp(str, "\\rtf") != 0 )
-  {
-    fprintf(stderr, "rtf version unspecified.\n");
-    return 0;
-  }
-  else if ((fscanf(doc->stream, "%d\\%c", &doc->version, &str[0]), str[0] != 'a') &&
-	   str[0] != 'p' &&
-	   str[0] != 'm')
-  {
-    // todo: improve the if condition for full word checking
-    fprintf(stderr, "charset not defined\n");
-    return 0;
-  }
-  else
-  {
-    //increase brace count
-    doc->bracecount++;
-
-    // store charset
-    ungetc(str[0], doc->stream);
-    fscanf(doc->stream, "%[^\\{]", doc->charset);
-  }
-
-  return 1;
+  fprintf(stderr, "ertf_document_header_get: encountered EOF while parsing header.\n");
+  return 0;
 }
 
 int
@@ -222,12 +247,6 @@ ertf_document_parse(Ertf_Document *doc)
 	  printf("failure parsing parapgraph.\n");
       }
 
-      /* default font */
-      else if (strcmp(control_word, "deff") == 0)
-      {
-	fscanf(doc->stream, "%d", &_ertf_default_font);      
-      }
-
       /* handle paper height */
       else if (strcmp(control_word, "paperh") == 0)
       {
@@ -299,7 +318,7 @@ ertf_document_parse(Ertf_Document *doc)
   // it is not, print an error message stating "incomplete rtf file".
   if (doc->bracecount)
     fprintf(stderr, "ertf_document_parse: Ill-formed rtf - inconsistent use of braces.\n");
-  
+
   return 1;
 }
 
@@ -312,14 +331,14 @@ ertf_document_version_get(Ertf_Document *doc)
   return doc->version;
 }
 
-const char *
+/*const char *
 ertf_document_charset_get(Ertf_Document *doc)
 {
   if (!doc)
     return NULL;
 
   return doc->charset;
-}
+  }*/
 
 void
 ertf_document_size_get(Ertf_Document *doc, int *width, int *height)
@@ -340,11 +359,11 @@ ertf_document_margin_get(Ertf_Document *doc, int *left, int *right, int *top, in
     return;
 
   if (left)
-    *left = _ertf_margin_left;
+    *left = (int) ceilf(_ertf_margin_left / 1440.0f * _twip_scale_factor);
   if (right)
-    *right = _ertf_margin_right;
+    *right = (int) ceilf(_ertf_margin_right / 1440.0f * _twip_scale_factor);
   if (top)
-    *top = _ertf_margin_top;
+    *top = (int) ceilf(_ertf_margin_top / 1440.0f * _twip_scale_factor);
   if (bottom)
-    *bottom = _ertf_margin_bottom;
+    *bottom = (int) ceilf(_ertf_margin_bottom / 1440.0f * _twip_scale_factor);
 }

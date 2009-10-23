@@ -72,7 +72,7 @@ main(int argc, char *argv[])
 
   printf ("Filename : %s\n", ertf_document_filename_get(doc));
   printf ("Version  : %d\n", ertf_document_version_get(doc));
-  printf ("Charset  : %s\n", ertf_document_charset_get(doc));
+  //  printf ("Charset  : %s\n", ertf_document_charset_get(doc));
   // printf ("markup   : %s\n", doc->markup);
 
   /* background */
