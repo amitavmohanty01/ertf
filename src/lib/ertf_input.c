@@ -56,7 +56,31 @@ ertf_markup_add(char *string, int len)
 int
 ertf_tag_get(FILE *fp, char *s)
 {
+  int c;
   fscanf(fp, "%[^ 0123456789;\\{}\n]", s);
-  CHECK_EOF(fp, "", return 1);
+  if ((c = fgetc(fp)) != ' ')
+    ungetc(c, fp);
+  CHECK_EOF(fp, "ertf_tag_get: EOF encountered while obtaining control tag.\n", return 1);
   return 0;
+}
+
+int
+ertf_group_skip(FILE *fp)
+{
+  int c, brace = 0;
+  while((c = fgetc(fp)) != EOF)
+  {
+    if (c == '{')
+      brace++;
+    else if (c == '}')
+    {
+      if (brace != 0)
+	brace--;
+      else
+	return 0; // success
+    }
+    else
+      ; // skip
+  }
+  return 1; // error
 }

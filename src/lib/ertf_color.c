@@ -9,6 +9,7 @@
 
 #include "ertf_color.h"
 #include "ertf_private.h"
+#include "ertf_input.h"
 
 
 Eina_Array *color_table = NULL;
@@ -103,22 +104,24 @@ _ertf_color_add(FILE *fp)
     fprintf(stderr, "_ertf_color_add: short of memory while allocating color node.\n");
     return 0;
   }
-  // todo: remove debug msg
+
   printf("Inside color entry parser.\n");
 
   while ((c = fgetc(fp)) != EOF)
   {
     switch (c)
     {
-    case '\\':
-      ungetc(c, fp);
-      fscanf(fp, "%[^0123456789]", color);
-      if(feof(fp)) goto err;
+    case '\\':      
+      if (ertf_tag_get(fp, color))
+      {
+	fprintf(stderr, "_ertf_color_add: EOF encountered while getting control tag.\n");
+	goto err;
+      }
 
       fscanf(fp, "%d", &index);// todo: do error checking for range of rgb value
       if (feof(fp)) goto err;
 
-      if (strcmp(color, "\\green") == 0)
+      if (strcmp(color, "green") == 0)
       {
 	if (!(set & GREEN))
 	  node->g = index;
@@ -126,15 +129,15 @@ _ertf_color_add(FILE *fp)
 	  fprintf(stderr, "_ertf_color_add: multiple values for same color.\n");
 	// todo: confirm if this should only be logged and not stopped at
       }
-      else if (strcmp(color, "\\red") == 0)
+      else if (strcmp(color, "red") == 0)
 	node->r = index;
       // todo: add set/unset check as above
-      else if (strcmp(color, "\\blue") == 0)
+      else if (strcmp(color, "blue") == 0)
 	node->b = index;
       // todo: add set/unset check as above
       else
 	// continue as the tag is not recognised and should be therefore skipped
-	fprintf(stderr, "Warning: skipped tag ``%s\".\n", color);
+	fprintf(stderr, "_ertf_color_add: skipped unrecognised control tag \"%s\".\n", color);
       break;
     case ';':// todo: error checking on success of the push operation
       eina_array_push(color_table, node);

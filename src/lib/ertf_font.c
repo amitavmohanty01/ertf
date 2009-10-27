@@ -159,23 +159,25 @@ _ertf_font_add(FILE *fp)
       }
       break;
 
-    case ' ':
-      fscanf(fp, "%[^;{]", node->name);
-      // font tables can also contains groups, especially specifying alternative fonts
-      CHECK_EOF(fp, "_ertf_font_add: end of file encountered while reading font name. \n", goto error);
-      break;
-
     case ';':// end of font entry
       eina_array_push(font_table, node);
       return 1;// successful return
 
     case '{':// group
-      while((c = fgetc(fp)) != '}')
-	;
+      if (ertf_group_skip(fp))
+	fprintf(stderr, "_ertf_font_add: EOF encountered while skipping group.\n");
       break;
 
-    default:      
-      fprintf(stderr, "_ertf_font_add: unrecognised control character '%c'.\n", c);      
+    default:
+      if (isalpha(c))
+      {
+	ungetc(c, fp);
+	fscanf(fp, "%[^;{]", node->name);
+      // font tables can also contains groups, especially specifying alternative fonts
+	CHECK_EOF(fp, "_ertf_font_add: end of file encountered while reading font name. \n", goto error);
+      }
+      else
+	fprintf(stderr, "_ertf_font_add: unrecognised control character '%c'.\n", c);      
     }
   }
   // end of file is reached  
