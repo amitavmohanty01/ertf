@@ -5,7 +5,6 @@
 #include <Ecore_Evas.h>
 
 #include "Ertf.h"
-#include "ertf_private.h"
 
 
 static void
@@ -25,7 +24,8 @@ main(int argc, char *argv[])
   Ertf_Document        *doc;
   int                   w, h, dpi;
   char                 *s;
-  Evas_Coord x,y,h1,w1;
+  char                 *markup_text;
+  Evas_Coord            x,y,h1,w1;
 
   if (argc < 2)
     {
@@ -72,7 +72,6 @@ main(int argc, char *argv[])
 
   printf ("Filename : %s\n", ertf_document_filename_get(doc));
   printf ("Version  : %d\n", ertf_document_version_get(doc));
-  //  printf ("Charset  : %s\n", ertf_document_charset_get(doc));
   // printf ("markup   : %s\n", doc->markup);
 
   /* background */
@@ -95,8 +94,8 @@ main(int argc, char *argv[])
   evas_object_textblock_style_set(textblock, st);
   evas_textblock_style_free(st);
   evas_object_textblock_clear(textblock);
-  // todo: replace markup by doc->markup
-  evas_object_textblock_text_markup_set(textblock, markup);
+  markup_text = ertf_document_markup_get(doc);
+  evas_object_textblock_text_markup_set(textblock, markup_text);
   evas_object_move(textblock, 0, 0);
   evas_object_resize(textblock, w, h);
   evas_object_show(textblock);
@@ -114,7 +113,6 @@ main(int argc, char *argv[])
   ertf_document_free(doc);
   ertf_shutdown();
   ecore_evas_shutdown();
-  // conditional
   ecore_x_shutdown();
 
   return EXIT_SUCCESS;
@@ -125,6 +123,7 @@ main(int argc, char *argv[])
   ertf_shutdown();
  shutdown_ecore_evas:
   ecore_evas_shutdown();
+  ecore_x_shutdown();
 
   return EXIT_FAILURE;
 }

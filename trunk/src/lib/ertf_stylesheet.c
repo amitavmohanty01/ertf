@@ -67,7 +67,7 @@ int ertf_stylesheet_parse(FILE *fp)
   }
 
  err_loop:
-  fprintf(stderr, "End of file reached in stylesheet table.\n");
+  fprintf(stderr, "ertf_stylesheet_parse: End of file reached in stylesheet table.\n");
   return 0;// unsuccessful return
 }
 
@@ -218,9 +218,7 @@ _ertf_stylesheet_add(FILE *fp)
 
       // parse group
     case '{':      
-      while ((c = fgetc(fp)) != EOF  && c != '}')
-	;
-      if(c == EOF)
+      if (ertf_group_skip(fp))
       {
 	fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised group\n");
 	goto error;
@@ -231,14 +229,15 @@ _ertf_stylesheet_add(FILE *fp)
       eina_array_push(stylesheet_table, style);
       return 1;
 
-    case ' ':// get style name
+    default:
+      if (isalpha(c))
+      {
+	ungetc(c, fp);
       fscanf(fp, "%[^;]", style->name);
       CHECK_EOF(fp, "_ertf_stylesheet_add: end of file encountered while reading stylesheet name.\n", goto error);
-      break;
-
-    default:
-      fprintf(stderr, "_ertf_stylesheet_add: unrecognised control character `%c'.\n", c);
-      goto error;
+      }
+      else
+	fprintf(stderr, "_ertf_stylesheet_add: unrecognised control character `%c'.\n", c);      
     }
   }
   // end of file is reached
@@ -250,7 +249,7 @@ _ertf_stylesheet_add(FILE *fp)
   return 0;
 }
 
-char ertf_style_string[1024] = "";
+char ertf_style_string[4096] = "";
 
 static void
 _ertf_textblock_style_generate()
@@ -284,7 +283,7 @@ _ertf_textblock_style_generate()
 
   EINA_ARRAY_ITER_NEXT(font_table, i, font, iterator)
   {
-    printf("%d# %s\n", i, font->family);
+    printf("%d# %s\n", i, font->name);
   }
 }
 

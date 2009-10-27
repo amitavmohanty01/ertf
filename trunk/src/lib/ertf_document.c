@@ -24,8 +24,6 @@ struct Ertf_Document
   // todo: add a member for summary information of the document
 };
 
-static int _ertf_document_group_skip(Ertf_Document *doc);
-
 Ertf_Document *
 ertf_document_new(void)
 {
@@ -38,7 +36,6 @@ ertf_document_new(void)
   doc->filename = NULL;
   doc->stream = NULL;
   doc->markup = NULL;
-  //  doc->charset[0] = '\0';
   doc->version = -1;
   doc->bracecount = 0;
 
@@ -119,8 +116,15 @@ ertf_document_header_get(Ertf_Document *doc)
     {
       char tag [30];
     case '{':
-      ungetc(c, doc->stream);
-      return 1;
+      if (doc->bracecount)
+      {
+	ungetc(c, doc->stream);
+	return 1;
+      }
+      else
+	doc->bracecount++;
+      break;
+
     case '\\':
       if(ertf_tag_get(doc->stream, tag))
       {
@@ -240,9 +244,11 @@ ertf_document_parse(Ertf_Document *doc)
         else
 	  printf("failure parsing parapgraph.\n");
       }
+
+      /* unsupported group */
       else if (strcmp(control_word, "*") == 0)
       {
-	if (_ertf_document_group_skip(doc))
+	if (ertf_group_skip(doc->stream))
 	  fprintf(stderr, "ertf_document_parse: EOF encountered while skipping group\n");
       }
 
@@ -312,6 +318,7 @@ ertf_document_parse(Ertf_Document *doc)
 
   markup[ertf_markup_position] = '\0';
   doc->markup = markup;
+  markup = NULL;
   printf("%d\nmarkup:\n%s\n", ertf_markup_position, doc->markup);
   // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
@@ -367,23 +374,10 @@ ertf_document_margin_get(Ertf_Document *doc, int *left, int *right, int *top, in
     *bottom = (int) ceilf(_ertf_margin_bottom / 1440.0f * _twip_scale_factor);
 }
 
-static int
-_ertf_document_group_skip(Ertf_Document *doc)
+char *
+ertf_document_markup_get(Ertf_Document *doc)
 {
-  int c, brace = 0;
-  while((c = fgetc(doc->stream)) != EOF)
-  {
-    if (c == '{')
-      brace++;
-    else if (c == '}')
-    {
-      if (brace != 0)
-	brace--;
-      else
-	return 0; // success
-    }
-    else
-      ; // skip
-  }
-  return 1; // error
+  if (!doc)
+    return NULL;
+  return doc->markup;
 }

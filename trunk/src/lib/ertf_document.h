@@ -33,5 +33,7 @@ void ertf_document_size_get(Ertf_Document *doc, int *width, int *height);
 
 void ertf_document_margin_get(Ertf_Document *doc, int *left, int *right, int *top, int *bottom);
 
+char *ertf_document_markup_get(Ertf_Document *doc);
+
 
 #endif /* __ERTF_DOCUMENT_H__ */

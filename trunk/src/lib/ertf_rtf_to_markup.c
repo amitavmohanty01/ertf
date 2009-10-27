@@ -50,11 +50,13 @@ ertf_paragraph_translate(FILE *fp, int align)
       else
 	ungetc(c, fp);
       
-      if (ertf_tag_get(fp, buf))
+      /*if (ertf_tag_get(fp, buf))
       {
 	fprintf(stderr, "ertf_paragraph_translate: end-of-file encountered while retrieving control word.\n");
 	return 0;
-      }
+	}*/
+      fscanf(fp, "%[^ 0123456789;\\{}\n]", buf);
+      CHECK_EOF(fp, "ertf_paragraph_translate: end-of-file encountered while retrieving control word.\n", return 0);
 
       /* reset to default character formatting */
       if (strcmp(buf, "plain") == 0)
@@ -362,7 +364,6 @@ ertf_paragraph_translate(FILE *fp, int align)
     default:
       if (c == '\n')
       {
-	//ertf_markup_add("<br>", 4);
 	/* Since unnecessary newlines are added by rtf writers, they are ignored. The tag <br> is used when \line is encountered. */
       }
       else

@@ -14,4 +14,6 @@ int ertf_markup_add(char *, int);
 
 int ertf_tag_get(FILE *, char *);
 
+int ertf_group_skip(FILE *);
+
 #endif /* ERTF_INPUT_H_ */
