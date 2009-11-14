@@ -7,6 +7,7 @@
 
 #include <Evas.h>
 
+#include "ertf_document.h"
 #include "ertf_color.h"
 #include "ertf_font.h"
 #include "ertf_stylesheet.h"

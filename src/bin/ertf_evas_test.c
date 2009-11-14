@@ -43,7 +43,7 @@ main(int argc, char *argv[])
   if (!ee)
     goto shutdown_ertf;
 
-  ecore_evas_title_set(ee, "Ertf Evas test");
+/*   ecore_evas_title_set(ee, "Ertf Evas test"); */
   ecore_evas_callback_delete_request_set(ee, _ertf_cb_delete);
 
   evas = ecore_evas_get(ee);

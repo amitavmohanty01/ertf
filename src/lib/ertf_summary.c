@@ -6,43 +6,68 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ertf_document.h"
 #include "ertf_summary.h"
 #include "ertf_input.h"
+#include "ertf_private.h"
 
 
-Ertf_Info *doc_info;
+struct Ertf_Summary{
+  // todo: check if there should be a limitation to the length of the strings
+  char *author;
+  char *title;
+  char *subject;
+  char *operator;
+  char *keywords;
+  char *comment;
+  int version;
+  char *doccomm;
+  int internal_version;
+  int pages;
+  long int words;
+  long int chars;
+  int internal_ID;
+  // todo: add time variables
+};
 
-static int _ertf_resolve_control_word(FILE *);
+
+static int _ertf_resolve_control_word(Ertf_Document *doc);
 
 /*
  * This function is called when \info tag is encountered.
  */
 int
-ertf_summary(FILE *fp)
+ertf_summary(Ertf_Document *doc)
 {
   int c;
   int braces = 1;
-  doc_info = (Ertf_Info *)malloc(sizeof(Ertf_Info));
-  if (!doc_info)
+  FILE *fp;
+
+  /* doc is never NULL when this function is called */
+
+  doc->summary = (Ertf_Summary *)malloc(sizeof(Ertf_Summary));
+  if (!doc->summary)
   {
     fprintf(stderr, "ertf_summary: out of memory while allocating doc_info.\n");
     return 0;
   }
 
+  fp = doc->stream;
+
   // default values
-  doc_info->author = NULL;
-  doc_info->title = NULL;
-  doc_info->subject = NULL;
-  doc_info->operator = NULL;
-  doc_info->keywords = NULL;
-  doc_info->comment = NULL;
-  doc_info->version = 0;// zero indicates not set
-  doc_info->doccomm = NULL;
-  doc_info->internal_version = 0;
-  doc_info->pages = -1;
-  doc_info->words = -1;
-  doc_info->chars = -1;
-  doc_info->internal_ID = 0;
+  doc->summary->author = NULL;
+  doc->summary->title = NULL;
+  doc->summary->subject = NULL;
+  doc->summary->operator = NULL;
+  doc->summary->keywords = NULL;
+  doc->summary->comment = NULL;
+  doc->summary->version = 0;// zero indicates not set
+  doc->summary->doccomm = NULL;
+  doc->summary->internal_version = 0;
+  doc->summary->pages = -1;
+  doc->summary->words = -1;
+  doc->summary->chars = -1;
+  doc->summary->internal_ID = 0;
   // todo: update for default of time variables
 
   // obtain keywords till the end of group with proper error checking
@@ -54,7 +79,7 @@ ertf_summary(FILE *fp)
     case '{':
       if (c == '{')
 	braces++;      
-      if (_ertf_resolve_control_word(fp))
+      if (_ertf_resolve_control_word(doc))
 	break;
       else
 	goto error;
@@ -70,18 +95,23 @@ ertf_summary(FILE *fp)
 
   // free it in case of EOF and in presence of invalid characters
  error:
-  free(doc_info);
+  free(doc->summary);
+  doc->summary = NULL;
   return 0;
 }
 /*
  * This function reads each summary group till the end brace (including it).
  */
 static int
-_ertf_resolve_control_word(FILE *fp)
+_ertf_resolve_control_word(Ertf_Document *doc)
 {
   // keeping it a multiple of four
   char control_word[20];
   int c;
+  FILE *fp;
+
+  fp = doc->stream;
+
   if ((c = fgetc(fp)) == EOF || c != '\\')
   {
     fprintf(stderr, "_ertf_resolve_control_word: Ill-formed rtf.\n");
@@ -104,7 +134,7 @@ _ertf_resolve_control_word(FILE *fp)
       s = (char *)malloc(256);
       fscanf(fp, "%[^}]", s);
       CHECK_EOF(fp, "_ertf_resolve_control_word: EOF encountered while reading author name.\n", return 0);
-      doc_info->author = s;
+      doc->summary->author = s;
       return 1;
     }
     else
@@ -127,13 +157,13 @@ _ertf_resolve_control_word(FILE *fp)
   case 'v':// \version, \vern
     if (strcmp(control_word + 1, "ersion") == 0)
     {
-      fscanf(fp, "%d", &doc_info->version);
+      fscanf(fp, "%d", &doc->summary->version);
       CHECK_EOF(fp, "_ertf_resolve_control_word: EOF encountered while reading version.\n", return 0);
       return 1;
     }
     else if (strcmp(control_word + 1, "ern") == 0)
     {
-      fscanf(fp, "%d", &doc_info->internal_version);
+      fscanf(fp, "%d", &doc->summary->internal_version);
       CHECK_EOF(fp, "_ertf_resolve_control_word: EOF encountered while reading internal version number.\n", return 0);
       return 1;
     }

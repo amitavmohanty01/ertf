@@ -5,6 +5,21 @@
 #include <Eina.h>
 
 
+typedef struct Ertf_Summary Ertf_Summary;
+
+struct Ertf_Document
+{
+  char                 *filename;
+  FILE                 *stream;
+  char                 *markup;
+  Ertf_Summary         *summary;
+  int                   markup_position;
+  int                   version;
+  int                   bracecount;
+  Ertf_Document_Charset charset;
+};
+
+
 extern unsigned char _ertf_default_color_r;
 extern unsigned char _ertf_default_color_g;
 extern unsigned char _ertf_default_color_b;
