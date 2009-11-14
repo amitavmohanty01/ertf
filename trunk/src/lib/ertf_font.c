@@ -8,6 +8,7 @@
 
 #include <Eina.h>
 
+#include "ertf_document.h"
 #include "ertf_font.h"
 #include "ertf_input.h"
 #include "ertf_private.h"

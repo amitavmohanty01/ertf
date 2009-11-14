@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
+#include "ertf_document.h"
 #include "ertf_input.h"
 #include "ertf_color.h"
 #include "ertf_font.h"

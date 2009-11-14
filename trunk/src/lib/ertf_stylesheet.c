@@ -9,6 +9,7 @@
 
 #include <Eina.h>
 
+#include "ertf_document.h"
 #include "ertf_stylesheet.h"
 #include "ertf_input.h"
 #include "ertf_color.h"

@@ -7,9 +7,10 @@
 
 #include <Eina.h>
 
+#include "ertf_document.h"
 #include "ertf_color.h"
-#include "ertf_private.h"
 #include "ertf_input.h"
+#include "ertf_private.h"
 
 
 Eina_Array *color_table = NULL;

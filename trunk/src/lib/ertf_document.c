@@ -8,36 +8,21 @@
 #include <math.h>
 
 #include "ertf_document.h"
+#include "ertf_summary.h"
 #include "ertf_input.h"
 #include "ertf_private.h"
 
-
-struct Ertf_Document
-{
-  char *filename;
-  FILE *stream;
-  char *markup;
-  int   markup_position;
-  int   version;
-  int   bracecount;
-  enum Ertf_Document_Charset charset;
-  // todo: add a member for summary information of the document
-};
 
 Ertf_Document *
 ertf_document_new(void)
 {
   Ertf_Document *doc;
 
-  doc = (Ertf_Document *)malloc(sizeof(Ertf_Document));
+  doc = (Ertf_Document *)calloc(1, sizeof(Ertf_Document));
   if (!doc)
     return NULL;
 
-  doc->filename = NULL;
-  doc->stream = NULL;
-  doc->markup = NULL;
   doc->version = -1;
-  doc->bracecount = 0;
 
   return doc;
 }
@@ -54,6 +39,8 @@ ertf_document_free(Ertf_Document *doc)
     free(doc->filename);
   if (doc->markup)
     free(doc->markup);
+  if (doc->summary)
+    free(doc->summary);
   free(doc);
 }
 
@@ -297,7 +284,7 @@ ertf_document_parse(Ertf_Document *doc)
 
       else if (strcmp(control_word, "info") == 0)
       {
-	if (ertf_summary(doc->stream))
+	if (ertf_summary(doc))
 	  printf("Successfully parsed information section.\n");
 	else
 	  printf("failure parsing information about the file.\n");

@@ -10,7 +10,6 @@ extern "C" {
 #include "ertf_input.h"
 #include "ertf_font.h"
 #include "ertf_color.h"
-#include "ertf_summary.h"
 #include "ertf_stylesheet.h"
 #include "ertf_document.h"
 

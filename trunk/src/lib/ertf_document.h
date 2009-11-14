@@ -4,14 +4,14 @@
 
 typedef struct Ertf_Document Ertf_Document;
 
-enum Ertf_Document_Charset
+typedef enum Ertf_Document_Charset
 {
   ERTF_DOCUMENT_CHARSET_ANSI,
   ERTF_DOCUMENT_CHARSET_MAC,
   ERTF_DOCUMENT_CHARSET_PC,
   ERTF_DOCUMENT_CHARSET_PCA,
   ERTF_DOCUMENT_CHARSET_UNKNOWN
-};
+} Ertf_Document_Charset;
 
 Ertf_Document *ertf_document_new(void);
 
