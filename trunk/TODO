@@ -1,0 +1,5 @@
+1. implement proper paging
+2. modify the document structure to include summary information and free the information structure while freeing the document structure.
+3. modify the design to enable parallel run of multiple ertf executables.
+4. integrate with eina logging API
+5. check for possible attacks and secure against them
