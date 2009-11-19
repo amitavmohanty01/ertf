@@ -1,4 +1,5 @@
 1. implement proper paging
 2. modify the design to enable parallel run of multiple ertf executables.
 3. integrate with eina logging API
-4. check for possible attacks and secure against them
+4. include a doxygen template for documentation of the API
+5. check for possible attacks and secure against them
