@@ -42,6 +42,8 @@ AC_PROG_CC
 # pkg-config
 PKG_PROG_PKG_CONFIG
 
+# doxygen
+EFL_CHECK_DOXYGEN()
 
 ### Checks for libraries
 
@@ -70,6 +72,7 @@ AM_PROG_CC_C_O
 
 AC_CONFIG_FILES([
 Makefile
+doc/Makefile
 src/Makefile
 src/bin/Makefile
 src/lib/Makefile
@@ -90,6 +93,7 @@ echo
 echo
 echo "Configuration Options Summary:"
 echo
+echo "  Documentation........: ${efl_have_doxygen}"
 echo "  DPI..................: ${use_dpi}"
 echo
 echo "  Installation.........: make install"
