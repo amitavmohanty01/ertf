@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = src
+SUBDIRS = src doc
 
 MAINTAINERCLEANFILES = \
 Makefile.in \
@@ -20,4 +20,14 @@ EXTRA_DIST = \
 AUTHORS \
 COPYING \
 README \
-autogen.sh
+autogen.sh \
+ertf.pc.in \
+m4/efl_doxygen.m4
+
+.PHONY: doc
+
+# Documentation
+
+doc:
+	@echo "entering doc/"
+	make -C doc doc
