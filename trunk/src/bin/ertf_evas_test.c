@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <Ecore_Evas.h>
 
@@ -16,16 +17,18 @@ _ertf_cb_delete (Ecore_Evas *ee)
 int
 main(int argc, char *argv[])
 {
-  Ecore_Evas           *ee;
-  Evas                 *evas;
-  Evas_Object          *textblock;
-  Evas_Object          *background;
-  Evas_Textblock_Style *st;
-  Ertf_Document        *doc;
-  int                   w, h, dpi;
-  char                 *s;
-  char                 *markup_text;
-  Evas_Coord            x,y,h1,w1;
+  Ecore_Evas            *ee;
+  Evas                  *evas;
+  Evas_Object           *textblock;
+  Evas_Object           *background;
+  Evas_Textblock_Style  *st;
+  Ertf_Document         *doc;
+  int                    w, h, dpi, line_number;
+  char                  *s;
+  char                  *markup_text;
+  Evas_Coord             x, y, h1, w1;
+  Evas_Textblock_Cursor *c1, *c2;
+  int                    page = 1, last_page = 0;
 
   if (argc < 2)
     {
@@ -43,7 +46,7 @@ main(int argc, char *argv[])
   if (!ee)
     goto shutdown_ertf;
 
-/*   ecore_evas_title_set(ee, "Ertf Evas test"); */
+  ecore_evas_title_set(ee, "Ertf Evas test"); 
   ecore_evas_callback_delete_request_set(ee, _ertf_cb_delete);
 
   evas = ecore_evas_get(ee);
@@ -61,6 +64,7 @@ main(int argc, char *argv[])
 #ifdef USE_DPI
   dpi = ecore_x_dpi_get();
   ertf_twip_scale_factor_set(dpi);
+  printf("Using dpi.\n");
 #endif
   
   ertf_document_size_get(doc, &w, &h);
@@ -71,8 +75,7 @@ main(int argc, char *argv[])
     goto free_doc;
 
   printf ("Filename : %s\n", ertf_document_filename_get(doc));
-  printf ("Version  : %d\n", ertf_document_version_get(doc));
-  // printf ("markup   : %s\n", doc->markup);
+  printf ("Version  : %d\n", ertf_document_version_get(doc));  
 
   /* background */
   background = evas_object_rectangle_add(evas);
@@ -87,8 +90,7 @@ main(int argc, char *argv[])
   st = evas_textblock_style_new();
 
   // todo create a member 'style' in the document structure and use that
-  s = ertf_textblock_style_get();
-  printf("%s\n", s);
+  s = ertf_textblock_style_get();  
   evas_textblock_style_set(st, s);
   evas_object_name_set(textblock, "textblock");
   evas_object_textblock_style_set(textblock, st);
@@ -102,10 +104,45 @@ main(int argc, char *argv[])
 
   // trial code begin
   printf("%d %d\n", w, h);
-  evas_object_textblock_size_formatted_get(textblock, &w, &h);
-  printf("%d %d\n", w, h);
-  if(evas_object_textblock_line_number_geometry_get(textblock, 5, &x, &y, &w1, &h1))
-    printf("%d %d %d %d\n", x, y, w1, h1);
+  c1 = evas_object_textblock_cursor_new(textblock);
+  evas_textblock_cursor_line_first(c1);
+  evas_textblock_cursor_char_first(c1);  
+  c2 = evas_object_textblock_cursor_new(textblock);
+  h--;
+  line_number = evas_textblock_cursor_line_coord_set(c2, h);  
+  /* while there is a range of text to be copied */
+  do
+  {
+    if (line_number < 0)
+    {
+      if (last_page)
+      {
+	printf("We have gone out of bounds now.\n");
+	break;
+      }
+      else
+      {	
+	evas_textblock_cursor_line_last(c2);
+	evas_textblock_cursor_char_last(c2);
+	last_page++;
+	line_number = 0;
+	printf("comparision: %d position: %d\n", evas_textblock_cursor_compare(c1, c2), evas_textblock_cursor_pos_get(c2));
+	continue;
+      }
+    }
+    evas_textblock_cursor_char_last(c2);
+    s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
+    printf("%s\n", s);
+    /* instead of a free statement add proper page deletion code on deletion of document object */
+    free(s);
+    printf("line #%d page #%d\n", line_number, page);
+
+    /* update */
+    page++;
+    evas_textblock_cursor_pos_set(c1, evas_textblock_cursor_pos_get(c2) + 1);
+    line_number = evas_textblock_cursor_line_coord_set(c2, page * h);
+
+  } while (evas_textblock_cursor_compare(c1, c2) < 0);
   // trial code end
 
   ecore_main_loop_begin ();

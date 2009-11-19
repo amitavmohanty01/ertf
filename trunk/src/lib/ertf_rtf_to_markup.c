@@ -51,11 +51,6 @@ ertf_paragraph_translate(FILE *fp, int align)
       else
 	ungetc(c, fp);
       
-      /*if (ertf_tag_get(fp, buf))
-      {
-	fprintf(stderr, "ertf_paragraph_translate: end-of-file encountered while retrieving control word.\n");
-	return 0;
-	}*/
       fscanf(fp, "%[^ 0123456789;\\{}\n]", buf);
       CHECK_EOF(fp, "ertf_paragraph_translate: end-of-file encountered while retrieving control word.\n", return 0);
 
@@ -348,7 +343,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	CHECK_EOF(fp, "ertf_paragraph_translate: EOF reached while skipping"
 		  " control info.\n", return 0);
       if (c != ' ')
-	ungetc(c, fp);
+      ungetc(c, fp);
 
       break;
 

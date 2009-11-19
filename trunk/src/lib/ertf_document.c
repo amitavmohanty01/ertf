@@ -306,7 +306,7 @@ ertf_document_parse(Ertf_Document *doc)
   markup[ertf_markup_position] = '\0';
   doc->markup = markup;
   markup = NULL;
-  printf("%d\nmarkup:\n%s\n", ertf_markup_position, doc->markup);
+  // printf("%d\nmarkup:\n%s\n", ertf_markup_position, doc->markup);
   // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
   if (doc->bracecount)
