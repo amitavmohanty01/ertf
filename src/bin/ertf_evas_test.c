@@ -31,10 +31,10 @@ main(int argc, char *argv[])
   int                    page = 1, last_page = 0;
 
   if (argc < 2)
-    {
+  {
       printf ("Usage: %s file.rtf\n", argv[0]);
       return EXIT_FAILURE;
-    }
+  }
 
   if (!ecore_evas_init())
     return EXIT_FAILURE;
@@ -106,13 +106,16 @@ main(int argc, char *argv[])
   printf("%d %d\n", w, h);
   c1 = evas_object_textblock_cursor_new(textblock);
   evas_textblock_cursor_line_first(c1);
-  evas_textblock_cursor_char_first(c1);  
+  evas_textblock_cursor_char_first(c1);
+  printf("val:%s eol:%d\n", evas_textblock_cursor_node_text_get(c1), evas_textblock_cursor_eol_get(c1));
   c2 = evas_object_textblock_cursor_new(textblock);
   h--;
   line_number = evas_textblock_cursor_line_coord_set(c2, h);  
+  
   /* while there is a range of text to be copied */
   do
   {
+    printf("line number: %d last page:%d\n", line_number, last_page);
     if (line_number < 0)
     {
       if (last_page)
@@ -125,8 +128,9 @@ main(int argc, char *argv[])
 	evas_textblock_cursor_line_last(c2);
 	evas_textblock_cursor_char_last(c2);
 	last_page++;
-	line_number = 0;
+	line_number = evas_textblock_cursor_line_geometry_get(c2, NULL, NULL, NULL, NULL);
 	printf("comparision: %d position: %d\n", evas_textblock_cursor_compare(c1, c2), evas_textblock_cursor_pos_get(c2));
+	printf("reason: c1: %s\nc2:%s\n", evas_textblock_cursor_node_text_get(c1), evas_textblock_cursor_node_text_get(c2));
 	continue;
       }
     }
@@ -139,7 +143,8 @@ main(int argc, char *argv[])
 
     /* update */
     page++;
-    evas_textblock_cursor_pos_set(c1, evas_textblock_cursor_pos_get(c2) + 1);
+    evas_textblock_cursor_copy(c2, c1);
+    evas_textblock_cursor_char_next(c1); // todo: check the return value
     line_number = evas_textblock_cursor_line_coord_set(c2, page * h);
 
   } while (evas_textblock_cursor_compare(c1, c2) < 0);
