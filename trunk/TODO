@@ -1,5 +1,6 @@
 1. implement proper paging
 2. modify the design to enable parallel run of multiple ertf executables.
-3. integrate with eina logging API
-4. include a doxygen template for documentation of the API
-5. check for possible attacks and secure against them
+3. update the smart test
+4. integrate with eina logging API
+5. include a doxygen template for documentation of the API
+6. check for possible attacks and secure against them
