@@ -223,13 +223,22 @@ ertf_document_parse(Ertf_Document *doc)
       /* paragraph */
       else if (strcmp(control_word, "pard") == 0)
       {
-	ertf_markup_add("<p>", 3);
-	if (ertf_paragraph_translate(doc->stream, 0))
-        {
-	  printf("Successfully parsed a paragraph.\n");
+	int c;
+	while ((c = fgetc(doc->stream)) != EOF || c != '}')
+	{
+	  ertf_markup_add("<p>", 3);
+	  ungetc(c, doc->stream);
+	  if (ertf_paragraph_translate(doc->stream, 0))
+	  {
+	    printf("Successfully parsed a paragraph.\n");
+	  }
+	  else
+	  {
+	    printf("failure parsing parapgraph.\n");
+	    break;
+	  }
 	}
-        else
-	  printf("failure parsing parapgraph.\n");
+	doc->bracecount--;
       }
 
       /* unsupported group */

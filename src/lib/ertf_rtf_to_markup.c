@@ -51,7 +51,7 @@ ertf_paragraph_translate(FILE *fp, int align)
       else
 	ungetc(c, fp);
       
-      fscanf(fp, "%[^ 0123456789;\\{}\n]", buf);
+      fscanf(fp, "%[^ 0123456789;\\{}\n\r]", buf);
       CHECK_EOF(fp, "ertf_paragraph_translate: end-of-file encountered while retrieving control word.\n", return 0);
 
       /* reset to default character formatting */
@@ -82,8 +82,16 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* end of paragraph */
       else if (strcmp(buf, "par") == 0)
       {
+	int c;
 	// todo: ensure that </p> is defined in style string
 	ertf_markup_add("</p>", 4);
+	// read till end of group
+	while ((c = fgetc(fp)) != EOF && c != '{' && c != '\\')
+	  ;
+	if (feof(fp))
+	  return 0;
+	else
+	  ungetc(c, fp);
 	goto success;
       }
 

@@ -32,8 +32,8 @@ main(int argc, char *argv[])
 
   if (argc < 2)
   {
-      printf ("Usage: %s file.rtf\n", argv[0]);
-      return EXIT_FAILURE;
+    printf ("Usage: %s file.rtf\n", argv[0]);
+    return EXIT_FAILURE;
   }
 
   if (!ecore_evas_init())
@@ -107,7 +107,8 @@ main(int argc, char *argv[])
   c1 = evas_object_textblock_cursor_new(textblock);
   evas_textblock_cursor_line_first(c1);
   evas_textblock_cursor_char_first(c1);
-  printf("val:%s eol:%d\n", evas_textblock_cursor_node_text_get(c1), evas_textblock_cursor_eol_get(c1));
+  line_number = evas_textblock_cursor_line_geometry_get(c1, NULL, NULL, NULL, NULL);
+  printf("val:%s eol:%d line:%d\n", evas_textblock_cursor_node_text_get(c1), evas_textblock_cursor_eol_get(c1), line_number);
   c2 = evas_object_textblock_cursor_new(textblock);
   h--;
   line_number = evas_textblock_cursor_line_coord_set(c2, h);  
@@ -124,7 +125,7 @@ main(int argc, char *argv[])
 	break;
       }
       else
-      {	
+      {
 	evas_textblock_cursor_line_last(c2);
 	evas_textblock_cursor_char_last(c2);
 	last_page++;
@@ -145,9 +146,12 @@ main(int argc, char *argv[])
     page++;
     evas_textblock_cursor_copy(c2, c1);
     evas_textblock_cursor_char_next(c1); // todo: check the return value
-    line_number = evas_textblock_cursor_line_coord_set(c2, page * h);
+    line_number = evas_textblock_cursor_line_coord_set(c2, page * h);    
 
   } while (evas_textblock_cursor_compare(c1, c2) < 0);
+  s = NULL;
+  evas_textblock_cursor_free(c2);
+  evas_textblock_cursor_free(c1);
   // trial code end
 
   ecore_main_loop_begin ();
