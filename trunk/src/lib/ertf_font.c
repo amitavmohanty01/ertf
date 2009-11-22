@@ -63,7 +63,7 @@ int ertf_font_table(FILE *fp)
       break;
 
     default:
-      fprintf(stderr, "ertf_font_table: skipped control character %c\n", c);
+      fprintf(stderr, "ertf_font_table: skipped control character '%c'\n", c);
     }
   }
 
