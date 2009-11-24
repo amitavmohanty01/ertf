@@ -16,6 +16,9 @@ ltconfig \
 ltmain.sh \
 missing
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = ertf.pc
+
 EXTRA_DIST = \
 AUTHORS \
 COPYING \

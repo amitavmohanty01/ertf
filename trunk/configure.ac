@@ -22,6 +22,9 @@ AC_SUBST(version_info)
 
 ### Needed information
 
+requirement_ertf=""
+AC_SUBST(requirement_ertf)
+
 
 ### Additional options to configure
 
@@ -42,6 +45,14 @@ AC_PROG_CC
 # pkg-config
 PKG_PROG_PKG_CONFIG
 
+# Check whether pkg-config supports Requires.private
+if $PKG_CONFIG --atleast-pkgconfig-version 0.22; then
+   pkgconfig_requires_private="Requires.private"
+else
+   pkgconfig_requires_private="Requires"
+fi
+AC_SUBST(pkgconfig_requires_private)
+
 # doxygen
 EFL_CHECK_DOXYGEN()
 
@@ -50,6 +61,7 @@ EFL_CHECK_DOXYGEN()
 PKG_CHECK_MODULES([ERTF], [evas eina-0])
 PKG_CHECK_MODULES([ECORE_EVAS], [ecore-evas])
 
+requirement_ertf="evas eina-0"
 
 ### Checks for header files
 
@@ -76,6 +88,7 @@ doc/Makefile
 src/Makefile
 src/bin/Makefile
 src/lib/Makefile
+ertf.pc
 ])
 
 AC_OUTPUT
