@@ -5,6 +5,24 @@
 #include <Eina.h>
 
 
+struct Ertf_Summary{
+  // todo: check if there should be a limitation to the length of the strings
+  char *author;
+  char *title;
+  char *subject;
+  char *operator;
+  char *keywords;
+  char *comment;
+  int version;
+  char *doccomm;
+  int internal_version;
+  int pages;
+  long int words;
+  long int chars;
+  int internal_ID;
+  // todo: add time variables
+};
+
 typedef struct Ertf_Summary Ertf_Summary;
 
 struct Ertf_Document

@@ -58,7 +58,7 @@ int
 ertf_tag_get(FILE *fp, char *s)
 {
   int c;
-  fscanf(fp, "%[^ 0123456789;\\{}\n]", s);
+  fscanf(fp, "%[^ 0123456789;\\{}\n\r]", s);
   if ((c = fgetc(fp)) != ' ')
     ungetc(c, fp);
   CHECK_EOF(fp, "ertf_tag_get: EOF encountered while obtaining control tag.\n", return 1);
