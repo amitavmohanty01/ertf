@@ -241,8 +241,7 @@ _ertf_stylesheet_add(FILE *fp)
 	fprintf(stderr, "_ertf_stylesheet_add: unrecognised control character `%c'.\n", c);      
     }
   }
-  // end of file is reached
-  // todo: remove debug statement in final version
+  // end of file is reached  
   fprintf(stderr, "_ertf_stylesheet_add: Ill-formed rtf.\n");
 
  error:
