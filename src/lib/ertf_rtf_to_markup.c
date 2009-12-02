@@ -40,10 +40,8 @@ ertf_paragraph_translate(FILE *fp, int align)
       {
 	if (c == '\'')
 	{
-	  char hex[3];
-	  fscanf(fp, "%2s", hex);
-	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading hexadecimal value of character.\n", return 0);
-	  c = atoi(hex);
+	  fscanf(fp, "%x", &c);
+	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading hexadecimal value of character.\n", return 0);	 
 	}
 	ertf_markup_add(&c, 1);
 	break;
