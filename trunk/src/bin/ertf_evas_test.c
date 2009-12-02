@@ -171,6 +171,6 @@ main(int argc, char *argv[])
  shutdown_ecore_evas:
   ecore_evas_shutdown();
   ecore_x_shutdown();
-
+ 
   return EXIT_FAILURE;
 }
