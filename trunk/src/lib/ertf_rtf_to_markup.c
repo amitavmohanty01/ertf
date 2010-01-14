@@ -38,10 +38,14 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* handle special characters */
       if ((c = getc(fp)) == '\\' || c == '{' || c == '}' || c == '\'')
       {
+	/* handle 8-bit characters */
 	if (c == '\'')
 	{
+	  char w;
 	  fscanf(fp, "%x", &c);
-	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading hexadecimal value of character.\n", return 0);	 
+	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading hexadecimal value of character.\n", return 0);	  
+	  w = 0xc2;
+	  ertf_markup_add(&w, 1);	 
 	}
 	ertf_markup_add(&c, 1);
 	break;
