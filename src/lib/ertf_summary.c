@@ -29,7 +29,8 @@ ertf_summary(Ertf_Document *doc)
   doc->summary = (Ertf_Summary *)malloc(sizeof(Ertf_Summary));
   if (!doc->summary)
   {
-    fprintf(stderr, "ertf_summary: out of memory while allocating doc_info.\n");
+    //fprintf(stderr, "ertf_summary: out of memory while allocating doc_info.\n");
+    ERR("ertf_summary: out of memory while allocating doc_info.\n");
     return 0;
   }
 
@@ -70,7 +71,8 @@ ertf_summary(Ertf_Document *doc)
 	return 1;
       break;
     default:
-      fprintf(stderr, "ertf_summary: skipping control character %c\n", c);      
+      //fprintf(stderr, "ertf_summary: skipping control character %c\n", c);
+      INFO("ertf_summary: skipping control character %c\n", c);
     }
   }
 
@@ -95,13 +97,15 @@ _ertf_resolve_control_word(Ertf_Document *doc)
 
   if ((c = fgetc(fp)) == EOF || c != '\\')
   {
-    fprintf(stderr, "_ertf_resolve_control_word: Ill-formed rtf.\n");
+    //fprintf(stderr, "_ertf_resolve_control_word: Ill-formed rtf.\n");
+    WARN("_ertf_resolve_control_word: Ill-formed rtf.\n");
     return 0;
   }
   // get control word
   if (ertf_tag_get(fp, control_word))
   {
-    fprintf(stderr, "_ertf_resolve_control_word: End of file reached while reading control word.\n");
+    //fprintf(stderr, "_ertf_resolve_control_word: End of file reached while reading control word.\n");
+    ERR("_ertf_resolve_control_word: End of file reached while reading control word.\n");
     return 0;
   }
 
@@ -165,6 +169,7 @@ _ertf_resolve_control_word(Ertf_Document *doc)
   }
 
  skip:
-  fprintf(stderr, "_ertf_resolve_control_word: skipping control tag %s\n", control_word);
+  //fprintf(stderr, "_ertf_resolve_control_word: skipping control tag %s\n", control_word);
+  DBG("_ertf_resolve_control_word: skipping control tag %s\n", control_word);
   return 1;
 }

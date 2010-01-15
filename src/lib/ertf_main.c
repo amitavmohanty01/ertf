@@ -26,6 +26,8 @@ int _ertf_default_font = 0;
 /* Usually, this is the screen dpi */
 int _twip_scale_factor = 86;
 
+int _ertf_log_dom = -1;
+
 static int _ertf_initcount = 0;
 
 static void _ertf_cleanup();
@@ -40,6 +42,12 @@ ertf_init(void)
   {
     fprintf(stderr, "Could not initialize eina array module.\n");
     return 0;
+  }
+
+  _ertf_log_dom = eina_log_domain_register("Ertf", ERTF_DEFAULT_LOG_COLOR);
+  if (_ertf_log_dom < 0)
+  {
+    EINA_LOG_ERR("Ertf can't create a general log domain.\n");
   }
 
  finish_init:
