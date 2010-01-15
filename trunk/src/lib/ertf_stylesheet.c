@@ -41,7 +41,8 @@ int ertf_stylesheet_parse(FILE *fp)
     case '{':
       if (!_ertf_stylesheet_add(fp))
       {
-	fprintf(stderr, "ertf_stylesheet_parse: Ill-formed rtf.\n");
+	//fprintf(stderr, "ertf_stylesheet_parse: Ill-formed rtf.\n");
+	INFO("ertf_stylesheet_parse: Ill-formed rtf.\n");
 	return 0;
       }
       if ((c = fgetc(fp)) == EOF || c!='}')
@@ -62,13 +63,15 @@ int ertf_stylesheet_parse(FILE *fp)
       break;
 
     default:
-      fprintf(stderr, "ertf_stylesheet_parse: invalid character `%c'.\n", c);
+      //fprintf(stderr, "ertf_stylesheet_parse: invalid character `%c'.\n", c);
+      DBG("ertf_stylesheet_parse: invalid character `%c'.\n", c);
       return 0;
     }
   }
 
  err_loop:
-  fprintf(stderr, "ertf_stylesheet_parse: End of file reached in stylesheet table.\n");
+  //fprintf(stderr, "ertf_stylesheet_parse: End of file reached in stylesheet table.\n");
+  ERR("ertf_stylesheet_parse: End of file reached in stylesheet table.\n");
   return 0;// unsuccessful return
 }
 
@@ -84,7 +87,8 @@ _ertf_stylesheet_add(FILE *fp)
   style = (Ertf_Stylesheet *)malloc(sizeof(Ertf_Stylesheet));
   if (!style)
   {
-    fprintf(stderr, "_ertf_stylesheet_add: out of memory while allocating style node.\n");
+    //fprintf(stderr, "_ertf_stylesheet_add: out of memory while allocating style node.\n");
+    ERR("_ertf_stylesheet_add: out of memory while allocating style node.\n");
     return 0;
   }
   colour_max = eina_array_count_get(color_table);
@@ -98,7 +102,8 @@ _ertf_stylesheet_add(FILE *fp)
     case '\\':// get the control word      
       if(ertf_tag_get(fp, buf))
       {
-	fprintf(stderr, "_ertf_stylesheet_add: Ill-formed rtf.\n");
+	//fprintf(stderr, "_ertf_stylesheet_add: Ill-formed rtf.\n");
+	INFO("_ertf_stylesheet_add: Ill-formed rtf.\n");
 	goto error;
       }
 
@@ -111,7 +116,8 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%u", &style->foreground_colour);
 	  if (style->foreground_colour >= colour_max)
           {
-	    fprintf(fp, "_ertf_stylesheet_add: stylesheet colour not in colour table\n");
+	    //fprintf(fp, "_ertf_stylesheet_add: stylesheet colour not in colour table\n");
+	    INFO("_ertf_stylesheet_add: stylesheet colour not in colour table\n");
 	    goto error;
 	  }
 	  style->set |= STYLE_FOREGROUND_SET;
@@ -121,7 +127,8 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%u", &style->background_colour);
 	  if (style->background_colour >= colour_max)
           {
-	    fprintf(fp, "_ertf_stylesheet_add: stylesheet colour not in colour table\n");
+	    //fprintf(fp, "_ertf_stylesheet_add: stylesheet colour not in colour table\n");
+	    INFO("_ertf_stylesheet_add: stylesheet colour not in colour table\n");
 	    goto error;
 	  }
 	  style->set |= STYLE_BACKGROUND_SET;
@@ -154,7 +161,8 @@ _ertf_stylesheet_add(FILE *fp)
 	    ;
 	  if (c == EOF)
           {
-	    fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
+	    //fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
+	    ERR("_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag\n");
 	    goto error;
 	  }
           else if (c == '\\')
@@ -192,7 +200,8 @@ _ertf_stylesheet_add(FILE *fp)
 	    ;
 	  if (c == EOF)
           {
-	    fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag \n");
+	    //fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag \n");
+	    ERR("_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag \n");
 	    goto error;
 	  }
           else if (c == '\\')
@@ -221,7 +230,8 @@ _ertf_stylesheet_add(FILE *fp)
     case '{':      
       if (ertf_group_skip(fp))
       {
-	fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised group\n");
+	//fprintf(stderr, "_ertf_stylesheet_add: end of file encountered while skipping unrecognised group\n");
+	ERR("_ertf_stylesheet_add: end of file encountered while skipping unrecognised group\n");
 	goto error;
       }
       break;
@@ -241,8 +251,9 @@ _ertf_stylesheet_add(FILE *fp)
 	fprintf(stderr, "_ertf_stylesheet_add: unrecognised control character `%c'.\n", c);      
     }
   }
-  // end of file is reached  
-  fprintf(stderr, "_ertf_stylesheet_add: Ill-formed rtf.\n");
+  // end of file is reached
+  //fprintf(stderr, "_ertf_stylesheet_add: Ill-formed rtf.\n");
+  INFO("_ertf_stylesheet_add: Ill-formed rtf.\n");
 
  error:
   free(style);

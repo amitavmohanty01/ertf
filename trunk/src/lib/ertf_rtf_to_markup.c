@@ -378,8 +378,9 @@ ertf_paragraph_translate(FILE *fp, int align)
       }
     }
   }
-  fprintf(stderr, "ertf_paragraph_translate: EOF encountered while looping for"
-	  " control word.\n");
+  //fprintf(stderr, "ertf_paragraph_translate: EOF encountered while looping for"
+  //  " control word.\n");
+  ERR("ertf_paragraph_translate: EOF encountered while looping for control word.\n");
   return 0;
 
  success:

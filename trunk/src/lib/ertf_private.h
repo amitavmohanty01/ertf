@@ -58,5 +58,28 @@ extern Eina_Array *stylesheet_table;
 extern int         ertf_markup_position;
 extern char       *markup;
 
+ 
+extern int _ertf_log_dom;
+#ifdef ERTF_DEFAULT_LOG_COLOR
+# undef ERTF_DEFAULT_LOG_COLOR
+#endif
+#define ERTF_DEFAULT_LOG_COLOR EINA_COLOR_BLUE
+#ifdef ERR 
+# undef ERR 
+#endif 
+#define ERR(...) EINA_LOG_DOM_ERR(_ertf_log_dom, __VA_ARGS__) 
+#ifdef INFO
+# undef INFO 
+#endif 
+#define INFO(...) EINA_LOG_DOM_INFO(_ertf_log_dom, __VA_ARGS__) 
+#ifdef WARN
+# undef WARN
+#endif 
+#define WARN(...) EINA_LOG_DOM_WARN(_ertf_log_dom, __VA_ARGS__)
+#ifdef DBG
+# undef DBG
+#endif
+#define DBG(...) EINA_LOG_DOM_DBG(_ertf_log_dom, __VA_ARGS__)
+
 
 #endif /* ERTF_PRIVATE_H_ */
