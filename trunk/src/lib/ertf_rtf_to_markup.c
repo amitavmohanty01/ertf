@@ -343,7 +343,7 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* unsupported or unrecognised control tag */
       else
       {
-	fprintf(stderr, "ertf_paragraph_translate: skipped control tag `%s'\n", buf);
+	INFO(stderr, "ertf_paragraph_translate: skipped control tag `%s'", buf);
       }
       /* read till next delimiter */
       while ((c = fgetc(fp)) != '\\' &&
@@ -380,7 +380,7 @@ ertf_paragraph_translate(FILE *fp, int align)
   }
   //fprintf(stderr, "ertf_paragraph_translate: EOF encountered while looping for"
   //  " control word.\n");
-  ERR("ertf_paragraph_translate: EOF encountered while looping for control word.\n");
+  ERR("ertf_paragraph_translate: EOF encountered while looping for control word");
   return 0;
 
  success:

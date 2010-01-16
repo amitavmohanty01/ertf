@@ -8,7 +8,11 @@
 /*
  * This enables cleaner EOF checking.
  */
-#define CHECK_EOF(STREAM, MESSAGE, RECOVERY); if (feof(STREAM)){fprintf(stderr, MESSAGE);RECOVERY;}
+#define CHECK_EOF(STREAM, MESSAGE, RECOVERY); if (feof(STREAM))\
+{                                                              \
+  ERR(MESSAGE);						       \
+  RECOVERY;                                                    \
+}
 
 int ertf_markup_add(char *, int);
 

@@ -27,8 +27,7 @@ ertf_color_table(FILE *fp)
 {
   int c;
 
-  // todo: remove debug msg
-  printf("Inside color table handler.\n");
+  DBG("Inside color table handler.\n");
 
   // create an eina array
   color_table = eina_array_new(7);
@@ -50,7 +49,7 @@ ertf_color_table(FILE *fp)
       node = (Ertf_Color *)malloc(sizeof(Ertf_Color));
       if (!node)
       {
-	fprintf(stderr, "ertf_color_table: short of memory while allocating color node.\n");
+	ERR("ertf_color_table: short of memory while allocating color node");
 	return 0;
       }
       node->r = _ertf_default_color_r;
@@ -64,7 +63,7 @@ ertf_color_table(FILE *fp)
       if (_ertf_color_add(fp))
 	continue;
       else
-	fprintf(stderr, "ertf_color_table: Ill-formed rtf\n");
+	INFO("ertf_color_table: Ill-formed rtf");
       break;
 
     case '}':// end of color table
@@ -73,11 +72,11 @@ ertf_color_table(FILE *fp)
       return 1;
 
     default:
-      fprintf(stderr, "ertf_color_table: skipping control character %c.\n", c);      
+      DBG("ertf_color_table: skipping control character %c.", c);      
     }
   }
 
-  fprintf(stderr, "ertf_color_table: End of file reached in color table.\n");
+  ERR("ertf_color_table: End of file reached in color table.");
   return 0;
 }
 
@@ -102,11 +101,11 @@ _ertf_color_add(FILE *fp)
   node = (Ertf_Color *)malloc(sizeof(Ertf_Color));
   if (!node)
   {
-    fprintf(stderr, "_ertf_color_add: short of memory while allocating color node.\n");
+    ERR("_ertf_color_add: short of memory while allocating color node");
     return 0;
   }
 
-  printf("Inside color entry parser.\n");
+  DBG("Inside color entry parser");
 
   while ((c = fgetc(fp)) != EOF)
   {
@@ -115,7 +114,7 @@ _ertf_color_add(FILE *fp)
     case '\\':      
       if (ertf_tag_get(fp, color))
       {
-	fprintf(stderr, "_ertf_color_add: EOF encountered while getting control tag.\n");
+	ERR("_ertf_color_add: EOF encountered while getting control tag");
 	goto err;
       }
 
@@ -127,8 +126,7 @@ _ertf_color_add(FILE *fp)
 	if (!(set & GREEN))
 	  node->g = index;
 	else
-	  fprintf(stderr, "_ertf_color_add: multiple values for same color.\n");
-	// todo: confirm if this should only be logged and not stopped at
+	  WARN("_ertf_color_add: multiple values for same color.\n");
       }
       else if (strcmp(color, "red") == 0)
 	node->r = index;
@@ -138,13 +136,13 @@ _ertf_color_add(FILE *fp)
       // todo: add set/unset check as above
       else
 	// continue as the tag is not recognised and should be therefore skipped
-	fprintf(stderr, "_ertf_color_add: skipped unrecognised control tag \"%s\".\n", color);
+	DBG("_ertf_color_add: skipped unrecognised control tag `%s'", color);
       break;
     case ';':// todo: error checking on success of the push operation
       eina_array_push(color_table, node);
       return 1;
     default:
-      fprintf(stderr, "_ertf_color_add: skipped control character %c.\n", c);      
+      DBG("_ertf_color_add: skipped control character %c.\n", c);      
     }    
   }
 

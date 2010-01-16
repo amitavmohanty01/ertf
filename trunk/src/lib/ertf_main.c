@@ -40,7 +40,7 @@ ertf_init(void)
 
   if (!eina_init())
   {
-    fprintf(stderr, "Could not initialize eina array module.\n");
+    fprintf(stderr, "Could not initialize eina");
     return 0;
   }
 
@@ -60,6 +60,8 @@ ertf_shutdown(void)
   if (_ertf_initcount != 1) goto finish_shutdown;
 
   _ertf_cleanup();
+  eina_log_domain_unregister(_ertf_log_dom);
+  _ertf_log_dom = -1;
   eina_shutdown();
 
  finish_shutdown:

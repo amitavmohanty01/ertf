@@ -118,7 +118,7 @@ ertf_document_header_get(Ertf_Document *doc)
     case '\\':
       if(ertf_tag_get(doc->stream, tag))
       {
-	fprintf(stderr, "ertf_document_header_get: encountered EOF while reading control tag.\n");
+	ERR("ertf_document_header_get: encountered EOF while reading control tag");
 	return 0;
       }
       if (strcmp(tag, "rtf") == 0)
@@ -147,14 +147,14 @@ ertf_document_header_get(Ertf_Document *doc)
       }
       else
       {
-	fprintf(stderr, "ertf_document_header_get: unrecognised control tag %s\n", tag);
+	DBG("ertf_document_header_get: unrecognised control tag %s", tag);
       }
       break;
     default:
-      fprintf(stderr, "ertf_document_header_get: unrecognised control character %c.\n", c);
+      DBG("ertf_document_header_get: unrecognised control character %c", c);
     }
   }
-  fprintf(stderr, "ertf_document_header_get: encountered EOF while parsing header.\n");
+  ERR("ertf_document_header_get: encountered EOF while parsing header.\n");
   return 0;
 }
 
@@ -183,7 +183,7 @@ ertf_document_parse(Ertf_Document *doc)
     case '\\'://todo:perform the control operation
       if (ertf_tag_get(doc->stream, control_word))
       {
-        fprintf(stderr, "ertf_document_parse: EOF encountered.\n");
+        ERR("ertf_document_parse: EOF encountered");
         return 0;
       }
 
@@ -192,11 +192,11 @@ ertf_document_parse(Ertf_Document *doc)
       {
 	if (ertf_font_table(doc->stream))
         {	
-	  printf("Successfully created font table.\n");
+	  DBG("Successfully created font table");
 	  doc->bracecount--;
 	}
         else
-	  printf("failure in creating font table.\n");
+	  DBG("failure in creating font table");
 
 	/* color table */
       }
@@ -204,11 +204,11 @@ ertf_document_parse(Ertf_Document *doc)
       {
 	if (ertf_color_table(doc->stream))
         {
-	  printf("Successfully created color table.\n");
+	  DBG("Successfully created color table");
 	  doc->bracecount--;
 	}
         else
-	  printf("failure in creating color table.\n");
+	  DBG("failure in creating color table");
 
 	/* stylesheet */
       }
@@ -216,11 +216,11 @@ ertf_document_parse(Ertf_Document *doc)
       {
 	if (ertf_stylesheet_parse(doc->stream))
         {
-	  printf("Successfully created stylesheet table.\n");
+	  DBG("Successfully created stylesheet table");
 	  doc->bracecount--;
 	}
         else
-	  printf("failure in creating stylesheet table.\n");
+	  DBG("failure in creating stylesheet table");
       }
 
       /* paragraph */
@@ -233,11 +233,11 @@ ertf_document_parse(Ertf_Document *doc)
 	  ungetc(c, doc->stream);
 	  if (ertf_paragraph_translate(doc->stream, 0))
 	  {
-	    printf("Successfully parsed a paragraph.\n");
+	    DBG("Successfully parsed a paragraph");
 	  }
 	  else
 	  {
-	    printf("failure parsing parapgraph.\n");
+	    DBG("failure parsing parapgraph");
 	    break;
 	  }
 	}
@@ -248,7 +248,7 @@ ertf_document_parse(Ertf_Document *doc)
       else if (strcmp(control_word, "*") == 0)
       {
 	if (ertf_group_skip(doc->stream))
-	  fprintf(stderr, "ertf_document_parse: EOF encountered while skipping group\n");
+	  ERR("ertf_document_parse: EOF encountered while skipping group");
       }
 
       /* handle paper height */
@@ -297,21 +297,21 @@ ertf_document_parse(Ertf_Document *doc)
       else if (strcmp(control_word, "info") == 0)
       {
 	if (ertf_summary(doc))
-	  printf("Successfully parsed information section.\n");
+	  DBG("Successfully parsed information section");
 	else
-	  printf("failure parsing information about the file.\n");
+	  DBG("failure parsing information about the file");
       }
 
       /* unrecognised control word */
       else
       {
-	fprintf(stderr, "ertf_document_parse: skipping unrecognised control word %s\n", control_word);
+	DBG("ertf_document_parse: skipping unrecognised control word %s", control_word);
       }
 
       break;
 
     default:
-      fprintf(stderr, "ertf_document_parse: skipped control char `%c'\n", c);
+      DBG("ertf_document_parse: skipped control char `%c'", c);
     }
   }
 
@@ -322,7 +322,7 @@ ertf_document_parse(Ertf_Document *doc)
   // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
   if (doc->bracecount)
-    fprintf(stderr, "ertf_document_parse: Ill-formed rtf - inconsistent use of braces.\n");
+    WARN("ertf_document_parse: Ill-formed rtf - inconsistent use of braces");
 
   return 1;
 }

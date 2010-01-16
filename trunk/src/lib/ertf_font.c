@@ -27,8 +27,7 @@ int ertf_font_table(FILE *fp)
 {
   int c;
 
-  // todo: remove debug msg
-  printf("Inside font table handler.\n");
+  DBG("Inside font table handler");
 
   // create an eina array
   font_table = eina_array_new(7);
@@ -63,12 +62,12 @@ int ertf_font_table(FILE *fp)
       break;
 
     default:
-      fprintf(stderr, "ertf_font_table: skipped control character '%c'\n", c);
+      DBG("ertf_font_table: skipped control character '%c'", c);
     }
   }
 
  err_loop:
-  fprintf(stderr, "ertf_font_table: Incorrect termination of file. Probably corrupted.\n");
+  ERR("ertf_font_table: Incorrect termination of file. Probably corrupted");
   return 0;// unsuccessful return
 }
 
@@ -83,10 +82,10 @@ _ertf_font_add(FILE *fp)
   node = (Ertf_Font_Node *)malloc(sizeof(Ertf_Font_Node));
 
   if (!node)
-    fprintf(stderr, "_ertf_font_add: Out of memory while allocating font node.\n");
+    ERR("_ertf_font_add: Out of memory while allocating font node");
 
   node->status = 0;
-  printf("Inside font entry parser.\n");
+  DBG("Inside font entry parser");
 
   while ((c = fgetc(fp)) != EOF)
   {
@@ -95,14 +94,14 @@ _ertf_font_add(FILE *fp)
     case '\\': //encountered a control word      
       if (ertf_tag_get(fp, buf))
       {
-	fprintf(stderr, "_ertf_fond_add: Ill-formed rtf.\n");
+	ERR("_ertf_fond_add: Ill-formed rtf");
 	goto error;
       }
 
       if (strcmp(buf, "f") == 0)
       {
 	fscanf(fp, "%d", &node->number);
-	CHECK_EOF(fp, "_ertf_font_add: EOF encountered while reading font number.\n", return 0);
+	CHECK_EOF(fp, "_ertf_font_add: EOF encountered while reading font number", return 0);
       }
       else if (strcmp(buf, "froman") == 0)
       {
@@ -144,7 +143,7 @@ _ertf_font_add(FILE *fp)
       else if (strcmp(buf, "fcharset") == 0)
       {
 	fscanf(fp, "%d", &node->charset);
-	CHECK_EOF(fp, "_ertf_font_add: EOF encountered while reading charset.", return 0);
+	CHECK_EOF(fp, "_ertf_font_add: EOF encountered while reading charset", return 0);
 	node->status |= CHARSET_SET;
       }
       else
@@ -152,7 +151,7 @@ _ertf_font_add(FILE *fp)
         // skip unrecognised or unsupported tag
 	while ((c = fgetc(fp)) != EOF  && c != '\\' && !isdigit(c))
 	  ;
-	CHECK_EOF(fp, "_ertf_font_add: end of file encountered while skipping unrecognised tag\n", goto error);
+	CHECK_EOF(fp, "_ertf_font_add: end of file encountered while skipping unrecognised tag", goto error);
         if (c == '\\')
         {
 	  ungetc(c, fp);
@@ -175,14 +174,14 @@ _ertf_font_add(FILE *fp)
 	ungetc(c, fp);
 	fscanf(fp, "%[^;{]", node->name);
       // font tables can also contains groups, especially specifying alternative fonts
-	CHECK_EOF(fp, "_ertf_font_add: end of file encountered while reading font name. \n", goto error);
+	CHECK_EOF(fp, "_ertf_font_add: end of file encountered while reading font name", goto error);
       }
       else
-	fprintf(stderr, "_ertf_font_add: unrecognised control character '%c'.\n", c);      
+	DBG("_ertf_font_add: unrecognised control character '%c'", c);      
     }
   }
   // end of file is reached  
-  fprintf(stderr, "_ertf_font_add: Ill-formed rtf.\n");
+  ERR("_ertf_font_add: Ill-formed rtf.\n");
 
  error:
   free(node);
