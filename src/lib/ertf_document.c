@@ -76,6 +76,7 @@ ertf_document_filename_set(Ertf_Document *doc, const char *filename)
   if (!doc->stream)
   {
     free(doc->filename);
+    doc->filename = NULL;
     return 0;
   }
 
