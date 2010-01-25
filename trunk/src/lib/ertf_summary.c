@@ -29,8 +29,7 @@ ertf_summary(Ertf_Document *doc)
   doc->summary = (Ertf_Summary *)malloc(sizeof(Ertf_Summary));
   if (!doc->summary)
   {
-    //fprintf(stderr, "ertf_summary: out of memory while allocating doc_info.\n");
-    ERR("ertf_summary: out of memory while allocating doc_info");
+    ERR("out of memory while allocating doc_info");
     return 0;
   }
 
@@ -71,7 +70,7 @@ ertf_summary(Ertf_Document *doc)
 	return 1;
       break;
     default:
-      INFO("ertf_summary: skipping control character %c", c);
+      INFO("skipping control character %c", c);
     }
   }
 
@@ -96,13 +95,13 @@ _ertf_resolve_control_word(Ertf_Document *doc)
 
   if ((c = fgetc(fp)) == EOF || c != '\\')
   {
-    WARN("_ertf_resolve_control_word: Ill-formed rtf");
+    WARN("Ill-formed rtf");
     return 0;
   }
   // get control word
   if (ertf_tag_get(fp, control_word))
   {
-    ERR("_ertf_resolve_control_word: End of file reached while reading control word");
+    ERR("End of file reached while reading control word");
     return 0;
   }
 
@@ -115,7 +114,7 @@ _ertf_resolve_control_word(Ertf_Document *doc)
       char *s;
       s = (char *)malloc(256);
       fscanf(fp, "%[^}]", s);
-      CHECK_EOF(fp, "_ertf_resolve_control_word: EOF encountered while reading author name", return 0);
+      CHECK_EOF(fp, "EOF encountered while reading author name", return 0);
       doc->summary->author = s;
       return 1;
     }
@@ -140,13 +139,13 @@ _ertf_resolve_control_word(Ertf_Document *doc)
     if (strcmp(control_word + 1, "ersion") == 0)
     {
       fscanf(fp, "%d", &doc->summary->version);
-      CHECK_EOF(fp, "_ertf_resolve_control_word: EOF encountered while reading version", return 0);
+      CHECK_EOF(fp, "EOF encountered while reading version", return 0);
       return 1;
     }
     else if (strcmp(control_word + 1, "ern") == 0)
     {
       fscanf(fp, "%d", &doc->summary->internal_version);
-      CHECK_EOF(fp, "_ertf_resolve_control_word: EOF encountered while reading internal version number", return 0);
+      CHECK_EOF(fp, "EOF encountered while reading internal version number", return 0);
       return 1;
     }
     else
@@ -166,6 +165,6 @@ _ertf_resolve_control_word(Ertf_Document *doc)
   }
 
  skip:
-  DBG("_ertf_resolve_control_word: skipping control tag %s", control_word);
+  DBG("skipping control tag %s", control_word);
   return 1;
 }
