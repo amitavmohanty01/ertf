@@ -119,7 +119,7 @@ ertf_document_header_get(Ertf_Document *doc)
     case '\\':
       if(ertf_tag_get(doc->stream, tag))
       {
-	ERR("ertf_document_header_get: encountered EOF while reading control tag");
+	ERR("encountered EOF while reading control tag");
 	return 0;
       }
       if (strcmp(tag, "rtf") == 0)
@@ -148,14 +148,14 @@ ertf_document_header_get(Ertf_Document *doc)
       }
       else
       {
-	DBG("ertf_document_header_get: unrecognised control tag %s", tag);
+	DBG("unrecognised control tag %s", tag);
       }
       break;
     default:
-      DBG("ertf_document_header_get: unrecognised control character %c", c);
+      DBG("unrecognised control character %c", c);
     }
   }
-  ERR("ertf_document_header_get: encountered EOF while parsing header.\n");
+  ERR("encountered EOF while parsing header.\n");
   return 0;
 }
 
@@ -184,7 +184,7 @@ ertf_document_parse(Ertf_Document *doc)
     case '\\'://todo:perform the control operation
       if (ertf_tag_get(doc->stream, control_word))
       {
-        ERR("ertf_document_parse: EOF encountered");
+        ERR("EOF encountered");
         return 0;
       }
 
@@ -249,7 +249,7 @@ ertf_document_parse(Ertf_Document *doc)
       else if (strcmp(control_word, "*") == 0)
       {
 	if (ertf_group_skip(doc->stream))
-	  ERR("ertf_document_parse: EOF encountered while skipping group");
+	  ERR("EOF encountered while skipping group");
       }
 
       /* handle paper height */
@@ -306,13 +306,13 @@ ertf_document_parse(Ertf_Document *doc)
       /* unrecognised control word */
       else
       {
-	DBG("ertf_document_parse: skipping unrecognised control word %s", control_word);
+	DBG("skipping unrecognised control word %s", control_word);
       }
 
       break;
 
     default:
-      DBG("ertf_document_parse: skipped control char `%c'", c);
+      DBG("skipped control char `%c'", c);
     }
   }
 
@@ -323,7 +323,7 @@ ertf_document_parse(Ertf_Document *doc)
   // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
   if (doc->bracecount)
-    WARN("ertf_document_parse: Ill-formed rtf - inconsistent use of braces");
+    WARN("Ill-formed rtf - inconsistent use of braces");
 
   return 1;
 }

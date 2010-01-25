@@ -43,7 +43,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	{
 	  char w;
 	  fscanf(fp, "%x", &c);
-	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading hexadecimal value of character.\n", return 0);	  
+	  CHECK_EOF(fp, "EOF encountered while reading hexadecimal value of character", return 0);
 	  w = 0xc2;
 	  ertf_markup_add(&w, 1);	 
 	}
@@ -54,7 +54,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	ungetc(c, fp);
       
       fscanf(fp, "%[^ 0123456789;\\{}\n\r]", buf);
-      CHECK_EOF(fp, "ertf_paragraph_translate: end-of-file encountered while retrieving control word.\n", return 0);
+      CHECK_EOF(fp, "end-of-file encountered while retrieving control word", return 0);
 
       /* reset to default character formatting */
       if (strcmp(buf, "plain") == 0)
@@ -66,8 +66,8 @@ ertf_paragraph_translate(FILE *fp, int align)
       {
 	// todo: add the relevant style string to markup
 	fgetc(fp);
-	CHECK_EOF(fp, "ertf_paragraph_translate: end-of-file encountered while "
-		"retrieving style number.\n", return 0);
+	CHECK_EOF(fp, "end-of-file encountered while "
+		"retrieving style number", return 0);
       }
 
       /* right aligned text */
@@ -156,7 +156,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 
 	// todo: find relevant markup
 	fscanf(fp, "%d", &c);
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for font number.\n", return 0);
+	CHECK_EOF(fp, "EOF encountered while checking for font number", return 0);
 	font = eina_array_data_get(font_table, c);	
       }
 
@@ -191,11 +191,11 @@ ertf_paragraph_translate(FILE *fp, int align)
 	{
 	  ungetc(c, fp);
 	  fscanf(fp, "%4s", temp);	
-	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for underline colour.\n", return 0);
+	  CHECK_EOF(fp, "EOF encountered while checking for underline colour", return 0);
 	  if (strcmp(temp, "\\ulc") == 0)
 	  {
 	    fscanf(fp, "%d", &c);
-	    CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for colour number for underlining.\n", return 0);
+	    CHECK_EOF(fp, "EOF encountered while checking for colour number for underlining", return 0);
 	    node = (Ertf_Color *)eina_array_data_get(color_table, c);
 	    ertf_markup_add("<underline=on underline_color=#", 31);
 	    ertf_markup_add(node->string, 8);
@@ -225,11 +225,11 @@ ertf_paragraph_translate(FILE *fp, int align)
 	  ertf_markup_add("</>", 3);
 	}
 	fscanf(fp, "%4s", temp);	
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for underline colour.\n", return 0);
+	CHECK_EOF(fp, "EOF encountered while checking for underline colour", return 0);
 	if (strcmp(temp, "\\ulc") == 0)
 	{
 	    fscanf(fp, "%d", &c);
-	    CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for colour number for underlining.\n", return 0);
+	    CHECK_EOF(fp, "EOF encountered while checking for colour number for underlining", return 0);
 	    node = (Ertf_Color *)eina_array_data_get(color_table, c);
 	    ertf_markup_add("<underline=double underline_color=#", 35);
 	    ertf_markup_add(node->string, 8);
@@ -259,7 +259,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	{
 	  ertf_markup_add("<font_size=", 11);
 	  fscanf(fp, "%d", &c);
-	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while getting font size.\n", return 0);
+	  CHECK_EOF(fp, "EOF encountered while getting font size", return 0);
 	  /* integer divison yields the floor value, which is used as the font size as fractional font size is currently not supported */
 	  // todo: implement support for fractional font size in text block.
 	  c /= 2;
@@ -268,10 +268,10 @@ ertf_paragraph_translate(FILE *fp, int align)
 	  ertf_markup_add(">", 1);
 	  fontset = 1;
 	}
-	else 
+	else
 	{
 	  fscanf(fp, "%d", &c);
-	  CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while skipping font size.\n", return 0);
+	  CHECK_EOF(fp, "EOF encountered while skipping font size", return 0);
 	}
       }
 
@@ -285,7 +285,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	}
 	ertf_markup_add("<color=#", 8);
 	fscanf(fp, "%d", &c);
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading colour number.\n", return 0);
+	CHECK_EOF(fp, "EOF encountered while reading colour number", return 0);
 	node = (Ertf_Color *) eina_array_data_get(color_table, c);
 	if(!node){
 	  printf("invalid node.");
@@ -309,7 +309,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	}
 	ertf_markup_add("<backing=on backing_color=#", 27);
 	fscanf(fp, "%d", &c);
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while reading background colour number.\n", return 0);
+	CHECK_EOF(fp, "EOF encountered while reading background colour number", return 0);
 	node = (Ertf_Color *)eina_array_data_get(color_table, c);
 	ertf_markup_add(node->string, 8);
 	ertf_markup_add(">", 1);
@@ -336,22 +336,21 @@ ertf_paragraph_translate(FILE *fp, int align)
 	/* They not supported in the prototype. */
 	while ((c = fgetc(fp)) != EOF && c != '}')
 	  ;
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF reached while handling unsupported target.\n", return 0);
+	CHECK_EOF(fp, "EOF reached while handling unsupported target", return 0);
 	ungetc(c, fp);
       }
 
       /* unsupported or unrecognised control tag */
       else
       {
-	INFO(stderr, "ertf_paragraph_translate: skipped control tag `%s'", buf);
+	INFO(stderr, "skipped control tag `%s'", buf);
       }
       /* read till next delimiter */
       while ((c = fgetc(fp)) != '\\' &&
 	     c != ' ' &&
 	     c != '{' &&
 	     c != '}')
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF reached while skipping"
-		  " control info.\n", return 0);
+	CHECK_EOF(fp, "EOF reached while skipping control info", return 0);
       if (c != ' ')
       ungetc(c, fp);
 
@@ -378,9 +377,8 @@ ertf_paragraph_translate(FILE *fp, int align)
       }
     }
   }
-  //fprintf(stderr, "ertf_paragraph_translate: EOF encountered while looping for"
-  //  " control word.\n");
-  ERR("ertf_paragraph_translate: EOF encountered while looping for control word");
+
+  ERR("EOF encountered while looping for control word");
   return 0;
 
  success:

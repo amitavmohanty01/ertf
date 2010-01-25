@@ -39,7 +39,7 @@ ertf_markup_add(char *string, int len)
     if (!tmp)
     {
       //fprintf(stderr, "ertf_markup_add: Out of memory while allocating markup.\n");
-      ERR("ertf_markup_add: Out of memory while allocating markup");
+      ERR("Out of memory while allocating markup");
       return 0;
     }
     memcpy(tmp, markup, current_size);
@@ -62,7 +62,7 @@ ertf_tag_get(FILE *fp, char *s)
   fscanf(fp, "%[^ 0123456789;\\{}\n\r]", s);
   if ((c = fgetc(fp)) != ' ')
     ungetc(c, fp);
-  CHECK_EOF(fp, "ertf_tag_get: EOF encountered while obtaining control tag.\n", return 1);
+  CHECK_EOF(fp, "EOF encountered while obtaining control tag.\n", return 1);
   return 0;
 }
 

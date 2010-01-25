@@ -41,7 +41,7 @@ int ertf_stylesheet_parse(FILE *fp)
     case '{':
       if (!_ertf_stylesheet_add(fp))
       {
-	DBG("ertf_stylesheet_parse: Ill-formed rtf");
+	DBG("Ill-formed rtf");
 	return 0;
       }
       if ((c = fgetc(fp)) == EOF || c!='}')
@@ -62,15 +62,13 @@ int ertf_stylesheet_parse(FILE *fp)
       break;
 
     default:
-      //fprintf(stderr, "ertf_stylesheet_parse: invalid character `%c'.\n", c);
-      DBG("ertf_stylesheet_parse: invalid character `%c'", c);
+      DBG("invalid character `%c'", c);
       return 0;
     }
   }
 
  err_loop:
-  //fprintf(stderr, "ertf_stylesheet_parse: End of file reached in stylesheet table.\n");
-  ERR("ertf_stylesheet_parse: End of file reached in stylesheet table");
+  ERR("End of file reached in stylesheet table");
   return 0;// unsuccessful return
 }
 
@@ -86,8 +84,7 @@ _ertf_stylesheet_add(FILE *fp)
   style = (Ertf_Stylesheet *)malloc(sizeof(Ertf_Stylesheet));
   if (!style)
   {
-    //fprintf(stderr, "_ertf_stylesheet_add: out of memory while allocating style node.\n");
-    ERR("_ertf_stylesheet_add: out of memory while allocating style node");
+    ERR("out of memory while allocating style node");
     return 0;
   }
   colour_max = eina_array_count_get(color_table);
@@ -101,8 +98,7 @@ _ertf_stylesheet_add(FILE *fp)
     case '\\':// get the control word      
       if(ertf_tag_get(fp, buf))
       {
-	//fprintf(stderr, "_ertf_stylesheet_add: Ill-formed rtf.\n");
-	INFO("_ertf_stylesheet_add: Ill-formed rtf");
+	INFO("Ill-formed rtf");
 	goto error;
       }
 
@@ -115,7 +111,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%u", &style->foreground_colour);
 	  if (style->foreground_colour >= colour_max)
           {
-	    INFO("_ertf_stylesheet_add: stylesheet colour not in colour table");
+	    INFO("stylesheet colour not in colour table");
 	    goto error;
 	  }
 	  style->set |= STYLE_FOREGROUND_SET;
@@ -125,7 +121,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  fscanf(fp, "%u", &style->background_colour);
 	  if (style->background_colour >= colour_max)
           {
-	    INFO("_ertf_stylesheet_add: stylesheet colour not in colour table");
+	    INFO("stylesheet colour not in colour table");
 	    goto error;
 	  }
 	  style->set |= STYLE_BACKGROUND_SET;
@@ -136,18 +132,18 @@ _ertf_stylesheet_add(FILE *fp)
 	if (buf[1] == '\0')
         {	  
 	  fscanf(fp, "%d", &style->style_number);
-	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading stylesheet number", goto error);
+	  CHECK_EOF(fp, "end of file reached while reading stylesheet number", goto error);
 	}
         else if (strcmp(buf + 1,"basedon") == 0)
         {
 	  fscanf(fp, "%d", &c);
-	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading style number", goto error);
+	  CHECK_EOF(fp, "end of file reached while reading style number", goto error);
 	  //todo: copy relevant parts of the style
 	}
         else if (strcmp(buf + 1, "next") == 0)
         {
 	  fscanf(fp, "%d", &c);
-	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading paragraph number", goto error);
+	  CHECK_EOF(fp, "end of file reached while reading paragraph number", goto error);
 	  // todo: set relevant paragraphs for the style
 	}
         else
@@ -158,7 +154,7 @@ _ertf_stylesheet_add(FILE *fp)
 	    ;
 	  if (c == EOF)
           {
-	    ERR("_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag");
+	    ERR("end of file encountered while skipping unrecognised tag");
 	    goto error;
 	  }
           else if (c == '\\')
@@ -171,7 +167,7 @@ _ertf_stylesheet_add(FILE *fp)
       case '*':
 	while((c = fgetc(fp)) != EOF && c != ';')
 	  ;
-	CHECK_EOF(fp, "_ertf_stylesheet_add: EOF encountered while skipping spcial style group.", goto error);
+	CHECK_EOF(fp, "EOF encountered while skipping spcial style group.", goto error);
 	ungetc(c, fp);
 	break;
 
@@ -179,13 +175,13 @@ _ertf_stylesheet_add(FILE *fp)
 	if (buf[1] == '\0')
         {
 	  fscanf(fp, "%u", &style->font_number);
-	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading font number", goto error);
+	  CHECK_EOF(fp, "end of file reached while reading font number", goto error);
 	  style->set |= STYLE_FONT_SET;
 	}
         else if (strcmp(buf + 1, "s") == 0)
         {
 	  fscanf(fp, "%u", &style->font_size);
-	  CHECK_EOF(fp, "_ertf_stylesheet_add: end of file reached while reading font number", goto error);
+	  CHECK_EOF(fp, "end of file reached while reading font number", goto error);
 	  style->set |= STYLE_FONT_SIZE_SET;
 	}
         else
@@ -196,7 +192,7 @@ _ertf_stylesheet_add(FILE *fp)
 	    ;
 	  if (c == EOF)
           {
-	    ERR("_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag");
+	    ERR("end of file encountered while skipping unrecognised tag");
 	    goto error;
 	  }
           else if (c == '\\')
@@ -211,7 +207,7 @@ _ertf_stylesheet_add(FILE *fp)
 	  ;
 	if (c == EOF)
         {
-	  DBG("_ertf_stylesheet_add: end of file encountered while skipping unrecognised tag");
+	  DBG("end of file encountered while skipping unrecognised tag");
 	  goto error;
 	}
         else if (c == '\\')
@@ -225,7 +221,7 @@ _ertf_stylesheet_add(FILE *fp)
     case '{':      
       if (ertf_group_skip(fp))
       {
-	ERR("_ertf_stylesheet_add: end of file encountered while skipping unrecognised group");
+	ERR("end of file encountered while skipping unrecognised group");
 	goto error;
       }
       break;
@@ -239,14 +235,14 @@ _ertf_stylesheet_add(FILE *fp)
       {
 	ungetc(c, fp);
       fscanf(fp, "%[^;]", style->name);
-      CHECK_EOF(fp, "_ertf_stylesheet_add: end of file encountered while reading stylesheet name", goto error);
+      CHECK_EOF(fp, "end of file encountered while reading stylesheet name", goto error);
       }
       else
-	DBG("_ertf_stylesheet_add: unrecognised control character `%c'.\n", c); 
+	DBG("unrecognised control character `%c'.\n", c); 
     }
   }
   // end of file is reached
-  INFO("_ertf_stylesheet_add: Ill-formed rtf");
+  INFO("Ill-formed rtf");
 
  error:
   free(style);

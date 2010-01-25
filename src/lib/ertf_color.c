@@ -49,7 +49,7 @@ ertf_color_table(FILE *fp)
       node = (Ertf_Color *)malloc(sizeof(Ertf_Color));
       if (!node)
       {
-	ERR("ertf_color_table: short of memory while allocating color node");
+	ERR("short of memory while allocating color node");
 	return 0;
       }
       node->r = _ertf_default_color_r;
@@ -63,7 +63,7 @@ ertf_color_table(FILE *fp)
       if (_ertf_color_add(fp))
 	continue;
       else
-	INFO("ertf_color_table: Ill-formed rtf");
+	INFO("Ill-formed rtf");
       break;
 
     case '}':// end of color table
@@ -72,11 +72,11 @@ ertf_color_table(FILE *fp)
       return 1;
 
     default:
-      DBG("ertf_color_table: skipping control character %c.", c);      
+      DBG("skipping control character %c.", c);      
     }
   }
 
-  ERR("ertf_color_table: End of file reached in color table.");
+  ERR("End of file reached in color table.");
   return 0;
 }
 
@@ -101,7 +101,7 @@ _ertf_color_add(FILE *fp)
   node = (Ertf_Color *)malloc(sizeof(Ertf_Color));
   if (!node)
   {
-    ERR("_ertf_color_add: short of memory while allocating color node");
+    ERR("short of memory while allocating color node");
     return 0;
   }
 
@@ -114,7 +114,7 @@ _ertf_color_add(FILE *fp)
     case '\\':      
       if (ertf_tag_get(fp, color))
       {
-	ERR("_ertf_color_add: EOF encountered while getting control tag");
+	ERR("EOF encountered while getting control tag");
 	goto err;
       }
 
@@ -126,7 +126,7 @@ _ertf_color_add(FILE *fp)
 	if (!(set & GREEN))
 	  node->g = index;
 	else
-	  WARN("_ertf_color_add: multiple values for same color.\n");
+	  WARN("multiple values for same color");
       }
       else if (strcmp(color, "red") == 0)
 	node->r = index;
@@ -136,13 +136,13 @@ _ertf_color_add(FILE *fp)
       // todo: add set/unset check as above
       else
 	// continue as the tag is not recognised and should be therefore skipped
-	DBG("_ertf_color_add: skipped unrecognised control tag `%s'", color);
+	DBG("skipped unrecognised control tag `%s'", color);
       break;
     case ';':// todo: error checking on success of the push operation
       eina_array_push(color_table, node);
       return 1;
     default:
-      DBG("_ertf_color_add: skipped control character %c.\n", c);      
+      DBG("skipped control character %c.\n", c);      
     }    
   }
 
