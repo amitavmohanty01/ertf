@@ -152,7 +152,7 @@ ertf_document_header_get(Ertf_Document *doc)
       }
       break;
     default:
-      DBG("unrecognised control character %c", c);
+      DBG("unrecognised control character '%c'", c);
     }
   }
   ERR("encountered EOF while parsing header.\n");
