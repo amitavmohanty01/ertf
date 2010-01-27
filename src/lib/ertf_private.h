@@ -58,6 +58,9 @@ extern Eina_Array *stylesheet_table;
 extern int         ertf_markup_position;
 extern char       *markup;
 
+// for debugging
+extern int _line;
+
  
 extern int _ertf_log_dom;
 #ifdef ERTF_DEFAULT_LOG_COLOR

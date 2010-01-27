@@ -54,7 +54,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	ungetc(c, fp);
       
       fscanf(fp, "%[^ 0123456789;\\{}\n\r]", buf);
-      CHECK_EOF(fp, "end-of-file encountered while retrieving control word", return 0);
+      CHECK_EOF(fp, "EOF encountered while retrieving control word", return 0);
 
       /* reset to default character formatting */
       if (strcmp(buf, "plain") == 0)
@@ -123,7 +123,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	    italicset = 0;
 	  }
 	}
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for italicisation.\n", return 0);	
+	CHECK_EOF(fp, "EOF encountered while checking for italicisation", return 0);	
       }
 
       /* bold text */
@@ -146,7 +146,7 @@ ertf_paragraph_translate(FILE *fp, int align)
 	    boldset = 0;
 	  }
 	}
-	CHECK_EOF(fp, "ertf_paragraph_translate: EOF encountered while checking for bold text.\n", return 0);
+	CHECK_EOF(fp, "EOF encountered while checking for bold text", return 0);
       }
 
       /* font entry number */
@@ -343,7 +343,7 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* unsupported or unrecognised control tag */
       else
       {
-	INFO(stderr, "skipped control tag `%s'", buf);
+	INFO("skipped control tag `%s' and at line#%d", buf, _line);
       }
       /* read till next delimiter */
       while ((c = fgetc(fp)) != '\\' &&
@@ -367,9 +367,12 @@ ertf_paragraph_translate(FILE *fp, int align)
 	goto success;
 
     default:
-      if (c == '\n')
+      if (c == '\n' || c == '\r')
       {
 	/* Since unnecessary newlines are added by rtf writers, they are ignored. The tag <br> is used when \line is encountered. */
+
+	// for debugging
+	_line++;
       }
       else
       {
