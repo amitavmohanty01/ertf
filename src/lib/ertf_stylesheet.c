@@ -55,6 +55,9 @@ int ertf_stylesheet_parse(FILE *fp)
       _ertf_textblock_style_generate();
       return 1;// successful return
 
+    case '\r':
+      break;
+
     case '\n':// todo: check whether newline character is a valid delimiter?
       // the spec doesn't mention so as far as I know.
       // The issue came up during debugging and I am just skipping it as of now.
@@ -167,7 +170,8 @@ _ertf_stylesheet_add(FILE *fp)
       case '*':
 	while((c = fgetc(fp)) != EOF && c != ';')
 	  ;
-	CHECK_EOF(fp, "EOF encountered while skipping spcial style group.", goto error);
+	CHECK_EOF(fp, "EOF encountered while skipping special style group.", goto error);
+	// free style
 	ungetc(c, fp);
 	break;
 
@@ -224,8 +228,10 @@ _ertf_stylesheet_add(FILE *fp)
 	ERR("end of file encountered while skipping unrecognised group");
 	goto error;
       }
+      /*if((c = fgetc(fp)) != '}')
+	ungetc(c, fp);*/
       break;
-
+      
     case ';':// end of style
       eina_array_push(stylesheet_table, style);
       return 1;

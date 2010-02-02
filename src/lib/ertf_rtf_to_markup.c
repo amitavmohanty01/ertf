@@ -345,14 +345,16 @@ ertf_paragraph_translate(FILE *fp, int align)
       {
 	INFO("skipped control tag `%s' and at line#%d", buf, _line);
       }
+
       /* read till next delimiter */
       while ((c = fgetc(fp)) != '\\' &&
-	     c != ' ' &&
-	     c != '{' &&
-	     c != '}')
+	      c != ' '               &&
+	      c != '{'               &&
+	      c != '}'
+	     )
 	CHECK_EOF(fp, "EOF reached while skipping control info", return 0);
       if (c != ' ')
-      ungetc(c, fp);
+	ungetc(c, fp);
 
       break;
 

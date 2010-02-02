@@ -29,7 +29,7 @@ int _twip_scale_factor = 86;
 int _ertf_log_dom = -1;
 
 // for debugging
-int _line = 0;
+int _line = 1;
 
 static int _ertf_initcount = 0;
 

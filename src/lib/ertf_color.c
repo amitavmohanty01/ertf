@@ -27,7 +27,7 @@ ertf_color_table(FILE *fp)
 {
   int c;
 
-  DBG("Inside color table handler.\n");
+  DBG("Inside color table handler.");
 
   // create an eina array
   color_table = eina_array_new(7);
@@ -72,11 +72,11 @@ ertf_color_table(FILE *fp)
       return 1;
 
     default:
-      DBG("skipping control character %c.", c);      
+      DBG("skipping control character `%c'", c);      
     }
   }
 
-  ERR("End of file reached in color table.");
+  ERR("End of file reached in color table");
   return 0;
 }
 
@@ -118,7 +118,8 @@ _ertf_color_add(FILE *fp)
 	goto err;
       }
 
-      fscanf(fp, "%d", &index);// todo: do error checking for range of rgb value
+      fscanf(fp, "%d", &index);
+      // todo: do error checking for range of rgb value
       if (feof(fp)) goto err;
 
       if (strcmp(color, "green") == 0)
