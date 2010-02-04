@@ -77,6 +77,7 @@ ertf_document_filename_set(Ertf_Document *doc, const char *filename)
   {
     free(doc->filename);
     doc->filename = NULL;
+    ERR("error opening file");
     return 0;
   }
 
