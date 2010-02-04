@@ -228,8 +228,7 @@ _ertf_stylesheet_add(FILE *fp)
 	ERR("end of file encountered while skipping unrecognised group");
 	goto error;
       }
-      /*if((c = fgetc(fp)) != '}')
-	ungetc(c, fp);*/
+      
       break;
       
     case ';':// end of style
@@ -264,15 +263,14 @@ _ertf_textblock_style_generate()
   Ertf_Font_Node *font;
   Eina_Array_Iterator iterator;
   unsigned int i;
-  
-  // todo: use functions in ertf_input.c generate style string of exact size
+
   font = eina_array_data_get(font_table, _ertf_default_font);  
   sprintf(buf, "DEFAULT='font=%s font_size=12 align=left color=#%02x%02x%02xff wrap=word left_margin=+12 right_margin=+12'", font->family, _ertf_default_color_r, _ertf_default_color_g, _ertf_default_color_b);
   strcat(ertf_style_string, buf);
-  sprintf(buf, "bold='+ font=%s:style=Bold wrap=word font_size=12'", font->family);
+  sprintf(buf, "bold='+ font=%s:style=Bold wrap=word'", font->family);
   strcat(ertf_style_string, buf);
   sprintf(buf, "/bold='-'");
-  sprintf(buf, "em='+ font=%s:style=Oblique wrap=word font_size=12'", font->family);
+  sprintf(buf, "em='+ font=%s:style=Oblique wrap=word'", font->family);
   strcat(ertf_style_string, buf);
   sprintf(buf, "/em='-'");
   strcat(ertf_style_string, buf);
