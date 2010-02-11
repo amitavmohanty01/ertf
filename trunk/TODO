@@ -2,4 +2,3 @@
 2. modify the design to enable parallel run of multiple ertf executables.
 3. add support for files without stylesheets defined
 4. update the smart test
-5. check against known attacks

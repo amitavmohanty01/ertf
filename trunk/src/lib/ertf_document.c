@@ -153,6 +153,8 @@ ertf_document_header_get(Ertf_Document *doc)
       }
       break;
     default:
+      if (c == '\n' || c == '\r')
+	_line++;
       DBG("unrecognised control character '%c'", c);
     }
   }
@@ -313,6 +315,8 @@ ertf_document_parse(Ertf_Document *doc)
       break;
 
     default:
+      if (c == '\n' || c == '\r')
+	_line++;
       DBG("skipped control char `%c'", c);
     }
   }

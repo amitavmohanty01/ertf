@@ -62,6 +62,8 @@ int ertf_font_table(FILE *fp)
       break;
 
     default:
+      if (c == '\n' || c == '\r')
+	_line++;
       DBG("skipped control character '%c'", c);
     }
   }
