@@ -45,9 +45,11 @@ ertf_paragraph_translate(FILE *fp, int align)
 	  fscanf(fp, "%x", &c);
 	  CHECK_EOF(fp, "EOF encountered while reading hexadecimal value of character", return 0);
 	  w = 0xc2;
-	  ertf_markup_add(&w, 1);	 
+	  //ertf_markup_add(&w, 1);
+	  eina_strbuf_append_char(markup_buf, w);
 	}
-	ertf_markup_add(&c, 1);
+	//ertf_markup_add(&c, 1);
+	eina_strbuf_append_char(markup_buf, c);
 	break;
       }
       else
@@ -74,11 +76,13 @@ ertf_paragraph_translate(FILE *fp, int align)
       else if (strcmp(buf, "rtlch") == 0)
       {
 	// todo: either insert align=right in markup or in a style
-	ertf_markup_add("<right>", 7);
+	//ertf_markup_add("<right>", 7);
+	eina_strbuf_append(markup_buf, "<right>");
 
 	if (!ertf_paragraph_translate(fp, 1))
 	  return 0;
-	ertf_markup_add("</right>", 8);
+	//ertf_markup_add("</right>", 8);
+	eina_strbuf_append(markup_buf, "</right>");
       }
 
       /* end of paragraph */
@@ -86,7 +90,8 @@ ertf_paragraph_translate(FILE *fp, int align)
       {
 	int c;
 	// todo: ensure that </p> is defined in style string
-	ertf_markup_add("</p>", 4);
+	//ertf_markup_add("</p>", 4);
+	eina_strbuf_append(markup_buf, "</p>");
 	// read till end of group
 	while ((c = fgetc(fp)) != EOF && c != '{' && c != '\\')
 	  ;
@@ -111,7 +116,8 @@ ertf_paragraph_translate(FILE *fp, int align)
 	  ungetc(c, fp);
 	  if (!italicset)
 	  {
-	    ertf_markup_add("<em>", 4);
+	    //ertf_markup_add("<em>", 4);
+	    eina_strbuf_append(markup_buf, "<em>");
 	    italicset++;
 	  }
 	}
@@ -119,7 +125,8 @@ ertf_paragraph_translate(FILE *fp, int align)
 	{
 	  if (italicset)
 	  {
-	    ertf_markup_add("</em>", 5);
+	    //ertf_markup_add("</em>", 5);
+	    eina_strbuf_append(markup_buf, "</em>");
 	    italicset = 0;
 	  }
 	}
@@ -134,7 +141,8 @@ ertf_paragraph_translate(FILE *fp, int align)
 	  ungetc(c, fp);
 	  if (!boldset)
 	  {
-	    ertf_markup_add("<bold>", 6);
+	    //ertf_markup_add("<bold>", 6);
+	    eina_strbuf_append(markup_buf, "<bold>");
 	    boldset++;
 	  }
 	}
@@ -142,7 +150,8 @@ ertf_paragraph_translate(FILE *fp, int align)
 	{
 	  if (boldset)
 	  {
-	    ertf_markup_add("</bold>", 7);
+	    //ertf_markup_add("</bold>", 7);
+	    eina_strbuf_append(markup_buf, "</bold>");
 	    boldset = 0;
 	  }
 	}
@@ -163,13 +172,15 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* line break */
       else if (strcmp(buf, "line") == 0)
       {
-	ertf_markup_add("<br>", 4);
+	//ertf_markup_add("<br>", 4);
+	eina_strbuf_append(markup_buf, "<br>");
       }
 
       /* tab */
       else if (strcmp(buf, "tab") == 0)
       {
-	ertf_markup_add("<tab>", 5);
+	//ertf_markup_add("<tab>", 5);
+	eina_strbuf_append(markup_buf, "<tab>");
       }
 
       /* underline */
@@ -181,7 +192,8 @@ ertf_paragraph_translate(FILE *fp, int align)
 
 	if (underlineset)
 	{
-	  ertf_markup_add("</>", 3);
+	  //ertf_markup_add("</>", 3);
+	  eina_strbuf_append(markup_buf, "</>");
 	}
 	if ((c = getc(fp)) == 0)
 	{
@@ -197,16 +209,21 @@ ertf_paragraph_translate(FILE *fp, int align)
 	    fscanf(fp, "%d", &c);
 	    CHECK_EOF(fp, "EOF encountered while checking for colour number for underlining", return 0);
 	    node = (Ertf_Color *)eina_array_data_get(color_table, c);
-	    ertf_markup_add("<underline=on underline_color=#", 31);
-	    ertf_markup_add(node->string, 8);
-	    ertf_markup_add(">", 1);	  
+	    //ertf_markup_add("<underline=on underline_color=#", 31);
+	    eina_strbuf_append(markup_buf, "<underline=on underline_color=#");
+	    //ertf_markup_add(node->string, 8);
+	    eina_strbuf_append(markup_buf, node->string);
+	    //ertf_markup_add(">", 1);
+	    eina_strbuf_append_char(markup_buf, '>');
 	  }
 	  else
 	  {
-	    ertf_markup_add("<underline=on underline_color=#", 31);
+	    //ertf_markup_add("<underline=on underline_color=#", 31);
+	    eina_strbuf_append(markup_buf, "<underline=on underline_color=#");
 	    sprintf(color, "%02x%02x%02xff", current_r, current_g, current_b);
-	    ertf_markup_add(color, 8);
-	    ertf_markup_add(">", 1);
+	    //ertf_markup_add(color, 8);
+	    eina_strbuf_append(markup_buf, color);
+	    //ertf_markup_add(">", 1);
 	  }
 
 	  underlineset++;	  
@@ -222,29 +239,40 @@ ertf_paragraph_translate(FILE *fp, int align)
 
 	if (underlineset)
 	{
-	  ertf_markup_add("</>", 3);
+	  //ertf_markup_add("</>", 3);
+	  eina_strbuf_append(markup_buf, "</>");
 	}
 	fscanf(fp, "%4s", temp);	
 	CHECK_EOF(fp, "EOF encountered while checking for underline colour", return 0);
 	if (strcmp(temp, "\\ulc") == 0)
 	{
-	    fscanf(fp, "%d", &c);
-	    CHECK_EOF(fp, "EOF encountered while checking for colour number for underlining", return 0);
-	    node = (Ertf_Color *)eina_array_data_get(color_table, c);
-	    ertf_markup_add("<underline=double underline_color=#", 35);
-	    ertf_markup_add(node->string, 8);
-	    ertf_markup_add(" underline2_color=#", 19);
-	    ertf_markup_add(node->string, 8);
-	    ertf_markup_add(">", 1);	  
+	  fscanf(fp, "%d", &c);
+	  CHECK_EOF(fp, "EOF encountered while checking for colour number for underlining", return 0);
+	  node = (Ertf_Color *)eina_array_data_get(color_table, c);
+	  //ertf_markup_add("<underline=double underline_color=#", 35);
+	  eina_strbuf_append(markup_buf, "<underline=double underline_color=#");
+	  //ertf_markup_add(node->string, 8);
+	  eina_strbuf_append(markup_buf, node->string);
+	  //ertf_markup_add(" underline2_color=#", 19);
+	  eina_strbuf_append(markup_buf, " underline2_color=#");
+	  //ertf_markup_add(node->string, 8);
+	  eina_strbuf_append(markup_buf, node->string);
+	  //ertf_markup_add(">", 1);
+	  eina_strbuf_append_char(markup_buf, '>');
 	}
 	else
 	{
-	    ertf_markup_add("<underline=double underline_color=#", 35);
-	    sprintf(color, "%02x%02x%02xff", current_r, current_g, current_b);
-	    ertf_markup_add(color, 8);
-	    ertf_markup_add(" underline2color=#", 19);
-	    ertf_markup_add(color, 8);
-	    ertf_markup_add(">", 1);
+	  //ertf_markup_add("<underline=double underline_color=#", 35);
+	  eina_strbuf_append(markup_buf, "<underline=double underline_color=#");
+	  sprintf(color, "%02x%02x%02xff", current_r, current_g, current_b);
+	  //ertf_markup_add(color, 8);
+	  eina_strbuf_append(markup_buf, color);
+	  //ertf_markup_add(" underline2color=#", 19);
+	  eina_strbuf_append(markup_buf, " underline2_color=#");
+	  //ertf_markup_add(color, 8);
+	  eina_strbuf_append(markup_buf, color);
+	  //ertf_markup_add(">", 1);
+	  eina_strbuf_append_char(markup_buf, '>');
 	}
 
 	underlineset++;	
@@ -257,15 +285,18 @@ ertf_paragraph_translate(FILE *fp, int align)
 
 	if (fontset == 0)
 	{
-	  ertf_markup_add("<font_size=", 11);
+	  //ertf_markup_add("<font_size=", 11);
+	  eina_strbuf_append(markup_buf, "<font_size=");
 	  fscanf(fp, "%d", &c);
 	  CHECK_EOF(fp, "EOF encountered while getting font size", return 0);
 	  /* integer divison yields the floor value, which is used as the font size as fractional font size is currently not supported */
 	  // todo: implement support for fractional font size in text block.
 	  c /= 2;
 	  sprintf(store, "%d", c);
-	  ertf_markup_add(store, strlen(store));
-	  ertf_markup_add(">", 1);
+	  //ertf_markup_add(store, strlen(store));
+	  eina_strbuf_append(markup_buf, store);
+	  //ertf_markup_add(">", 1);
+	  eina_strbuf_append_char(markup_buf, '>');
 	  fontset = 1;
 	}
 	else
@@ -281,18 +312,22 @@ ertf_paragraph_translate(FILE *fp, int align)
 	Ertf_Color *node;
 	if (foregroundset)
 	{
-	  ertf_markup_add("</>", 3);
+	  //ertf_markup_add("</>", 3);
+	  eina_strbuf_append(markup_buf, "</>");
 	}
-	ertf_markup_add("<color=#", 8);
+	//ertf_markup_add("<color=#", 8);
+	eina_strbuf_append(markup_buf, "<color=#");
 	fscanf(fp, "%d", &c);
 	CHECK_EOF(fp, "EOF encountered while reading colour number", return 0);
 	node = (Ertf_Color *) eina_array_data_get(color_table, c);
 	if(!node){
-	  printf("invalid node.");
+	  ERR("invalid node.");
 	  exit(1);
 	}
-	ertf_markup_add(node->string, 8);
-	ertf_markup_add(">", 1);
+	//ertf_markup_add(node->string, 8);
+	eina_strbuf_append(markup_buf, node->string);
+	//ertf_markup_add(">", 1);
+	eina_strbuf_append_char(markup_buf, '>');
 	foregroundset++;
 	current_r = node->r;
 	current_g = node->g;
@@ -305,14 +340,18 @@ ertf_paragraph_translate(FILE *fp, int align)
 	Ertf_Color *node;	
 	if (backgroundset)
 	{
-	  ertf_markup_add("</>", 3);
+	  //ertf_markup_add("</>", 3);
+	  eina_strbuf_append(markup_buf, "</>");
 	}
-	ertf_markup_add("<backing=on backing_color=#", 27);
+	//ertf_markup_add("<backing=on backing_color=#", 27);
+	eina_strbuf_append(markup_buf, "<backing=on backing_color=#");
 	fscanf(fp, "%d", &c);
 	CHECK_EOF(fp, "EOF encountered while reading background colour number", return 0);
 	node = (Ertf_Color *)eina_array_data_get(color_table, c);
-	ertf_markup_add(node->string, 8);
-	ertf_markup_add(">", 1);
+	//ertf_markup_add(node->string, 8);
+	eina_strbuf_append(markup_buf, node->string);
+	//ertf_markup_add(">", 1);
+	eina_strbuf_append_char(markup_buf, '>');
 	backgroundset++;
       }
 
@@ -322,10 +361,13 @@ ertf_paragraph_translate(FILE *fp, int align)
 	if (!strikethroughset)
 	{
 	  char color[9];
-	  ertf_markup_add("<strikethrough=on strikethrough_color=#", 39);
+	  //ertf_markup_add("<strikethrough=on strikethrough_color=#", 39);
+	  eina_strbuf_append(markup_buf, "<strikethrough=on strikethrough_color=#");
 	  sprintf(color, "%02x%02x%02xff", current_r, current_g, current_b);
-	  ertf_markup_add(color, 8);
-	  ertf_markup_add(">", 1);
+	  //ertf_markup_add(color, 8);
+	  eina_strbuf_append(markup_buf, color);
+	  //ertf_markup_add(">", 1);
+	  eina_strbuf_append_char(markup_buf, '>');
 	  strikethroughset++;
 	}
       }
@@ -378,7 +420,8 @@ ertf_paragraph_translate(FILE *fp, int align)
       }
       else
       {
-	ertf_markup_add(&c, 1);
+	//ertf_markup_add(&c, 1);
+	eina_strbuf_append_char(markup_buf, c);
       }
     }
   }
@@ -389,31 +432,38 @@ ertf_paragraph_translate(FILE *fp, int align)
  success:
   if (boldset)
   {
-    ertf_markup_add("</bold>", 7);
+    //ertf_markup_add("</bold>", 7);
+    eina_strbuf_append(markup_buf, "</bold>");
   }
   if (italicset)
   {
-    ertf_markup_add("</em>", 5);
+    //ertf_markup_add("</em>", 5);
+    eina_strbuf_append(markup_buf, "</em>");
   }
   if (fontset)
   {
-    ertf_markup_add("</>", 3);
+    //ertf_markup_add("</>", 3);
+    eina_strbuf_append(markup_buf, "</>");
   }
   if (foregroundset)
   {
-    ertf_markup_add("</>", 3);
+    //ertf_markup_add("</>", 3);
+    eina_strbuf_append(markup_buf, "</>");
   }
   if (backgroundset)
   {
-    ertf_markup_add("</>", 3);
+    //ertf_markup_add("</>", 3);
+    eina_strbuf_append(markup_buf, "</>");
   }
   if (strikethroughset)
   {
-    ertf_markup_add("</>", 3);
+    //ertf_markup_add("</>", 3);
+    eina_strbuf_append(markup_buf, "</>");
   }
   if (underlineset)
   {
-    ertf_markup_add("</>", 3);
+    //ertf_markup_add("</>", 3);
+    eina_strbuf_append(markup_buf, "</>");
   }
 
   return 1;
