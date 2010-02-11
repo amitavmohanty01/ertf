@@ -70,6 +70,8 @@ ertf_summary(Ertf_Document *doc)
 	return 1;
       break;
     default:
+      if (c == '\n' || c == '\r')
+	_line++;
       INFO("skipping control character %c", c);
     }
   }

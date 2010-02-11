@@ -65,6 +65,8 @@ int ertf_stylesheet_parse(FILE *fp)
       break;
 
     default:
+      if (c == '\n' || c == '\r')
+	_line++;
       DBG("invalid character `%c'", c);
       return 0;
     }

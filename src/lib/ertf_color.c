@@ -143,6 +143,8 @@ _ertf_color_add(FILE *fp)
       eina_array_push(color_table, node);
       return 1;
     default:
+      if (c == '\n' || c == '\r')
+	_line++;
       DBG("skipped control character %c.\n", c);      
     }    
   }

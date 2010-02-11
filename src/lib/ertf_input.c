@@ -38,7 +38,6 @@ ertf_markup_add(char *string, int len)
     tmp = (char *)malloc(current_size + 1024);
     if (!tmp)
     {
-      //fprintf(stderr, "ertf_markup_add: Out of memory while allocating markup.\n");
       ERR("Out of memory while allocating markup");
       return 0;
     }
