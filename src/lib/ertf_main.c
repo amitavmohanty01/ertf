@@ -31,6 +31,10 @@ int _ertf_log_dom = -1;
 // for debugging
 int _line = 1;
 
+// string buffers
+Eina_Strbuf *markup_buf;
+Eina_Strbuf *style_buf;
+
 static int _ertf_initcount = 0;
 
 static void _ertf_cleanup();
@@ -53,6 +57,9 @@ ertf_init(void)
     EINA_LOG_ERR("Ertf can't create a general log domain.\n");
   }
 
+  markup_buf = eina_strbuf_new();
+  style_buf = eina_strbuf_new();
+
  finish_init:
    return ++_ertf_initcount;
 }
@@ -63,6 +70,8 @@ ertf_shutdown(void)
   if (_ertf_initcount != 1) goto finish_shutdown;
 
   _ertf_cleanup();
+  //eina_strbuf_free(markup_buf);
+  //eina_strbuf_free(style_buf);
   eina_log_domain_unregister(_ertf_log_dom);
   _ertf_log_dom = -1;
   eina_shutdown();

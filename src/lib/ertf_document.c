@@ -171,8 +171,8 @@ ertf_document_parse(Ertf_Document *doc)
   if (!doc || !doc->stream)
     return 0;
 
-  ertf_markup_position = 0;
-  markup = NULL;
+  //ertf_markup_position = 0;
+  //markup = NULL;
 
   while ((c = getc(doc->stream)) != EOF)
   {    
@@ -233,7 +233,8 @@ ertf_document_parse(Ertf_Document *doc)
 	int c;
 	while ((c = fgetc(doc->stream)) != EOF || c != '}')
 	{
-	  ertf_markup_add("<p>", 3);
+	  //ertf_markup_add("<p>", 3);
+	  eina_strbuf_append(markup_buf, "<p>");
 	  ungetc(c, doc->stream);
 	  if (ertf_paragraph_translate(doc->stream, 0))
 	  {
@@ -321,10 +322,10 @@ ertf_document_parse(Ertf_Document *doc)
     }
   }
 
-  markup[ertf_markup_position] = '\0';
-  doc->markup = markup;
-  markup = NULL;
-  printf("%d\nmarkup:\n%s\n", ertf_markup_position, doc->markup);
+  //markup[ertf_markup_position] = '\0';
+  doc->markup = eina_strbuf_string_get(markup_buf);
+  //markup = NULL;
+  printf("%d\nmarkup:\n%s\n", /*ertf_markup_position*/eina_strbuf_length_get(markup_buf), doc->markup);
   // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
   if (doc->bracecount)

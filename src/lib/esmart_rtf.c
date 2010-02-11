@@ -119,8 +119,8 @@ esmart_rtf_file_set(Evas_Object *obj, const char *filename)
 
   /* we parse the entire file */
 
-  ertf_markup_position = 0;
-  markup = NULL;
+  //ertf_markup_position = 0;
+  //markup = NULL;
 
   while ((c = getc(sd->f)) != EOF)
   {
@@ -197,14 +197,14 @@ esmart_rtf_file_set(Evas_Object *obj, const char *filename)
     }
   }
 
-  markup[ertf_markup_position] = '\0';
-  printf("%d\nmarkup:\n%s\n", ertf_markup_position, markup);
+  //markup[ertf_markup_position] = '\0';
+  printf("%d\nmarkup:\n%s\n", eina_strbuf_length_get(markup_buf), eina_strbuf_string_get(markup_buf));
   // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
   if (sd->bracecount)
     fprintf(stderr, "esmart_rtf_file_set: Ill-formed rtf - inconsistent use of braces.\n");
 
-  evas_object_textblock_text_markup_set(sd->textblock, markup);
+  evas_object_textblock_text_markup_set(sd->textblock, eina_strbuf_string_get(markup_buf));
 
   return EINA_TRUE;
 
