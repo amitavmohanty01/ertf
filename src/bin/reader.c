@@ -208,7 +208,8 @@ readloop()
       else if (strcmp(control_word, "deftab") == 0)
       {
 	fscanf(fstream, "%d", &c);
-	// todo: look for possible implementation in textblock, otherwise the tag is useless.
+	// todo: look for possible implementation in textblock, otherwise the
+	// tag is useless.
       }
 
       else if (strcmp(control_word, "info") == 0)
