@@ -137,8 +137,29 @@ main(int argc, char *argv[])
       }
     }
     evas_textblock_cursor_char_last(c2);
+
+
+    if (!evas_textblock_cursor_node_format_get(c2))
+      printf("no format\n");
+
+    if (evas_textblock_cursor_node_next(c2)){
+	printf("no next node\n");
+	while (!evas_textblock_cursor_node_format_is_visible_get(c2))
+	  evas_textblock_cursor_node_next(c2);
+    }
+    if (evas_textblock_cursor_node_format_is_visible_get(c2))
+    {
+      printf("visible\n");
+    }
+
+
+
     s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
     printf("%s\n", s);
+    if (evas_textblock_cursor_node_format_is_visible_get(c2))
+      printf("visible\n");
+    else
+      printf("invisible\n");
     /* instead of a free statement add proper page deletion code on deletion of document object */
     free(s);
     printf("line #%d page #%d\n", line_number, page);
@@ -150,6 +171,9 @@ main(int argc, char *argv[])
     line_number = evas_textblock_cursor_line_coord_set(c2, page * h);    
 
   } while (evas_textblock_cursor_compare(c1, c2) < 0);
+
+  printf("last page: %d\n", last_page);
+
   s = NULL;
   evas_textblock_cursor_free(c2);
   evas_textblock_cursor_free(c1);

@@ -55,9 +55,6 @@ extern int _twip_scale_factor;
 extern Eina_Array  *color_table;
 extern Eina_Array  *font_table;
 extern Eina_Array  *stylesheet_table;
-//extern int          ertf_markup_position;
-//extern char        *markup;
-// string buffers
 extern Eina_Strbuf *markup_buf;
 extern Eina_Strbuf *style_buf;
 
