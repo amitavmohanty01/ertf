@@ -105,11 +105,18 @@ main(int argc, char *argv[])
 
   // trial code begin
   printf("%d %d\n", w, h);
+
   c1 = evas_object_textblock_cursor_new(textblock);
   evas_textblock_cursor_line_first(c1);
   evas_textblock_cursor_char_first(c1);
+
+  while (!evas_textblock_cursor_node_format_get(c1))
+    evas_textblock_cursor_node_next(c1);
+  while (!evas_textblock_cursor_node_format_is_visible_get(c1))
+    evas_textblock_cursor_node_next(c1);
   line_number = evas_textblock_cursor_line_geometry_get(c1, NULL, NULL, NULL, NULL);
   printf("val:%s eol:%d line:%d\n", evas_textblock_cursor_node_text_get(c1), evas_textblock_cursor_eol_get(c1), line_number);
+
   c2 = evas_object_textblock_cursor_new(textblock);
   h--;
   line_number = evas_textblock_cursor_line_coord_set(c2, h);  
@@ -118,7 +125,7 @@ main(int argc, char *argv[])
   do
   {
     printf("line number: %d last page:%d\n", line_number, last_page);
-    if (line_number < 0)
+    /*if (line_number < 0)
     {
       if (last_page)
       {
@@ -127,32 +134,37 @@ main(int argc, char *argv[])
       }
       else
       {
-	evas_textblock_cursor_line_last(c2);
+	//evas_textblock_cursor_line_last(c2);
 	evas_textblock_cursor_char_last(c2);
 	last_page++;
+	if (!evas_textblock_cursor_node_format_get(c2))
+	  printf("no format\n");
+	else
+	  printf("we have format\n");
+	if (evas_textblock_cursor_node_format_is_visible_get(c2))
+	  printf("visible\n");
+	else
+	{
+	  printf("invisible node\n");
+	}
 	line_number = evas_textblock_cursor_line_geometry_get(c2, NULL, NULL, NULL, NULL);
 	printf("comparision: %d position: %d\n", evas_textblock_cursor_compare(c1, c2), evas_textblock_cursor_pos_get(c2));
-	printf("reason: c1: %s\nc2:%s\n", evas_textblock_cursor_node_text_get(c1), evas_textblock_cursor_node_text_get(c2));
+	printf("reason: text of c1: %s\n\ttext of c2: %s\n", evas_textblock_cursor_node_text_get(c1), evas_textblock_cursor_node_text_get(c2));
 	continue;
       }
-    }
+    }*/
     evas_textblock_cursor_char_last(c2);
-
 
     if (!evas_textblock_cursor_node_format_get(c2))
       printf("no format\n");
 
-    if (evas_textblock_cursor_node_next(c2)){
-	printf("no next node\n");
-	while (!evas_textblock_cursor_node_format_is_visible_get(c2))
-	  evas_textblock_cursor_node_next(c2);
-    }
-    if (evas_textblock_cursor_node_format_is_visible_get(c2))
+    if (evas_textblock_cursor_node_prev(c2))
     {
-      printf("visible\n");
+	printf("no next node\n");
+
+	while (!evas_textblock_cursor_node_format_is_visible_get(c2))
+	  evas_textblock_cursor_node_prev(c2);
     }
-
-
 
     s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
     printf("%s\n", s);
