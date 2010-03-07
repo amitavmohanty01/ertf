@@ -29,6 +29,7 @@ main(int argc, char *argv[])
   Evas_Coord             x, y, h1, w1;
   Evas_Textblock_Cursor *c1, *c2;
   int                    page = 1, last_page = 0;
+  int ln;
 
   if (argc < 2)
   {
@@ -103,56 +104,25 @@ main(int argc, char *argv[])
   evas_object_resize(textblock, w, h);
   evas_object_show(textblock);
 
-  // trial code begin
-  printf("%d %d\n", w, h);
-
+  // paging code begin
   c1 = evas_object_textblock_cursor_new(textblock);
   evas_textblock_cursor_line_first(c1);
   evas_textblock_cursor_char_first(c1);
 
   while (!evas_textblock_cursor_node_format_get(c1))
     evas_textblock_cursor_node_next(c1);
+
   while (!evas_textblock_cursor_node_format_is_visible_get(c1))
     evas_textblock_cursor_node_next(c1);
-  line_number = evas_textblock_cursor_line_geometry_get(c1, NULL, NULL, NULL, NULL);
-  printf("val:%s eol:%d line:%d\n", evas_textblock_cursor_node_text_get(c1), evas_textblock_cursor_eol_get(c1), line_number);
 
+  line_number = evas_textblock_cursor_line_geometry_get(c1, NULL, NULL, NULL, NULL);
   c2 = evas_object_textblock_cursor_new(textblock);
   h--;
   line_number = evas_textblock_cursor_line_coord_set(c2, h);  
-  
-  /* while there is a range of text to be copied */
+
   do
   {
     printf("line number: %d last page:%d\n", line_number, last_page);
-    /*if (line_number < 0)
-    {
-      if (last_page)
-      {
-	printf("We have gone out of bounds now.\n");
-	break;
-      }
-      else
-      {
-	//evas_textblock_cursor_line_last(c2);
-	evas_textblock_cursor_char_last(c2);
-	last_page++;
-	if (!evas_textblock_cursor_node_format_get(c2))
-	  printf("no format\n");
-	else
-	  printf("we have format\n");
-	if (evas_textblock_cursor_node_format_is_visible_get(c2))
-	  printf("visible\n");
-	else
-	{
-	  printf("invisible node\n");
-	}
-	line_number = evas_textblock_cursor_line_geometry_get(c2, NULL, NULL, NULL, NULL);
-	printf("comparision: %d position: %d\n", evas_textblock_cursor_compare(c1, c2), evas_textblock_cursor_pos_get(c2));
-	printf("reason: text of c1: %s\n\ttext of c2: %s\n", evas_textblock_cursor_node_text_get(c1), evas_textblock_cursor_node_text_get(c2));
-	continue;
-      }
-    }*/
     evas_textblock_cursor_char_last(c2);
 
     if (!evas_textblock_cursor_node_format_get(c2))
@@ -160,8 +130,6 @@ main(int argc, char *argv[])
 
     if (evas_textblock_cursor_node_prev(c2))
     {
-	printf("no next node\n");
-
 	while (!evas_textblock_cursor_node_format_is_visible_get(c2))
 	  evas_textblock_cursor_node_prev(c2);
     }
@@ -181,15 +149,21 @@ main(int argc, char *argv[])
     evas_textblock_cursor_copy(c2, c1);
     evas_textblock_cursor_char_next(c1); // todo: check the return value
     line_number = evas_textblock_cursor_line_coord_set(c2, page * h);    
-
   } while (evas_textblock_cursor_compare(c1, c2) < 0);
 
-  printf("last page: %d\n", last_page);
+  evas_textblock_cursor_node_last(c2);
+  ln=evas_textblock_cursor_line_geometry_get(c1, NULL,NULL,NULL,NULL);
 
-  s = NULL;
+  if (ln > 0)
+  {
+    s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
+    printf("%s\npage#%d\n", s, page);
+    free(s);
+  }
+
   evas_textblock_cursor_free(c2);
   evas_textblock_cursor_free(c1);
-  // trial code end
+  // paging code end
 
   ecore_main_loop_begin ();
 
