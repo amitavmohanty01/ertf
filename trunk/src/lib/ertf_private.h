@@ -7,19 +7,19 @@
 
 struct Ertf_Summary{
   // todo: check if there should be a limitation to the length of the strings
-  char *author;
-  char *title;
-  char *subject;
-  char *operator;
-  char *keywords;
-  char *comment;
-  int version;
-  char *doccomm;
-  int internal_version;
-  int pages;
+  char    *author;
+  char    *title;
+  char    *subject;
+  char    *operator;
+  char    *keywords;
+  char    *comment;
+  int      version;
+  char    *doccomm;
+  int      internal_version;
+  int      pages;
   long int words;
   long int chars;
-  int internal_ID;
+  int      internal_ID;
   // todo: add time variables
 };
 
@@ -35,6 +35,13 @@ struct Ertf_Document
   int                   version;
   int                   bracecount;
   Ertf_Document_Charset charset;
+  Eina_Array           *pages;
+  char                 *style;
+};
+
+struct Ertf_Page{
+  Ertf_Document *doc;
+  int            page;
 };
 
 

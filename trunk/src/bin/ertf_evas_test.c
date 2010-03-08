@@ -90,8 +90,7 @@ main(int argc, char *argv[])
   textblock = evas_object_textblock_add(evas);
   st = evas_textblock_style_new();
 
-  // todo create a member 'style' in the document structure and use that
-  s = ertf_textblock_style_get();
+  s = ertf_document_style_get(doc);
   printf("style: %s\n", s);
   evas_textblock_style_set(st, s);
   evas_object_name_set(textblock, "textblock");
