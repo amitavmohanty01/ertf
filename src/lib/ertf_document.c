@@ -12,6 +12,7 @@
 #include "ertf_input.h"
 #include "ertf_private.h"
 
+static void _ertf_document_generate_pages(Ertf_Document *doc);
 
 Ertf_Document *
 ertf_document_new(void)
@@ -218,6 +219,7 @@ ertf_document_parse(Ertf_Document *doc)
 	if (ertf_stylesheet_parse(doc->stream))
         {
 	  DBG("Successfully created stylesheet table");
+	  doc->style = eina_strbuf_string_get(style_buf);
 	  doc->bracecount--;
 	}
         else
@@ -322,6 +324,10 @@ ertf_document_parse(Ertf_Document *doc)
   printf("%d\nmarkup:\n%s\n", eina_strbuf_length_get(markup_buf), doc->markup);
   // When end-of-file is reached, check if  parsing is complete. In case,
   // it is not, print an error message stating "incomplete rtf file".
+
+  // generate pages
+  _ertf_document_generate_pages(doc);
+
   if (doc->bracecount)
     WARN("Ill-formed rtf - inconsistent use of braces");
 
@@ -380,4 +386,19 @@ ertf_document_markup_get(Ertf_Document *doc)
   if (!doc)
     return NULL;
   return doc->markup;
+}
+
+char *
+ertf_document_style_get (Ertf_Document *doc)
+{
+  if (!doc)
+    return NULL;
+  return doc->style;
+}
+
+
+static void
+_ertf_document_generate_pages(Ertf_Document *doc)
+{
+  doc->pages = eina_array_new(10);
 }
