@@ -59,7 +59,7 @@ ertf_page_render (Ertf_Page *page, Evas_Object *textblock)
     _ertf_document_generate_pages(textblock, page->doc);
   }
   evas_object_textblock_clear(textblock);
-  markup_text = eina_array_data_get(page->doc->pages, page->page - 1);
+  markup_text = eina_array_data_get(page->doc->pages, page->page);
   evas_object_textblock_text_markup_set(textblock, markup_text);
 }
 
@@ -89,28 +89,32 @@ _ertf_document_generate_pages(Evas_Object *textblock, Ertf_Document *doc)
   c1 = evas_object_textblock_cursor_new(textblock);
   evas_textblock_cursor_node_first(c1);
 
-  while (!evas_textblock_cursor_node_format_get(c1))
-    evas_textblock_cursor_node_next(c1);
-
-  while (!evas_textblock_cursor_node_format_is_visible_get(c1))
-    evas_textblock_cursor_node_next(c1);
-
-  line_number = evas_textblock_cursor_line_geometry_get(c1, NULL, NULL, NULL, NULL);
+  ln = evas_textblock_cursor_line_geometry_get(c1, NULL, NULL, NULL, NULL);
+  printf("%d\n", ln);
   c2 = evas_object_textblock_cursor_new(textblock);
-  line_number = evas_textblock_cursor_line_coord_set(c2, h-1);  
+  line_number = evas_textblock_cursor_line_coord_set(c2, h-1);
+  printf("%d\n", line_number);
 
   do
   {
-    evas_textblock_cursor_char_last(c2);
+    if (line_number >= 0){
+      evas_textblock_cursor_char_last(c2);
 
-    if (!evas_textblock_cursor_node_format_get(c2))
-      DBG("no format");
+      if (!evas_textblock_cursor_node_format_get(c2))
+	DBG("no format");
 
-    if (evas_textblock_cursor_node_prev(c2))
-    {
-      while (!evas_textblock_cursor_node_format_is_visible_get(c2))
-	evas_textblock_cursor_node_prev(c2);
+      if (evas_textblock_cursor_node_prev(c2))
+      {
+	while (!evas_textblock_cursor_node_format_is_visible_get(c2))
+	  evas_textblock_cursor_node_prev(c2);
+      }
     }
+    else
+    {
+      evas_textblock_cursor_node_last(c2);
+    }
+    if (ln > 0)
+      evas_textblock_cursor_node_first(c1);
 
     s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
     printf("%s\n", s);
@@ -119,7 +123,6 @@ _ertf_document_generate_pages(Evas_Object *textblock, Ertf_Document *doc)
     else
       DBG("invisible\n");
     eina_array_push(doc->pages, s);
-    printf("line #%d page #%d\n", line_number, page);
 
     page++;
     evas_textblock_cursor_copy(c2, c1);
@@ -133,7 +136,6 @@ _ertf_document_generate_pages(Evas_Object *textblock, Ertf_Document *doc)
   if (ln > 0)
   {
     s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
-    printf("%s\npage#%d", s, page);
     eina_array_push(doc->pages, s);
   }
 

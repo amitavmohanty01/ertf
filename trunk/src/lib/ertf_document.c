@@ -33,6 +33,10 @@ ertf_document_new(void)
 void
 ertf_document_free(Ertf_Document *doc)
 {
+  unsigned int        i;
+  Eina_Array_Iterator iterator;
+  char               *page;
+
   if (!doc)
     return;
 
@@ -49,6 +53,7 @@ ertf_document_free(Ertf_Document *doc)
     free(doc->summary->author);
     free(doc->summary);
   }
+  EINA_ARRAY_ITER_NEXT(doc->pages, i, page, iterator)
   eina_array_free(doc->pages);
   free(doc);
 }
@@ -326,7 +331,6 @@ ertf_document_parse(Ertf_Document *doc)
   }
 
   doc->markup = eina_strbuf_string_get(markup_buf);
-  printf("%d\nmarkup:\n%s\n", eina_strbuf_length_get(markup_buf), doc->markup);
 
   if (doc->bracecount)
     WARN("Ill-formed rtf - inconsistent use of braces");
