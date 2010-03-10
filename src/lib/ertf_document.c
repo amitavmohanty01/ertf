@@ -6,13 +6,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <Eina.h>
+#include <Evas.h>
 
 #include "ertf_document.h"
 #include "ertf_summary.h"
 #include "ertf_input.h"
 #include "ertf_private.h"
-
-static void _ertf_document_generate_pages(Ertf_Document *doc);
 
 Ertf_Document *
 ertf_document_new(void)
@@ -22,6 +22,8 @@ ertf_document_new(void)
   doc = (Ertf_Document *)calloc(1, sizeof(Ertf_Document));
   if (!doc)
     return NULL;
+
+  doc->pages = eina_array_new(10);
 
   doc->version = -1;
 
@@ -40,11 +42,14 @@ ertf_document_free(Ertf_Document *doc)
     free(doc->filename);
   if (doc->markup)
     free(doc->markup);
+  if (doc->style)
+    free(doc->style);
   if (doc->summary)
   {
     free(doc->summary->author);
     free(doc->summary);
   }
+  eina_array_free(doc->pages);
   free(doc);
 }
 
@@ -322,11 +327,6 @@ ertf_document_parse(Ertf_Document *doc)
 
   doc->markup = eina_strbuf_string_get(markup_buf);
   printf("%d\nmarkup:\n%s\n", eina_strbuf_length_get(markup_buf), doc->markup);
-  // When end-of-file is reached, check if  parsing is complete. In case,
-  // it is not, print an error message stating "incomplete rtf file".
-
-  // generate pages
-  _ertf_document_generate_pages(doc);
 
   if (doc->bracecount)
     WARN("Ill-formed rtf - inconsistent use of braces");
@@ -394,11 +394,4 @@ ertf_document_style_get (Ertf_Document *doc)
   if (!doc)
     return NULL;
   return doc->style;
-}
-
-
-static void
-_ertf_document_generate_pages(Ertf_Document *doc)
-{
-  doc->pages = eina_array_new(10);
 }
