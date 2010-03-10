@@ -59,6 +59,11 @@ ertf_page_render (Ertf_Page *page, Evas_Object *textblock)
     _ertf_document_generate_pages(textblock, page->doc);
   }
   evas_object_textblock_clear(textblock);
+  if (page->page < 0)
+    page->page = 0;
+  if (page->page >= eina_array_count_get(page->doc->pages))
+    page->page = eina_array_count_get(page->doc->pages) - 1;
+  printf("count:%d\n", page->page);
   markup_text = eina_array_data_get(page->doc->pages, page->page);
   evas_object_textblock_text_markup_set(textblock, markup_text);
 }
