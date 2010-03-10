@@ -54,6 +54,9 @@ ertf_document_free(Ertf_Document *doc)
     free(doc->summary);
   }
   EINA_ARRAY_ITER_NEXT(doc->pages, i, page, iterator)
+  {
+    free(page);
+  }
   eina_array_free(doc->pages);
   free(doc);
 }
