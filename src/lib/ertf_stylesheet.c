@@ -261,8 +261,6 @@ _ertf_textblock_style_generate()
 {
   char buf[256] = "";
   Ertf_Font_Node *font;
-  Eina_Array_Iterator iterator;
-  unsigned int i;
 
   font = eina_array_data_get(font_table, _ertf_default_font);  
   sprintf(buf, "DEFAULT='font=%s font_size=12 align=left color=#%02x%02x%02xff wrap=word left_margin=+12 right_margin=+12'", font->family, _ertf_default_color_r, _ertf_default_color_g, _ertf_default_color_b);
@@ -286,9 +284,4 @@ _ertf_textblock_style_generate()
   sprintf(buf, "right='+ align=right left_margin=+12 right_margin=+12'/right='- align=left'");
   eina_strbuf_append(style_buf, buf);
 
-  // for debugging
-  EINA_ARRAY_ITER_NEXT(font_table, i, font, iterator)
-  {
-    printf("%d# %s\n", i, font->name);
-  }
 }

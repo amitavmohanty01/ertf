@@ -137,7 +137,7 @@ _ertf_font_add(FILE *fp)
       }
       else if (strcmp(buf, "fnil") == 0)
       {
-	strcpy(node->family, "default");
+	strcpy(node->family, "Sans");
 	// todo: after the multiple occurence check, the font family checks can
 	// be modified to be done only once and rather have a bitwise check
 	// run each time
