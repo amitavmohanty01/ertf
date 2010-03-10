@@ -2,12 +2,16 @@
 # include <config.h>
 #endif
 
-#include <stdio.h>
+#include <stdlib.h>
+#include <Eina.h>
 
 #include "Ertf.h"
 #include "ertf_page.h"
 #include "ertf_private.h"
 
+
+static void
+_ertf_document_generate_pages(Evas_Object *textblock, Ertf_Document *doc);
 
 Ertf_Page *
 ertf_page_new(const Ertf_Document *doc)
@@ -30,7 +34,6 @@ ertf_page_free(Ertf_Page *page)
   if (!page)
     return;
 
-  free(page->doc);
   free(page);
 }
 
@@ -47,20 +50,95 @@ ertf_page_page_get(Ertf_Page *page)
 }
 
 void 
-ertf_page_render (Ertf_Page *page, Evas *evas)
+ertf_page_render (Ertf_Page *page, Evas_Object *textblock)
 {
-  Evas_Object          *textblock;
-  Evas_Textblock_Style *st;
-  char                 *s;
-  char                 *markup_text;
+  char *markup_text;
 
-  textblock = evas_object_textblock_add(evas);
+  if (eina_array_count_get(page->doc->pages) == 0)
+  {
+    _ertf_document_generate_pages(textblock, page->doc);
+  }
+  evas_object_textblock_clear(textblock);
+  markup_text = eina_array_data_get(page->doc->pages, page->page - 1);
+  evas_object_textblock_text_markup_set(textblock, markup_text);
+}
+
+static void
+_ertf_document_generate_pages(Evas_Object *textblock, Ertf_Document *doc)
+{
+  Evas_Textblock_Style  *st;
+  Evas_Textblock_Cursor *c1;
+  Evas_Textblock_Cursor *c2;
+  char                  *s;
+  int                    line_number;
+  int                    ln;
+  int                    w;
+  int                    h;
+  int                    page = 1;
+  
+  ertf_document_size_get(doc, &w, &h);
   st = evas_textblock_style_new();
-  s = ertf_document_style_get(page->doc);
-  evas_textblock_style_set(st, s);
+  evas_textblock_style_set(st, doc->style);
   evas_object_textblock_style_set(textblock, st);
   evas_textblock_style_free(st);
   evas_object_textblock_clear(textblock);
-  markup_text = eina_array_data_get(page->doc->pages, page->page);
-  evas_object_textblock_text_markup_set(textblock, markup_text);
+  evas_object_textblock_text_markup_set(textblock, doc->markup);
+  evas_object_resize(textblock, w, h);
+  evas_object_show(textblock);
+
+  c1 = evas_object_textblock_cursor_new(textblock);
+  evas_textblock_cursor_node_first(c1);
+
+  while (!evas_textblock_cursor_node_format_get(c1))
+    evas_textblock_cursor_node_next(c1);
+
+  while (!evas_textblock_cursor_node_format_is_visible_get(c1))
+    evas_textblock_cursor_node_next(c1);
+
+  line_number = evas_textblock_cursor_line_geometry_get(c1, NULL, NULL, NULL, NULL);
+  c2 = evas_object_textblock_cursor_new(textblock);
+  line_number = evas_textblock_cursor_line_coord_set(c2, h-1);  
+
+  do
+  {
+    evas_textblock_cursor_char_last(c2);
+
+    if (!evas_textblock_cursor_node_format_get(c2))
+      DBG("no format");
+
+    if (evas_textblock_cursor_node_prev(c2))
+    {
+      while (!evas_textblock_cursor_node_format_is_visible_get(c2))
+	evas_textblock_cursor_node_prev(c2);
+    }
+
+    s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
+    printf("%s\n", s);
+    if (evas_textblock_cursor_node_format_is_visible_get(c2))
+      DBG("visible\n");
+    else
+      DBG("invisible\n");
+    eina_array_push(doc->pages, s);
+    printf("line #%d page #%d\n", line_number, page);
+
+    page++;
+    evas_textblock_cursor_copy(c2, c1);
+    evas_textblock_cursor_char_next(c1);
+    line_number = evas_textblock_cursor_line_coord_set(c2, page * h - 1);
+  } while (evas_textblock_cursor_compare(c1, c2) < 0);
+
+  evas_textblock_cursor_node_last(c2);
+  ln = evas_textblock_cursor_line_geometry_get(c1, NULL,NULL,NULL,NULL);
+
+  if (ln > 0)
+  {
+    s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
+    printf("%s\npage#%d", s, page);
+    eina_array_push(doc->pages, s);
+  }
+
+  evas_textblock_cursor_free(c2);
+  evas_textblock_cursor_free(c1);
+  //free(doc->markup);
+  // causes double free error and core dumps
 }
