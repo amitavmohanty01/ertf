@@ -63,7 +63,6 @@ ertf_page_render (Ertf_Page *page, Evas_Object *textblock)
     page->page = 0;
   if (page->page >= eina_array_count_get(page->doc->pages))
     page->page = eina_array_count_get(page->doc->pages) - 1;
-  printf("count:%d\n", page->page);
   markup_text = eina_array_data_get(page->doc->pages, page->page);
   evas_object_textblock_text_markup_set(textblock, markup_text);
 }
@@ -95,10 +94,10 @@ _ertf_document_generate_pages(Evas_Object *textblock, Ertf_Document *doc)
   evas_textblock_cursor_node_first(c1);
 
   ln = evas_textblock_cursor_line_geometry_get(c1, NULL, NULL, NULL, NULL);
-  printf("%d\n", ln);
+  // printf("%d\n", ln);
   c2 = evas_object_textblock_cursor_new(textblock);
   line_number = evas_textblock_cursor_line_coord_set(c2, h-1);
-  printf("%d\n", line_number);
+  // printf("%d\n", line_number);
 
   do
   {
@@ -122,7 +121,7 @@ _ertf_document_generate_pages(Evas_Object *textblock, Ertf_Document *doc)
       evas_textblock_cursor_node_first(c1);
 
     s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
-    printf("%s\n", s);
+    // printf("%s\n", s);
     if (evas_textblock_cursor_node_format_is_visible_get(c2))
       DBG("visible\n");
     else

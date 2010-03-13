@@ -73,7 +73,6 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* right aligned text */
       else if (strcmp(buf, "rtlch") == 0)
       {
-	// todo: either insert align=right in markup or in a style
 	eina_strbuf_append(markup_buf, "<right>");
 
 	if (!ertf_paragraph_translate(fp, 1))
@@ -87,14 +86,13 @@ ertf_paragraph_translate(FILE *fp, int align)
 	int c;
 	// todo: ensure that </p> is defined in style string
 	eina_strbuf_append(markup_buf, "</p>");
-	// read till end of group
-	while ((c = fgetc(fp)) != EOF && c != '{' && c != '\\')
+	/*while ((c = fgetc(fp)) != EOF && c != '{' && c != '\\')
 	  ;
 	if (feof(fp))
 	  return 0;
 	else
 	  ungetc(c, fp);
-	goto success;
+	  goto success;*/
       }
 
       /* left aligned text */
@@ -383,7 +381,7 @@ ertf_paragraph_translate(FILE *fp, int align)
     }
   }
 
-  ERR("EOF encountered while looping for control word");
+  DBG("EOF encountered while looping for control word");
   return 0;
 
  success:
