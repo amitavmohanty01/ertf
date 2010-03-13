@@ -53,13 +53,14 @@ main(int argc, char *argv[])
     goto shutdown_ertf;
 
   epage = ertf_page_new(doc);
-  // check for null
+  if (!epage)
+    goto free_doc;
 
   if (!ertf_document_filename_set(doc, argv[1]))
-    goto free_doc;
+    goto free_page;
 
   if (!ertf_document_header_get(doc))
-    goto free_doc;
+    goto free_page;
 
 #ifdef USE_DPI
   dpi = ecore_x_dpi_get();
@@ -72,7 +73,7 @@ main(int argc, char *argv[])
   ecore_evas_show(ee);
 
   if (!ertf_document_parse(doc))
-    goto free_doc;
+    goto free_page;
 
   printf ("Filename : %s\n", ertf_document_filename_get(doc));
   printf ("Version  : %d\n", ertf_document_version_get(doc));  
@@ -104,6 +105,8 @@ main(int argc, char *argv[])
 
   return EXIT_SUCCESS;
 
+ free_page:
+  ertf_page_free(epage);
  free_doc:
   ertf_document_free(doc);
  shutdown_ertf:
