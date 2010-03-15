@@ -48,19 +48,13 @@ main(int argc, char *argv[])
 
   evas = ecore_evas_get(ee);
 
-  doc = ertf_document_new();
+  doc = ertf_document_new(argv[1]);
   if (!doc)
     goto shutdown_ertf;
 
   epage = ertf_page_new(doc);
   if (!epage)
     goto free_doc;
-
-  if (!ertf_document_filename_set(doc, argv[1]))
-    goto free_page;
-
-  if (!ertf_document_header_get(doc))
-    goto free_page;
 
 #ifdef USE_DPI
   dpi = ecore_x_dpi_get();
