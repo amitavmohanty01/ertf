@@ -8,27 +8,54 @@
 #include <Evas.h>
 
 #include "ertf_document.h"
-#include "ertf_color.h"
-#include "ertf_font.h"
-#include "ertf_stylesheet.h"
-#include "ertf_private.h"
+#include "ertf_page.h"
 
 
-typedef struct _Smart_Data Smart_Data;
+#define E_SMART_OBJ_GET(smart, o, type) \
+  { \
+    char *_e_smart_str; \
+    \
+    if (!o) return; \
+    \
+    smart = evas_object_smart_data_get(o); \
+    if (!smart) return; \
+    \
+    _e_smart_str = (char *)evas_object_type_get(o); \
+    if (!_e_smart_str) return; \
+    \
+    if (strcmp(_e_smart_str, type)) return; \
+  }
 
-struct _Smart_Data
+#define E_SMART_OBJ_GET_RETURN(smart, o, type, ret) \
+  { \
+    char *_e_smart_str; \
+    \
+    if (!o) return ret; \
+    \
+    smart = evas_object_smart_data_get(o); \
+    if (!smart) return ret; \
+    \
+    _e_smart_str = (char *)evas_object_type_get(o); \
+    if (!_e_smart_str) return ret; \
+    \
+    if (strcmp(_e_smart_str, type)) return ret; \
+  }
+
+#define E_OBJ_NAME "rtf_object"
+
+
+typedef struct _Smart_Rtf Smart_Rtf;
+
+struct _Smart_Rtf
 {
-  char charset[6];
   Evas_Object *obj;
-  Evas_Object *textblock;
-  char *filename;
-  FILE *f;
-  int bracecount;
-  int version;
+
+  Ertf_Document *rtf_document;
+  Ertf_Page *rtf_page;
 };
 
 /* local subsystem functions */
-static void _smart_reconfigure(Smart_Data *sd);
+static void _smart_reconfigure(Smart_Rtf *sd);
 static void _smart_init(void);
 static void _smart_add(Evas_Object *obj);
 static void _smart_del(Evas_Object *obj);
@@ -54,180 +81,93 @@ esmart_rtf_add (Evas *evas)
 Eina_Bool
 esmart_rtf_file_set(Evas_Object *obj, const char *filename)
 {
-  char control_word[30];
-  char        str[5];
-  Smart_Data *sd;
-  int         c;
+  Smart_Rtf *sr;
 
   if (!filename || (*filename == '\0'))
     return EINA_FALSE;
 
-  sd = evas_object_smart_data_get(obj);
-  if (!sd) return EINA_FALSE;
+  E_SMART_OBJ_GET_RETURN (sr, obj, E_OBJ_NAME, 0);
 
-  if ((filename) &&
-      (sd->filename) &&
-      (!strcmp (filename, sd->filename))) return EINA_TRUE;
+  if (sr->rtf_page)
+    ertf_page_free (sr->rtf_page);
+  sr->rtf_page = NULL;
 
-  if (sd->f)
-    fclose(sd->f);
-  sd->f = NULL;
+  if (sr->rtf_document)
+    ertf_document_free (sr->rtf_document);
 
-  if (sd->filename)
-      free(sd->filename);
-
-  sd->filename = strdup(filename);
-  if (!sd->filename)
+  sr->rtf_document = ertf_document_new (filename);
+  if (!sr->rtf_document)
     return EINA_FALSE;
 
-  sd->f = fopen(filename, "rb");
-  if (!sd->f)
-    goto free_filename;
+  ertf_document_parse(sr->rtf_document);
 
-  /* init parser */
-
-  if ((c = getc(sd->f)) == EOF)
-  {
-    // todo:display blank textblock for empty file
-  }
-  else if (c != '{')
-  {
-    // An rtf file should start with `{'
-    goto free_f;
-  }
-  else if (fscanf(sd->f, "%4s", str), strcmp(str, "\\rtf") != 0 )
-  {
-    fprintf(stderr, "esmart_rtf_file_set: rtf version unspecified.\n");
-  }
-  else if ((fscanf(sd->f, "%d\\%c", &sd->version, &str[0]), str[0] != 'a') &&
-	   str[0] != 'p' &&
-	   str[0] != 'm'
-	   )
-  {
-    // todo:improve the if  condition for full word checking
-    fprintf(stderr, "esmart_rtf_file_set: charset not defined\n");
-  }
-  else
-  {
-    //increase brace count
-    sd->bracecount++;
-
-    // store charset
-    ungetc(str[0], sd->f);
-    fscanf(sd->f, "%[^\\{]", sd->charset);
-  }
-
-  /* we parse the entire file */
-
-  //ertf_markup_position = 0;
-  //markup = NULL;
-
-  while ((c = getc(sd->f)) != EOF)
-  {
-    switch (c)
-    {
-    case '{':
-      sd->bracecount++;
-      break;
-    case '}':
-      sd->bracecount--;
-      break;
-    case '\\':
-      fscanf(sd->f, "%[^ {\\;0123456789]", control_word);
-      // Interestingly, a semi-colon delimits the "\colortbl" keyword sometimes
-
-      if (feof(sd->f))
-      {
-          fprintf(stderr, "esmart_rtf_file_set: EOF encountered.\n");
-          goto free_f;
-      }
-
-      /* font table */
-      if (strcmp(control_word, "fonttbl") == 0)
-      {
-	if (ertf_font_table(sd->f))
-        {
-	  printf("Successfully created font table.\n");
-	  sd->bracecount--;
-	}
-        else
-	  printf("failure in creating font table.\n");
-
-	/* color table */
-      }
-      else if (strcmp(control_word, "colortbl") == 0)
-      {
-	if (ertf_color_table(sd->f))
-        {
-	  printf("Successfully created color table.\n");
-	  sd->bracecount--;
-	}
-        else
-	  printf("failure in creating color table.\n");
-
-	/* stylesheet */
-      }
-      else if (strcmp(control_word, "stylesheet") == 0)
-      {
-	if (ertf_stylesheet_parse(sd->f))
-        {
-	  printf("Successfully created stylesheet table.\n");
-	  sd->bracecount--;
-	}
-        else
-	  printf("failure in creating stylesheet table.\n");
-      }
-
-      /* paragraph */
-      else if (strcmp(control_word, "pard") == 0)
-      {
-	ertf_markup_add("<p>", 3);
-	if (ertf_paragraph_translate(sd->f, 0))
-        {
-	  printf("Successfully parsed a paragraph.\n");
-	}
-        else
-	  printf("failure parsing parapgraph.\n");
-      }
-
-      break;
-
-    default:
-      fprintf(stderr, "readloop: skipped control char `%c'\n", c);
-    }
-  }
-
-  //markup[ertf_markup_position] = '\0';
-  printf("%d\nmarkup:\n%s\n", eina_strbuf_length_get(markup_buf), eina_strbuf_string_get(markup_buf));
-  // When end-of-file is reached, check if  parsing is complete. In case,
-  // it is not, print an error message stating "incomplete rtf file".
-  if (sd->bracecount)
-    fprintf(stderr, "esmart_rtf_file_set: Ill-formed rtf - inconsistent use of braces.\n");
-
-  evas_object_textblock_text_markup_set(sd->textblock, eina_strbuf_string_get(markup_buf));
+  sr->rtf_page = ertf_page_new (sr->rtf_document);
 
   return EINA_TRUE;
-
- free_f:
-  fprintf(stderr, "esmart_rtf_file_set: invalid rtf file\n");
-  fclose(sd->f);
-  sd->f = NULL;
- free_filename:
-  free(sd->filename);
-  sd->filename = NULL;
-
-  return EINA_FALSE;
 }
 
 const char *
 esmart_rtf_file_get(Evas_Object *obj)
 {
-  Smart_Data *sd;
+  Smart_Rtf *sr;
 
-  sd = evas_object_smart_data_get(obj);
-  if (!sd) return NULL;
+  E_SMART_OBJ_GET_RETURN (sr, obj, E_OBJ_NAME, NULL);
 
-  return sd->filename;
+  return ertf_document_filename_get(sr->rtf_document);
+}
+
+void
+esmart_rtf_page_set (Evas_Object *obj, int page)
+{
+  Smart_Rtf *sr;
+
+  E_SMART_OBJ_GET(sr, obj, E_OBJ_NAME);
+
+  ertf_page_page_set (sr->rtf_page, page);
+}
+
+int
+esmart_rtf_page_get(Evas_Object *obj)
+{
+  Smart_Rtf *sr;
+
+  E_SMART_OBJ_GET_RETURN(sr, obj, E_OBJ_NAME, 0);
+
+  return ertf_page_page_get (sr->rtf_page);
+}
+
+void
+esmart_rtf_size_get(Evas_Object *obj, int *width, int *height)
+{
+  Smart_Rtf *sr;
+
+  E_SMART_OBJ_GET(sr, obj, E_OBJ_NAME);
+
+   if (!sr)
+   {
+      if (width) *width = 0;
+      if (height) *height = 0;
+      return;
+   }
+
+   ertf_document_size_get (sr->rtf_document, width, height);
+}
+
+void
+esmart_rtf_render (Evas_Object *obj)
+{
+  Smart_Rtf *sr;
+  int width;
+  int height;
+
+  E_SMART_OBJ_GET (sr, obj, E_OBJ_NAME);
+
+  if (sr->rtf_document && sr->rtf_page && sr->obj)
+    {
+      ertf_document_size_get(sr->rtf_document, &width, &height);
+      ertf_page_render (sr->rtf_page, sr->obj);
+      evas_object_resize (sr->obj, width, height);
+    }
 }
 
 
@@ -240,7 +180,7 @@ _smart_init(void)
 
   printf ("%s\n", __FUNCTION__);
   static const Evas_Smart_Class sc = {
-    "ertf",
+    E_OBJ_NAME,
     EVAS_SMART_CLASS_VERSION,
     _smart_add,
     _smart_del,
@@ -262,163 +202,108 @@ _smart_init(void)
 static void
 _smart_add(Evas_Object *obj)
 {
-  Smart_Data           *sd;
+  Smart_Rtf            *sr;
   Evas                 *evas;
   Evas_Textblock_Style *st;
 
-  sd = calloc(1, sizeof(Smart_Data));
-  if (!sd) return;
+  sr = calloc(1, sizeof(Smart_Rtf));
+  if (!sr) return;
 
   evas = evas_object_evas_get(obj);
-  sd->obj = evas_object_rectangle_add(evas);
-  evas_object_color_set(sd->obj, 255, 255, 255, 255);
-  sd->textblock = evas_object_textblock_add(evas);
-  sd->filename = NULL;
-  sd->f = NULL;
-  sd->bracecount = 0;
-  sd->version = 0;
-  evas_object_smart_member_add(sd->obj, obj);
-  evas_object_smart_data_set(obj, sd);
-
-  st = evas_textblock_style_new();
-  evas_textblock_style_set(st,
-                           "DEFAULT='font=Vera,Kochi font_size=8 align=left color=#000000 wrap=word left_margin=+12 right_margin=+12'"
-                           "center='+ font=Vera,Kochi font_size=10 align=center'"
-                           "/center='- \n'"
-                           "right='+ font=Vera,Kochi font_size=10 align=right'"
-                           "/right='- \n'"
-                           "blockquote='+ left_margin=+24 right_margin=+24 font=Vera,Kochi font_size=10 align=left'"
-                           "h1='+ font_size=20'"
-                           "red='+ color=#ff0000'"
-                           "p='+ font=Vera,Kochi font_size=10 align=left left_margin=+12 right_margin=+12'"
-                           "/p='- \n'"
-                           "br='\n'"
-                           "tab='\t'");
-  evas_object_textblock_style_set(sd->textblock, st);
-  evas_textblock_style_free(st);
-  evas_object_textblock_clear(sd->textblock);
+  sr->obj = evas_object_textblock_add(evas);
+  evas_object_smart_member_add(sr->obj, obj);
+  evas_object_smart_data_set(obj, sr);
 }
 
 static void
 _smart_del(Evas_Object *obj)
 {
-  Smart_Data         *sd;
+  Smart_Rtf         *sr;
   Eina_Array_Iterator iterator;
   unsigned int        i;
 
-  sd = evas_object_smart_data_get(obj);
-  if (!sd) return;
+  sr = evas_object_smart_data_get(obj);
+  if (!sr) return;
 
-  if (color_table)
-  {
-    Ertf_Color         *color;
+  if (sr->rtf_document)
+    ertf_document_free (sr->rtf_document);
+  if (sr->rtf_page)
+    ertf_page_free (sr->rtf_page);
 
-    EINA_ARRAY_ITER_NEXT(color_table, i, color, iterator)
-      free(color);
-    eina_array_free(color_table);
-  }
+  ertf_shutdown();
 
-  if (font_table)
-  {
-    Ertf_Font_Node     *font;
-
-    EINA_ARRAY_ITER_NEXT(font_table, i, font, iterator)
-      free(font);
-    eina_array_free(font_table);
-  }
-
-  if (stylesheet_table)
-  {
-    Ertf_Stylesheet    *stylesheet;
-
-    EINA_ARRAY_ITER_NEXT(stylesheet_table, i, stylesheet, iterator)
-      free(stylesheet);
-    eina_array_free(stylesheet_table);
-  }
-
-  if (sd->filename)
-    free(sd->filename);
-  if (sd->f)
-    fclose(sd->f);
-  evas_object_del(sd->obj);
-  free(sd);
+  free(sr);
 }
 
 static void
 _smart_move(Evas_Object *obj, Evas_Coord x, Evas_Coord y)
 {
-  Smart_Data *sd;
+  Smart_Rtf *sr;
 
-  sd = evas_object_smart_data_get(obj);
-  if (!sd) return;
+  sr = evas_object_smart_data_get(obj);
+  if (!sr) return;
 
-  evas_object_move (sd->obj, x, y);
-  evas_object_move (sd->textblock, x, y);
+  evas_object_move (sr->obj, x, y);
 }
 
 static void
 _smart_resize(Evas_Object *obj, Evas_Coord w, Evas_Coord h)
 {
-  Smart_Data *sd;
+  Smart_Rtf *sr;
 
-  sd = evas_object_smart_data_get(obj);
-  if (!sd) return;
+  sr = evas_object_smart_data_get(obj);
+  if (!sr) return;
 
-  //   if ((sd->w == w) && (sd->h == h)) return;
-  evas_object_resize (sd->obj, w, h);
-  evas_object_resize (sd->textblock, w, h);
+  //   if ((sr->w == w) && (sr->h == h)) return;
+  evas_object_resize (sr->obj, w, h);
 }
 
 static void
 _smart_show(Evas_Object *obj)
 {
-  Smart_Data *sd;
+  Smart_Rtf *sr;
 
-  sd = evas_object_smart_data_get(obj);
-  if (!sd) return;
-  evas_object_show(sd->obj);
-  evas_object_show(sd->textblock);
+  sr = evas_object_smart_data_get(obj);
+  if (!sr) return;
+  evas_object_show(sr->obj);
 }
 
 static void
 _smart_hide(Evas_Object *obj)
 {
-  Smart_Data *sd;
+  Smart_Rtf *sr;
 
-  sd = evas_object_smart_data_get(obj);
-  if (!sd) return;
-  evas_object_hide(sd->obj);
-  evas_object_hide(sd->textblock);
+  sr = evas_object_smart_data_get(obj);
+  if (!sr) return;
+  evas_object_hide(sr->obj);
 }
 
 static void
 _smart_color_set(Evas_Object *obj, int r, int g, int b, int a)
 {
-  Smart_Data *sd;
+  Smart_Rtf *sr;
 
-  sd = evas_object_smart_data_get(obj);
-  if (!sd) return;
-  evas_object_color_set(sd->obj, r, g, b, a);
+  sr = evas_object_smart_data_get(obj);
+  if (!sr) return;
+  evas_object_color_set(sr->obj, r, g, b, a);
 }
 
 static void
 _smart_clip_set(Evas_Object *obj, Evas_Object * clip)
 {
-  Smart_Data *sd;
+  Smart_Rtf *sr;
 
-  sd = evas_object_smart_data_get(obj);
-  if (!sd) return;
-  evas_object_clip_set(sd->obj, clip);
-  evas_object_clip_set(sd->textblock, clip);
+  sr = evas_object_smart_data_get(obj);
+  if (!sr) return;
+  evas_object_clip_set(sr->obj, clip);
 }
 
 static void
 _smart_clip_unset(Evas_Object *obj)
 {
-  Smart_Data *sd;
+  Smart_Rtf *sr;
 
-  sd = evas_object_smart_data_get(obj);
-  if (!sd) return;
-  evas_object_clip_unset(sd->obj);
-  evas_object_clip_unset(sd->textblock);
+  sr = evas_object_smart_data_get(obj);
+  if (!sr) return;
+  evas_object_clip_unset(sr->obj);
 }

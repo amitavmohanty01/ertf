@@ -15,106 +15,29 @@
 #include "ertf_private.h"
 
 Ertf_Document *
-ertf_document_new(void)
+ertf_document_new(const char *filename)
 {
   Ertf_Document *doc;
+  char str[5];
+  int  c;
+
+  if (!filename || (*filename == '\0'))
+    return NULL;
 
   doc = (Ertf_Document *)calloc(1, sizeof(Ertf_Document));
   if (!doc)
     return NULL;
 
-  doc->pages = eina_array_new(10);
-
-  doc->version = -1;
-
-  return doc;
-}
-
-void
-ertf_document_free(Ertf_Document *doc)
-{
-  unsigned int        i;
-  Eina_Array_Iterator iterator;
-  char               *page;
-
-  if (!doc)
-    return;
-
-  if (doc->stream)
-    fclose(doc->stream);
-  if (doc->filename)
-    free(doc->filename);
-  if (doc->markup)
-    free(doc->markup);
-  if (doc->style)
-    free(doc->style);
-  if (doc->summary)
-  {
-    free(doc->summary->author);
-    free(doc->summary);
-  }
-  EINA_ARRAY_ITER_NEXT(doc->pages, i, page, iterator)
-  {
-    free(page);
-  }
-  eina_array_free(doc->pages);
-  free(doc);
-}
-
-int
-ertf_document_filename_set(Ertf_Document *doc, const char *filename)
-{
-  if (!doc || !filename || (*filename == '\0'))
-    return 0;
-
-  if ((doc->filename) &&
-      (!strcmp (filename, doc->filename)))
-    return 1;
-
-  if (doc->filename)
-  {
-    free(doc->filename);
-    doc->filename = NULL;
-  }
-  if (doc->stream)
-  {
-    fclose(doc->stream);
-    doc->stream = NULL;
-  }
-
   doc->filename = strdup(filename);
   if (!doc->filename)
-    return 0;
+    goto free_doc;
 
   doc->stream = fopen(doc->filename, "rb");
   if (!doc->stream)
   {
-    free(doc->filename);
-    doc->filename = NULL;
     ERR("error opening file");
-    return 0;
+    goto free_filename;
   }
-
-  return 1;
-}
-
-const char *
-ertf_document_filename_get(Ertf_Document *doc)
-{
-  if (!doc)
-    return NULL;
-
-  return doc->filename;
-}
-
-int
-ertf_document_header_get(Ertf_Document *doc)
-{
-  char str[5];
-  int  c;
-
-  if (!doc || !doc->stream)
-    return 0;
 
   while ((c = getc(doc->stream)) != EOF)
   {
@@ -125,7 +48,7 @@ ertf_document_header_get(Ertf_Document *doc)
       if (doc->bracecount)
       {
 	ungetc(c, doc->stream);
-	return 1;
+	goto create_array;
       }
       else
 	doc->bracecount++;
@@ -135,7 +58,7 @@ ertf_document_header_get(Ertf_Document *doc)
       if(ertf_tag_get(doc->stream, tag))
       {
 	ERR("encountered EOF while reading control tag");
-	return 0;
+	goto close_stream;
       }
       if (strcmp(tag, "rtf") == 0)
 	fscanf(doc->stream, "%d", &doc->version);
@@ -173,7 +96,65 @@ ertf_document_header_get(Ertf_Document *doc)
     }
   }
   ERR("encountered EOF while parsing header.\n");
-  return 0;
+  goto close_stream;
+
+ create_array:
+  doc->pages = eina_array_new(10);
+  if (!doc->pages)
+    goto close_stream;
+
+  doc->version = -1;
+
+  return doc;
+
+ close_stream:
+  fclose(doc->stream);
+ free_filename:
+  free(doc->filename);
+ free_doc:
+  free(doc);
+
+  return NULL;
+}
+
+void
+ertf_document_free(Ertf_Document *doc)
+{
+  unsigned int        i;
+  Eina_Array_Iterator iterator;
+  char               *page;
+
+  if (!doc)
+    return;
+
+  if (doc->stream)
+    fclose(doc->stream);
+  if (doc->filename)
+    free(doc->filename);
+  if (doc->markup)
+    free(doc->markup);
+  if (doc->style)
+    free(doc->style);
+  if (doc->summary)
+  {
+    free(doc->summary->author);
+    free(doc->summary);
+  }
+  EINA_ARRAY_ITER_NEXT(doc->pages, i, page, iterator)
+  {
+    free(page);
+  }
+  eina_array_free(doc->pages);
+  free(doc);
+}
+
+const char *
+ertf_document_filename_get(Ertf_Document *doc)
+{
+  if (!doc)
+    return NULL;
+
+  return doc->filename;
 }
 
 int
@@ -339,6 +320,15 @@ ertf_document_parse(Ertf_Document *doc)
     WARN("Ill-formed rtf - inconsistent use of braces");
 
   return 1;
+}
+
+int
+ertf_document_page_count_get (const Ertf_Document *document)
+{
+  if (!document)
+    return 0;
+
+  return eina_array_count_get(document->pages);
 }
 
 int
