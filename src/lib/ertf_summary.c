@@ -82,15 +82,15 @@ ertf_summary(Ertf_Document *doc)
   doc->summary = NULL;
   return 0;
 }
+
 /*
  * This function reads each summary group till the end brace (including it).
  */
 static int
 _ertf_resolve_control_word(Ertf_Document *doc)
 {
-  // keeping it a multiple of four
-  char control_word[20];
-  int c;
+  char  control_word[20];
+  int   c;
   FILE *fp;
 
   fp = doc->stream;
@@ -130,8 +130,30 @@ _ertf_resolve_control_word(Ertf_Document *doc)
   case 'h':// \hr
   case 'i':// \id
   case 'k':// \keywords
-  case 'm':// \mo, \\min
+  case 'm':// \mo, \min
   case 'n':// \nofpages, \nofwords, \nofchars
+    if (strcmp(control_word + 1, "ofpages") == 0)
+    {
+      fscanf(fp, "%d", &doc->summary->pages);
+      CHECK_EOF(fp, "EOF encountered while reading number of pages", return 0);
+      return 1;
+    }
+    else if (strcmp(control_word + 1, "ofwords") == 0)
+    {
+      fscanf(fp, "%ld", &doc->summary->words);
+      CHECK_EOF(fp, "EOF encountered while reading number of words", return 0);
+      return 1;
+    }
+    else if (strcmp(control_word + 1, "ofchars") == 0)
+    {
+      fscanf(fp, "%ld", &doc->summary->chars);
+      CHECK_EOF(fp, "EOF encountered while reading number of characters", return 0);
+      return 1;
+    }
+    else
+      goto skip;
+  break;
+
   case 'o':// \operator
   case 'p':// \printim
   case 'r':// \revtim
@@ -153,6 +175,7 @@ _ertf_resolve_control_word(Ertf_Document *doc)
     else
       goto skip;
   break;
+
   case 'y':// \yr
     if (strcmp(control_word + 1, "r") == 0)
     {
@@ -163,7 +186,7 @@ _ertf_resolve_control_word(Ertf_Document *doc)
     {
       goto skip;
     }
-    //default: skip invaid tag
+    //default: skip invalid tag
   }
 
  skip:

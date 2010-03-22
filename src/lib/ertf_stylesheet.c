@@ -55,18 +55,12 @@ int ertf_stylesheet_parse(FILE *fp)
       _ertf_textblock_style_generate();
       return 1;// successful return
 
+    case '\n':
     case '\r':
-      break;
-
-    case '\n':// todo: check whether newline character is a valid delimiter?
-      // the spec doesn't mention so as far as I know.
-      // The issue came up during debugging and I am just skipping it as of now.
-      // Seeing the rtf file, that is what I interpret it to be.
+      _line++;
       break;
 
     default:
-      if (c == '\n' || c == '\r')
-	_line++;
       DBG("invalid character `%c'", c);
       return 0;
     }
