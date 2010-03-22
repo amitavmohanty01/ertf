@@ -39,6 +39,8 @@ ertf_document_new(const char *filename)
     goto free_filename;
   }
 
+  doc->bracecount = 0;
+
   while ((c = getc(doc->stream)) != EOF)
   {
     switch (c)
@@ -89,6 +91,7 @@ ertf_document_new(const char *filename)
 	DBG("unrecognised control tag %s", tag);
       }
       break;
+
     default:
       if (c == '\n' || c == '\r')
 	_line++;
@@ -375,20 +378,4 @@ ertf_document_margin_get(Ertf_Document *doc, int *left, int *right, int *top, in
     *top = (int) ceilf(_ertf_margin_top / 1440.0f * _twip_scale_factor);
   if (bottom)
     *bottom = (int) ceilf(_ertf_margin_bottom / 1440.0f * _twip_scale_factor);
-}
-
-char *
-ertf_document_markup_get(Ertf_Document *doc)
-{
-  if (!doc)
-    return NULL;
-  return doc->markup;
-}
-
-char *
-ertf_document_style_get (Ertf_Document *doc)
-{
-  if (!doc)
-    return NULL;
-  return doc->style;
 }

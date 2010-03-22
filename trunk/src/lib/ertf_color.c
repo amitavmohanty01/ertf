@@ -72,6 +72,8 @@ ertf_color_table(FILE *fp)
       return 1;
 
     default:
+      if (c == '\n' || c == '\r')
+	_line++;
       DBG("skipping control character `%c'", c);      
     }
   }

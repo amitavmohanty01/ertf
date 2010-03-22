@@ -33,9 +33,7 @@ ertf_paragraph_translate(FILE *fp, int align)
   {
     switch(c)
     {
-      /* get control word */
     case '\\':
-      /* handle special characters */
       if ((c = getc(fp)) == '\\' || c == '{' || c == '}' || c == '\'')
       {
 	/* handle 8-bit characters */
@@ -50,9 +48,15 @@ ertf_paragraph_translate(FILE *fp, int align)
 	eina_strbuf_append_char(markup_buf, c);
 	break;
       }
+      else if (c == '\r' || c == '\n')
+      {
+	eina_strbuf_append(markup_buf, "</p>");
+	//goto success;
+      }
       else
 	ungetc(c, fp);
-      
+     
+      /* get control word */ 
       fscanf(fp, "%[^ 0123456789;\\{}\n\r]", buf);
       CHECK_EOF(fp, "EOF encountered while retrieving control word", return 0);
 
@@ -71,7 +75,7 @@ ertf_paragraph_translate(FILE *fp, int align)
       }
 
       /* right aligned text */
-      else if (strcmp(buf, "rtlch") == 0)
+      else if (strcmp(buf, "qr") == 0)
       {
 	eina_strbuf_append(markup_buf, "<right>");
 
@@ -83,22 +87,31 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* end of paragraph */
       else if (strcmp(buf, "par") == 0)
       {
-	int c;
-	// todo: ensure that </p> is defined in style string
+	// int c;
 	eina_strbuf_append(markup_buf, "</p>");
 	/*while ((c = fgetc(fp)) != EOF && c != '{' && c != '\\')
 	  ;
 	if (feof(fp))
 	  return 0;
 	else
-	  ungetc(c, fp);
-	  goto success;*/
+	ungetc(c, fp);*/
+	//goto success;
       }
 
       /* left aligned text */
-      else if (strcmp(buf, "ltrch") == 0 && align == 1)
+      else if (strcmp(buf, "ql") == 0 && align == 1)
       {
 	goto success;
+      }
+
+      /* centre aligned text */
+      else if (strcmp(buf, "qc") == 0)
+      {
+      }
+
+      /* justified text */
+      else if (strcmp(buf, "qj") == 0)
+      {
       }
 
       /* italicized text */
@@ -374,6 +387,14 @@ ertf_paragraph_translate(FILE *fp, int align)
 	// for debugging
 	_line++;
       }
+      else if (c == '&')
+      {
+	eina_strbuf_append(markup_buf, "&amp;");
+      }
+      else if (c == '<')
+	eina_strbuf_append(markup_buf, "&lt;");
+      else if (c == '>')
+	eina_strbuf_append(markup_buf, "&gt;");
       else
       {
 	eina_strbuf_append_char(markup_buf, c);
