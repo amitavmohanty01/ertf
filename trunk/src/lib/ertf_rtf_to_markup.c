@@ -344,11 +344,9 @@ ertf_paragraph_translate(FILE *fp, int align)
       /* handle target */
       else if (strcmp(buf, "*") == 0)
       {
-	/* They not supported in the prototype. */
-	while ((c = fgetc(fp)) != EOF && c != '}')
-	  ;
-	CHECK_EOF(fp, "EOF reached while handling unsupported target", return 0);
-	ungetc(c, fp);
+	/* They not supported currently. */
+	ertf_group_skip(fp);
+	ungetc('}', fp);
       }
 
       /* unsupported or unrecognised control tag */

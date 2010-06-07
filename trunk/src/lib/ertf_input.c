@@ -10,9 +10,6 @@
 #include "ertf_private.h"
 
 
-/* The indicator to current location shall be maintained by the accessing*/
-/* programs. */
-
 int
 ertf_tag_get(FILE *fp, char *s)
 {
@@ -39,6 +36,8 @@ ertf_group_skip(FILE *fp)
       else
 	return 0; // success
     }
+    else if (c == '\n' || c == '\r')
+      _line++;
     else
       ; // skip
   }

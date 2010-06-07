@@ -83,10 +83,6 @@ main(int argc, char *argv[])
   ecore_evas_resize(ee, w, h);
   ecore_evas_show(ee);
 
-  //if (!ertf_document_parse(doc))
-  // goto free_page;
-  // postpone the check until thread termination.
-
   printf ("Filename : %s\n", ertf_document_filename_get(doc));
   printf ("Version  : %d\n", ertf_document_version_get(doc));  
 
