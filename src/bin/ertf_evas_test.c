@@ -96,7 +96,6 @@ main(int argc, char *argv[])
   ertf_document_free(doc);
   ertf_shutdown();
   ecore_evas_shutdown();
-  ecore_x_shutdown();
 
   return EXIT_SUCCESS;
 
@@ -108,7 +107,6 @@ main(int argc, char *argv[])
   ertf_shutdown();
  shutdown_ecore_evas:
   ecore_evas_shutdown();
-  ecore_x_shutdown();
  
   return EXIT_FAILURE;
 }
