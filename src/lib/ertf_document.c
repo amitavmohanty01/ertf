@@ -12,6 +12,9 @@
 #include "ertf_document.h"
 #include "ertf_summary.h"
 #include "ertf_input.h"
+#include "ertf_color.h"
+#include "ertf_font.h"
+#include "ertf_stylesheet.h"
 #include "ertf_private.h"
 
 Ertf_Document *
@@ -226,11 +229,11 @@ ertf_document_parse(Ertf_Document *doc)
       /* paragraph */
       else if (strcmp(control_word, "pard") == 0)
       {
-	int c;
-	while ((c = fgetc(doc->stream)) != EOF || c != '}')
+	int cc;
+	while ((cc = fgetc(doc->stream)) != EOF || cc != '}')
 	{
 	  eina_strbuf_append(markup_buf, "<p>");
-	  ungetc(c, doc->stream);
+	  ungetc(cc, doc->stream);
 	  if (ertf_paragraph_translate(doc->stream, 0))
 	  {
 	    DBG("Successfully parsed a paragraph");
