@@ -58,10 +58,10 @@ EFL_CHECK_DOXYGEN()
 
 ### Checks for libraries
 
-PKG_CHECK_MODULES([ERTF], [evas eina-0])
+PKG_CHECK_MODULES([ERTF], [evas >= 1.0.0 eina >= 1.0.0])
 PKG_CHECK_MODULES([ECORE_EVAS], [ecore-evas])
 
-requirement_ertf="evas eina-0"
+requirement_ertf="evas eina"
 
 ### Checks for header files
 
