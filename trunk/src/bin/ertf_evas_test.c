@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Ecore.h>
 #include <Ecore_Evas.h>
 
 #include "Ertf.h"
