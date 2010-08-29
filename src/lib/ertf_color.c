@@ -95,7 +95,7 @@ static int
 _ertf_color_add(FILE *fp)
 {
   char color[7];
-  int index;
+  int idx;
   int set = 0;
   Ertf_Color *node;
   int c;
@@ -120,22 +120,22 @@ _ertf_color_add(FILE *fp)
 	goto err;
       }
 
-      fscanf(fp, "%d", &index);
+      fscanf(fp, "%d", &idx);
       // todo: do error checking for range of rgb value
       if (feof(fp)) goto err;
 
       if (strcmp(color, "green") == 0)
       {
 	if (!(set & GREEN))
-	  node->g = index;
+	  node->g = idx;
 	else
 	  WARN("multiple values for same color");
       }
       else if (strcmp(color, "red") == 0)
-	node->r = index;
+	node->r = idx;
       // todo: add set/unset check as above
       else if (strcmp(color, "blue") == 0)
-	node->b = index;
+	node->b = idx;
       // todo: add set/unset check as above
       else
 	// continue as the tag is not recognised and should be therefore skipped
