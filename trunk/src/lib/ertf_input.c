@@ -39,7 +39,7 @@ ertf_group_skip(FILE *fp)
     else if (c == '\n' || c == '\r')
       _line++;
     else
-      ; // skip
+      {} // skip
   }
   return 1; // error
 }
