@@ -5,6 +5,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([1.6 dist-bzip2])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_LIBTOOL_WIN32_DLL
 define([AC_LIBTOOL_LANG_CXX_CONFIG], [:])dnl
@@ -75,6 +76,10 @@ requirement_ertf="evas eina"
 ### Checks for compiler characteristics
 
 AM_PROG_CC_C_O
+
+EFL_COMPILER_FLAG([-Wall])
+EFL_COMPILER_FLAG([-W])
+EFL_COMPILER_FLAG([-Wshadow])
 
 
 ### Checks for linker characteristics
