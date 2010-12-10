@@ -104,18 +104,17 @@ _ertf_document_generate_pages(Evas_Object *textblock, Ertf_Document *doc)
   do
   {
     evas_textblock_cursor_line_coord_set(c2, page * h - 1);
+    evas_textblock_cursor_line_char_last(c2);
     s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
     eina_array_push(doc->pages, s);
 
     page++;
     evas_textblock_cursor_copy(c2, c1);
-    evas_textblock_cursor_char_next(c1);
+    evas_textblock_cursor_char_next(c1);    
   } while (evas_textblock_cursor_compare(c1, c2) < 0);
 
   evas_textblock_cursor_paragraph_last(c2);
-  ln = evas_textblock_cursor_line_geometry_get(c1, NULL,NULL,NULL,NULL);
-
-  if (ln > 0)
+  if (evas_textblock_cursor_compare(c1, c2) < 0)
   {
     s = evas_textblock_cursor_range_text_get(c1, c2, EVAS_TEXTBLOCK_TEXT_MARKUP);
     eina_array_push(doc->pages, s);
