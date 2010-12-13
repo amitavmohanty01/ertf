@@ -88,7 +88,7 @@ ertf_paragraph_translate(FILE *fp, int align)
       else if (strcmp(buf, "par") == 0)
       {
 	// int c;
-	eina_strbuf_append(markup_buf, "</p>");
+	eina_strbuf_append(markup_buf, "</p><ps>");
 	/*while ((c = fgetc(fp)) != EOF && c != '{' && c != '\\')
 	  ;
 	if (feof(fp))

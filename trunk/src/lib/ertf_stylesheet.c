@@ -271,7 +271,7 @@ _ertf_textblock_style_generate()
   eina_strbuf_append(style_buf, buf);
   sprintf(buf, "tab='\t'");
   eina_strbuf_append(style_buf, buf);
-  sprintf(buf, "p='+ font=%s font_size=12 align=left wrap=word left_margin=+12 right_margin=+12'/p='- \n'", font->family);
+  sprintf(buf, "p='+ font=%s font_size=12 align=left wrap=word left_margin=+12 right_margin=+12'/p='-'", font->family);
   eina_strbuf_append(style_buf, buf);
   sprintf(buf, "center='+ font=%s font_size=12 align=center'/center='- \n'", font->family);
   eina_strbuf_append(style_buf, buf);
