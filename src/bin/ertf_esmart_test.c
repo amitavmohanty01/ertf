@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 
 #include <Ecore_Evas.h>
 
@@ -21,9 +20,9 @@ main(int argc, char *argv[])
   Ecore_Evas           *ee;
   Evas                 *evas;
   Evas_Object          *o;
-  Evas_Object *bg;
-  char        *filename;
-  int          page_number;
+  Evas_Object          *bg;
+  char                 *filename;
+  int                   page_number;
   int                   w, h, dpi;
 
   if (argc < 3)
@@ -58,13 +57,13 @@ main(int argc, char *argv[])
   o = esmart_rtf_add(evas);
 
   if (!esmart_rtf_file_set (o, filename)) {
-    printf ("1\n");
+    //printf ("1\n");
     evas_object_del (o);
     ecore_evas_shutdown ();
     return EXIT_FAILURE;
   }
 
-  printf ("2\n");
+  //printf ("2\n");
   esmart_rtf_page_set(o, page_number);
   esmart_rtf_render (o);
   evas_object_move (o, 0, 0);

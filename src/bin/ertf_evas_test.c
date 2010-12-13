@@ -1,7 +1,5 @@
 #include <stdlib.h>
-#include <math.h>
 #include <stdio.h>
-#include <string.h>
 
 #include <Ecore.h>
 #include <Ecore_Evas.h>
@@ -22,7 +20,6 @@ main(int argc, char *argv[])
   Evas                  *evas;
   Evas_Object           *textblock;
   Evas_Object           *background;
-  Evas_Textblock_Style  *st;
   Ertf_Document         *doc;
   Ertf_Page             *epage;
   int                    w, h, dpi;
@@ -90,8 +87,9 @@ main(int argc, char *argv[])
   evas_object_resize(textblock, w, h);
   evas_object_show(textblock);
 
-  ecore_main_loop_begin ();
+  //ecore_main_loop_begin ();
 
+  evas_object_del(textblock);
   ertf_page_free(epage);
   ertf_document_free(doc);
   ertf_shutdown();

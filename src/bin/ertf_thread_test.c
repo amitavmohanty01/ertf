@@ -1,9 +1,8 @@
 #include <stdlib.h>
-#include <math.h>
 #include <stdio.h>
-#include <string.h>
 #include <pthread.h>
 
+#include <Ecore.h>
 #include <Ecore_Evas.h>
 
 #include "Ertf.h"
@@ -15,7 +14,7 @@ _ertf_cb_delete (Ecore_Evas *ee)
   ecore_main_loop_quit();
 }
 
-static void *
+/*static void *
 _ertf_parse(void *arg)
 {
   Ertf_Document *document;
@@ -24,7 +23,7 @@ _ertf_parse(void *arg)
   document = (Ertf_Document *)arg;
   return_value = ertf_document_parse(document);
   return &return_value;
-}
+  }*/
 
 int
 main(int argc, char *argv[])
@@ -33,7 +32,6 @@ main(int argc, char *argv[])
   Evas                  *evas;
   Evas_Object           *textblock;
   Evas_Object           *background;
-  Evas_Textblock_Style  *st;
   Ertf_Document         *doc;
   Ertf_Page             *epage;
   int                    w, h, dpi;
@@ -62,7 +60,7 @@ main(int argc, char *argv[])
     goto shutdown_ertf;
 
   /* create a separate thread for parsing once a document object is successfully created*/
-  pthread_create(&thread_ID, NULL, _ertf_parse, doc);
+  pthread_create(&thread_ID, NULL, ertf_document_parse, doc);
 
   ecore_evas_title_set(ee, "Ertf Evas test"); 
   ecore_evas_callback_delete_request_set(ee, _ertf_cb_delete);
@@ -112,13 +110,12 @@ main(int argc, char *argv[])
   ertf_page_render(epage, textblock);
   evas_object_show(textblock);
 
-  ecore_main_loop_begin ();
+  //ecore_main_loop_begin ();
 
   ertf_page_free(epage);
   ertf_document_free(doc);
   ertf_shutdown();
   ecore_evas_shutdown();
-  ecore_x_shutdown();
 
   return EXIT_SUCCESS;
 
@@ -130,7 +127,6 @@ main(int argc, char *argv[])
   ertf_shutdown();
  shutdown_ecore_evas:
   ecore_evas_shutdown();
-  ecore_x_shutdown();
  
   return EXIT_FAILURE;
 }
