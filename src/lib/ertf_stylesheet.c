@@ -277,5 +277,6 @@ _ertf_textblock_style_generate()
   eina_strbuf_append(style_buf, buf);
   sprintf(buf, "right='+ align=right left_margin=+12 right_margin=+12'/right='- align=left'");
   eina_strbuf_append(style_buf, buf);
-
+  sprintf(buf, "ps='ps'");
+  eina_strbuf_append(style_buf, buf);
 }
