@@ -110,7 +110,7 @@ main(int argc, char *argv[])
   ertf_page_render(epage, textblock);
   evas_object_show(textblock);
 
-  //ecore_main_loop_begin ();
+  ecore_main_loop_begin ();
 
   ertf_page_free(epage);
   ertf_document_free(doc);
